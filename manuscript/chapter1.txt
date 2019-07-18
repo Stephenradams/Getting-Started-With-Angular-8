@@ -28,3 +28,49 @@ If you ever wanted to build an email client, you can in Angular. There is alread
 You can also build desktop applications in Angular. Working along with Electron *(Electron | Build cross-platform desktop apps with JavaScript, HTML, and CSS)*, the Node-based framework for building cross-platform desktop apps, you can use Angular as the framework to structure your code while letting Electron manage the running of the application on the desktop. A great example of this type of project is Nrwl's **Angular Console** application, which provides Angular developers with a UI in order to work with the Angular CLI (more on the CLI later).
 
 And, of course, there is mobile; through using projects such as Angular Material, you can create Angular applications that are designed to look exactly like native mobile applications, (especially if you are building for Android). Now, while Angular will allow you to create a web application that looks and acts like it will run as a native application, Angular doesn't solve the problem of how to install the project as a native mobile application, along with the full native support of the phone's features. That's where a project like Ionic comes in. But, as you can see, a developer who knows how to write Angular applications has a lot of variety for the projects they can build.
+
+## Angular's history
+The history of Angular is an interesting one; first, there was AngularJS, and then came Angular. AngularJS was created as part of an internal project within Google by Misko Hevery. He created the first version of the project to make it easier for the designers within his team to build web applications.
+
+Misko wanted a way to extend the vocabulary of HTML in order for the designers to use HTML tags that were more relevant to what they were designing. So, over a long weekend, yes, that's a weekend, Misko came up with the first version of AngularJS. The name Angular came from the angled brackets that are at the beginning and the end of an HTML tag.
+
+Brad Green, Misko's team leader at the time, asked Misko to work on a project called the Google Feedback Tool, which was written in **Google Web Kit (GWT)**, a Java-based framework. But, after six months working on the project with GWT, the team found that it was extremely difficult to work with. So, Misko said that he could rewrite the Feedback Tool project in two weeks using his side project, AngularJS. Unfortunately, he took three weeks to complete the project, but he reduced the number of lines of code down to 1,500 from the 17,000, which is the amount the old GWT version had. And all this in three weeks as a solo developer!
+
+Brad was obviously impressed, so he asked other developers to help Misko to work further on Angular; Igor Minor (who still works on Angular along with Misko) and Shyam Seshadri both helped Misko to complete the rewrite of the Google Feedback Tool and develop AngularJS further.
+
+The next project the team worked on with AngularJS was the DoubleClick application that Google had just purchased. The team was challenged to create a new landing page for DoubleClick; first, they tried using GWT, but, after a two-week struggle, they turned to AngularJS, which Misko had been promoting within Google. They were able to complete the landing page project within two days using AngularJS. As a result of this success, the DoubleClick team decided to use AngularJS. With this, the first version of AngularJS was released in May 2011.
+
+But this is all about AngularJS; we're not looking at the previous version. We're interested in the latest version of Angular, its second iteration. This new version of Angular came out in September 2016, after two and a half years of development, which shows how much thought has gone into the new version.
+
+## Why use Angular?
+Why should a developer decide to learn Angular? Well, there are several reasons, but the main reason is so they can create applications for all platforms: desktop, mobile, and the web. All these platforms are reachable for a developer who knows how to write Angular applications.
+
+There are other similar technologies out there; for example, there are many JavaScript frameworks like Angular, but Angular is extremely well established and supported by Google. It is an ideal frontend framework for enterprise-level application, with all the out-of-the-box features that come with Angular (including modules, classes, components, and unit testing), All of these are extremely important to enterprises wanting their teams to develop well structured, tested applications; applications that are going to work the first time for their clients.
+
+There is also a huge ecosystem around Angular; teams such as Nrwl with their Nx Extensions, which allow teams to create libraries to support the large enterprise-level applications that Nrwl specialises in. There is also a vast amount of training resources available to an Angular developer; companies such as Plurasight, EggHead, and Ultimate Angular all have in-depth courses for Angular development.
+
+There are a large number of reasons why we should use Angular as our web application framework of choice. Let's look at these reasons.
+
+## Supported by Google
+One of the main reasons to use Angular is because it is supported by Google. They don't just sponsor the development of Angular, they are the team behind the development of Angular; Unlike other frameworks, which are supported by open source developers who work on fixing issues and creating new features for a framework in their spare time, Angular has a full-time team constantly working on supporting Angular.
+
+Google has also provided a **Long Term Support (LTS)** plan for Angular, which shows that they plan to support older versions of Angular for the next few years. In this LTS, we can see what versions of Angular they provide support for and when older versions will no longer be supported. With Google being so transparent in terms of their support of Angular, we can be sure that it has a long future. This is extremely important for large businesses looking to select the framework they are going to invest in for their next large-scale project. Being able to see that Angular has the support of a large organisation like Google, and that there is an LTS plan, which shows that Angular will be supported for the long term, makes the decision to pick Angular as their framework of choice a straightforward one.
+
+See the release dates from the official Angular website: [https:/​/​angular.io/​guide/​releases.](https:/​/​angular.io/​guide/​releases)
+
+## Built on TypeScript
+Angular is built on TypeScript, a superset of JavaScript, from Microsoft. TypeScript brings so many benefits, including Type interfaces and static typing. When we create objects and variables within our code through static typing, the details of these types are known when we compile our code and this helps to provide insight. So, bugs can be found at compile time instead of runtime. Not only does TypeScript help us write better code, but it also allows tools such as VSCode to provide IntelliSense of our code, which gives us better navigation, refactoring, and autocompletion, making the experience of writing TypeScript far more enjoyable than JavaScript.
+
+Along with providing a great development experience, as a result of using TypeScript, we have access to all the ES2016/ES2017 features that aren't yet available in JavaScript. TypeScript can provide features that are still to be released in JavaScript. Being able to compile down to ES2015 (the version of JavaScript that the browser understands), TypeScript can provide these latest features and still be able to generate ES2015 code.
+
+So, being built on TypeScript, Angular has access to all the latest features of the language and all the fantastic tooling TypeScript provides.
+
+## The Angular CLI
+Another great reason for using Angular is the Angular CLI; this is a command-line tool provided by the Angular team that helps us to build and run Angular projects. The CLI comes with a wide range of features, including the following:
+- Creating the start of a project
+- Creates components, services, directives, and other files using a simple command
+- Runs the application in the browser
+- Reloads the application after each saved change so that the latest version is displayed in the browser
+- It can update a project's dependencies (other libraries used in a project) automatically
+- It can add new libraries to the project
+- It can run all the unit tests in a project and the end-to-end tests
