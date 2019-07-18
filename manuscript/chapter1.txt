@@ -1,15 +1,14 @@
-# Chapter 1
+# Chapter 1: What is Angular?
 
-This is some default content for a new Leanpub book.
+Welcome to this book on Getting Started with Angular 8. Throughout this book, we will be exploring Angular 8 and how to get started building applications with Angular. We will be looking at topics such as how to set up an Angular application and how to use the tools the Angular team provide to begin developing an Angular application. We will look at the architecture of a typical Angular application and how components and modules are used to build sections of the app. We will explore ways data is accessed and passed in an app and what mechanisms Angular provides for managing data.
 
-You can download the manuscript folder containing the plain text files from which this book is generated. That way, you can see how everything in this book is actually written.
+We will also look at more advanced topics, such as observables and RxJS, testing, and packaging an application for production. We will even take a look at the NgRx, which is a library for managing state.
 
-Here is the download link for a zip file with the manuscript of this book: [https://github.com/leanpub/default-new-book-content/archive/master.zip](https://github.com/leanpub/default-new-book-content/archive/master.zip).
+In this chapter, we will introduce Angular, what it is, and the reasons it is an ideal choice for web application development, as well as go through the features of Angular and what's in the latest release, version 8.
 
-Please note you can find our manual here: [https://leanpub.com/help/manual](https://leanpub.com/help/manual).
-
-We also have a author Help Center here: [http://help.leanpub.com/author-help](http://help.leanpub.com/author-help).
-
-In the following chapters you'll see some simple examples of how to format your writing and how to insert images.
-
-Hello world! 
+I will also introduce the demo application we are going to be building throughout the book. So, to recap, in this chapter, we will cover the following topics:
+- Why are we looking at Angular?
+- What is Angular?
+- Some examples of the types of applications that can be built with Angular
+- The history of Angular, how it was started, and what problems it aimed to solve What are the new features of Angular 8
+- What is the demo application we will be building throughout this book
