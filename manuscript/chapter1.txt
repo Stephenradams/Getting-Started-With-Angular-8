@@ -12,3 +12,19 @@ I will also introduce the demo application we are going to be building throughou
 - Some examples of the types of applications that can be built with Angular
 - The history of Angular, how it was started, and what problems it aimed to solve What are the new features of Angular 8
 - What is the demo application we will be building throughout this book
+
+## What is Angular?
+According to the official Angular docs, Angular is a platform that makes it easy to build applications with the web. Awesome, but what does that actually mean? Well, Angular is a web application framework that helps developers build web applications, web applications that can run on all platforms, from desktop and mobile, which makes Angular an ideal choice for your next web application.
+
+The official documentation goes on to describe Angular as, *[combining] declarative templates, dependency injection, end-to-end tooling, and integrated best practices to solve development challenges. Angular empowers developers to build applications that live on the web, mobile, or the desktop*. This perfectly describes what Angular is. Through templates, dependency injection, and end-to-end tooling, Angular empowers developers to build web applications and applications that are built on best practices.
+
+## Some examples of the type of projects built with Angular
+By learning Angular, you can build many different types of applications, using the one framework. For example, you can build a complete web application, such as the **Google Grab and Go** program, where enterprise companies can manage their usage of Chromebooks.
+
+*Google announced the Grab and Go program for Chromebooks, powered by Angular at the following URL: [https:/​/​blog.​angular.​io/​google- announces-​grab-​and-​go-​program-​for-​chromebooks-​powered-​by-angular-​7954c11900bd.](https:/​/​blog.​angular.​io/​google- announces-​grab-​and-​go-​program-​for-​chromebooks-​powered-​by-angular-​7954c11900bd)*
+
+If you ever wanted to build an email client, you can in Angular. There is already a project called **ProtonMail**, which is a full-featured email client developed by scientists and engineers from CERN, written in Angular.
+
+You can also build desktop applications in Angular. Working along with Electron *(Electron | Build cross-platform desktop apps with JavaScript, HTML, and CSS)*, the Node-based framework for building cross-platform desktop apps, you can use Angular as the framework to structure your code while letting Electron manage the running of the application on the desktop. A great example of this type of project is Nrwl's **Angular Console** application, which provides Angular developers with a UI in order to work with the Angular CLI (more on the CLI later).
+
+And, of course, there is mobile; through using projects such as Angular Material, you can create Angular applications that are designed to look exactly like native mobile applications, (especially if you are building for Android). Now, while Angular will allow you to create a web application that looks and acts like it will run as a native application, Angular doesn't solve the problem of how to install the project as a native mobile application, along with the full native support of the phone's features. That's where a project like Ionic comes in. But, as you can see, a developer who knows how to write Angular applications has a lot of variety for the projects they can build.
