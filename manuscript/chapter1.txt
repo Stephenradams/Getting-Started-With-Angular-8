@@ -119,3 +119,105 @@ Another great tool from the Angular community is the NX workspaces from Nrwl. Th
 
 As you can see, there are so many reasons to use Angular. We're already on version 8, which shows that the Angular team aren't slowing down in terms of making Angular better and better. Let's now go through some of the recent features of Angular and see what's new in Angular 8.
 
+# Features of Angular
+As we know, Angular provides a framework for developing web applications, but there is more to Angular than just the building blocks of a web application (components, services, directives, and so on). Angular has many features we can use as Angular developers to create fast, powerful applications.
+
+## Schematics
+
+The first feature we're going to look at is schematics. This is a tool we can add to our workflow as Angular developers, similar to how we use the Angular CLI. Schematics allow us to apply transforms to our projects; we see an example of this when we ask the Angular CLI to create Components or Services for our application.
+
+When we call the CLI to create a Component file, it updates the filesystem where our project is kept. So, the CLI is writing to the filesystem. You'll see as we progress through this book that the Angular CLI is really helpful at starting up and adding to a project.
+
+While the CLI is a wonderful workflow tool, the role of schematics is to build upon this scaffolding feature that the CLI supports. So, schematics allow us to add to the project in a way that we can get the CLI to build new features as part of our project. For example, we could write a schematic that will add a new library to a project. Or, we could have a schematic that adds a UI library, which is standard across all projects within an organisation, to a new Angular project. If your company has a set of UI components that need to be used in any project, we could write a schematic, which is called through the CLI, that will add this UI library and create the new Angular project in one process.
+
+Schematics don't write to our filesystem; they update a Tree object. This Tree object is a representation of our project's filesystem, and when a schematic is run, this Tree object is updated with the new updates, as set out in the schematic's rules.
+
+A schematic is a TypeScript file that has the rules for this new schematic set out within this file. In the schematic file, the Tree data object can be updated and added to. So, we can update the Tree to have new files, or add new libraries.
+
+Tools such as Nrwl's NX workspaces make use of schematics to add to the workflow of the Angular CLI. So, if your project is using the NX workspaces, you can run commands that create libraries that will be shared across teams.
+
+> To read more about NX and how it makes use of schematics, check out the NX workspaces website: [https:/​/​nx.​dev/​getting-​started/​nx-​and-​cli](https:/​/​nx.​dev/​getting-​started/​nx-​and-​cli).
+
+## CLI prompts
+Another feature is CLI prompts, where the Angular CLI will ask questions when we run a command such as ng add or ng generate (both commands we will see in use throughout the book). The CLI will prompt the user with questions such as *Which stylesheet format would you like to use?* or *Would you like to add Angular routing?*.
+
+We can also create these prompts for our own schematics, so when a team member is running one of our schematics through the Angular CLI, they will be prompted with questions we want them to be asked as the schematic is running in order for them to make different choices in terms of the features our schematic may be adding to the project it is building.
+
+The great benefit of having CLI prompts is that it helps developers discover new features of the CLI. With each release of the CLI, the team can add new prompts, asking if we want to make use of any new features that are part of a new Angular release.
+
+## Angular Elements
+A really interesting new feature of Angular is Angular Elements. Angular Elements is the ability to create custom web components that can be loaded into any modern browser.
+
+Through these web components, we can create small Angular applications, which will run as part of the web page. For example, if you have a web page built using ASP.Net, but a small section of the page needs to use a piece of functionality that is already in an Angular application, with Angular Elements, you can convert that Angular application to a web component that will run within the ASP.Net page as a standalone piece of functionality.
+
+Web components are a feature of the Web Platform ([https:/​/​www.​w3.​org/​Talks/​2012/​10- lea-​webplatform/​wpd-​talk/​#intro](https:/​/​www.​w3.​org/​Talks/​2012/​10- lea-​webplatform/​wpd-​talk/​#intro)) and are supported by all modern web browsers. They allow us, as web developers, to extend HTML by creating our own tags, which the browser will understand. We can package up HTML, CSS, and JavaScript to create one of these Web Components, which the browser can understand and run, just like it would a standard HTML tag.
+
+With Angular Elements, a Web Component made with HTML, CSS, and JavaScript can also have the Angular framework incorporated into the component, giving us access to all that Angular provides. This means our component can, in essence, be a mini-Angular application, running within any other type of web page. So, if we have a React page that needs to have a feature from an Angular application, it can be loaded via Angular Elements.
+
+One area where I've found Angular elements to be extremely useful is when there is an AngularJS application that needs upgrading to Angular (AngularJS will no longer be supported after 2021). With Angular Elements, we can create new features for an existing AngularJS site and then load this new feature into the AngularJS site using Angular Elements. Then, as the AngularJS code is rewritten in Angular, each new part can be loaded into the original application via an Angular Element. Once everything has been written in Angular, the AngularJS code can be removed and we now have everything written in Angular. The end user will not notice a difference. Well, perhaps the application will load faster for them, but that's not a problem!
+
+## The Ivy Renderer
+Another feature of Angular 8 is the new renderer engine called Ivy. In Angular 8, while Ivy is not the default rendering engine, it can be opted into when we start a new application. Using the CLI, we can choose to use the new renderer by starting the application using this command:
+
+   `ng new my_ivy_app --enable-ivy`
+   
+This will build us a new Angular application that will be rendered through Ivy instead of the current view engine renderer.
+
+Ivy provides so many great features, including the following:
+- Easier-to-read generated code.
+- Faster rebuild times between updates.
+- Small payload sizes, especially production-ready code. The smaller the payload, the faster the application loads.
+- Improved Type checking in our HTML templates.
+
+While Ivy is nearly ready, it's not quite set for production-ready applications, so if you want to play with it to see the great benefits it brings, then use the preceding command to create an application that uses Ivy. Then, you'll be able to see how much smaller the final size of the application Ivy generates is and how fast it reloads between each build.
+
+A great place to find out about Ivy is the Angular Next website, which is a guide with documentation on some of the new features coming in Angular. You can find this guide by going to Angular Next ([https:/​/​next.​angular.​io/​guide/​ivy](https:/​/​next.​angular.​io/​guide/​ivy)).
+
+## CLI Builders
+Another new feature in Angular 8 is CLI Builders. This is a new API that allows us to add to, and build upon, features with the Angular CLI.
+
+We currently have schematics, which, as we know, allow us to write commands that the CLI can use to generate new code for our applications. CLI Builders expands on this and provides an API we can use to write commands to the CLI's build system.
+
+While schematics give us the ability to ask the CLI to generate new files or install new packages for us, for example, adding Angular Material as part of a new application can be handled through a schematic. With CLI Builders, the Angular team have expanded on this openness to the CLI and have provided us with a way to write commands that can change the build system of Angular.
+
+Through CLI Builders, we can run commands and tasks against the CLI to build our Angular applications in any way we want. So, for example, as part of the build, we may need to have all Angular Libraries built at the same time, or have all our tests run as part of the build; these tasks can now be set up through the CLI Builder API.
+
+While, prior to Angular 8, it was possible to write build commands to the CLI, it wasn't officially supported; people who did manage to make these types of build commands knew the build system of Angular extremely well. Now, in Angular 8, the team have provided a way for any Angular developer to create a unique build system for their project.
+
+## Differential loading of JavaScript
+In Angular 8, the CLI will now produce both ES5 and ES2015 JavaScript. ES5 is a legacy version of JavaScript, while ES2015 is the latest version of JavaScript with all the modern features we now expect of JavaScript. This will improve loading times in today's modern browsers, as they will be given the ES2015 version of the bundled code instead of the legacy ES5 version, which is far slower.
+
+## The Angular route improvements
+Another new feature of Angular 8 is the fact that the routing in our applications has been improved to support AngularJS routing. By doing this, it will help with upgrading an AngularJS application to Angular because the routing of an application is usually the last thing to be upgraded.
+
+In Angular 8, there will be a backward compatibility mode for the router, so it will understand how to run the AngularJS version of the router, and lazy-loading is supported for the AngularJS router. This is a real benefit for those on AngularJS looking to upgrade before AngularJS is no longer supported.
+
+## Library updates
+Along with all these new features in Angular 8, all the versions of RxJS, TypeScript, and Node have been updated to their latest versions. So, we can start taking advantage of the new features from these libraries as well.
+
+Angular 8 has some really nice new features; it is expanding in terms of opening up the Angular CLI to us as developers so that we can tailor the CLI to our needs; it's also adding features to help with the upgrade from AngularJS to Angular.
+
+The way we write Angular applications, which we will learn in this book, still applies to Angular 8, so once you know how to create applications with Angular, you can then explore further these new features in Angular 8.
+
+# The Client Contacts Manager Application
+So, throughout this book, we are going to be building a sales team contacts app for a fictional company. The idea behind this app is to have a system that allows the fictional sales team of our fictional company to manage and access the contact details of their clients and the companies they work with.
+This mini-CRM (Customer Relationship Manager) allows us to create an app that uses a number of features so we can really explore the features of Angular. This application's main features are that it allows us to add, edit, and view the details of customers. We can also filter the list of customers using the built-in features of Angular.
+
+We can look at how we will create the UI using Angular components and Angular Material. We can look at how we will build up the model of the application, how data will be passed throughout our app as we build up the functionality to add new customers, save their details, and see a list of all of our saved customer contacts.
+
+We will see how Angular uses TypeScript, which gives us excellent tooling and insight into our code, making the development process even easier than before when we were using JavaScript.
+
+The idea is to create two versions of the mini-CRM that the salesperson will use; the mobile version will be used when they are out and about talking to their customers, and the desktop app will be used when back in the office to search for all the new wonderful customers they have.
+
+As part of this application, we are going to use a fantastic third-party library called the In- Memory Web API ([https:/​/​github.​com/​angular/​in-​memory-​web-​api](https:/​/​github.​com/​angular/​in-​memory-​web-​api)). This library allows us to create local, in-memory storage similar to a database that we can save data to, access data from, and remove data from, all via API calls.
+
+Using this library means we have a source of storage for our Client Contacts Manager Application and we can make API calls to this storage system without having to set up a local database of external API. We can just focus on learning how to write Angular.
+
+Once you've finished reading this book, and you'll want to create your own application to practice what you've learned, I highly recommend looking at the In Memory Web API as a temporary data source for your practice applications; it's not a replacement for a real database, but is really easy to use for small demo applications.
+
+# Summary
+So, we have looked at what Angular is, what problems it aims to solve, and a bit about the history of Angular. We have looked at some examples of the types of projects we can build using Angular and have gone through the new features of Angular 8.
+
+Finally, we've looked at what we will be building throughout this book, how we will be creating a mini-CRM, which gives us the ability to really explore the features of Angular. So by the end of this book, you should not only have an understanding of both frameworks, but you'll also be able to create apps in Angular.
+
+Next, we are going to start working the Angular version of the application. We're going to start building the app using the Angular CLI, and we will look at the architecture of an Angular application.
