@@ -1,11 +1,70 @@
-# Chapter 2
+# Chapter 2: Angular Architecture
 
-To start a new paragraph, hit the return key twice. You want to create a blank line between paragraphs.
+Now that you know what Angular and Ionic are, it's time to start looking into things more deeply. In the first part of this book, we're going to be concentrating on Angular, and in this chapter, we're going to be looking at the architecture of an Angular application.
 
-To *italicize*, surround a word in asterisks.
+How are we going to do that? Well, we need an application to look at, in order to see the various parts of the application: what they are, what they do, and how they are built. In order to do this, we need to create an Angular application, and in order to do that, we need to install the Angular CLI. So, let's do that.
 
-To **bold**, use two asterisks.
+In this chapter, we'll be looking at the architecture of an Angular application to see how the Angular framework structures a typical application. You'll also learn how the various parts of an Angular application are pieced together. Here's what you'll be learning in this chapter:
 
-Here is an image with a caption:
+- Why Angular is an ideal frontend framework
+- How an Angular application is structured
+- What modules are, what components are, and how they are used
+- What dependency injection is and how services are loaded
+- Why TypeScript is used, and the benefits it brings
+- The structure of the app being built throughout the first part of this book
 
-![Marmalade and Tangerine](images/marm-and-tangie.jpg)
+# Overview of Angular
+Angular is more than just a framework; it's now both a framework and a platform. In the previous version, AngularJS was just a frontend framework, but now, with more advanced frontend tools, Angular has grown from a frontend framework into a complete platform.
+
+Being a complete platform, Angular can now be used to create a wider variety of applications; before, AngularJS was used for creating **Single-Page Applications (SPAs)**. As more and more teams used AngularJS as the basis for their tools, AngularJS could be used to develop different types of applications.
+
+With Angular (the second version of AngularJS), as there are more mature tools for frontend development, the Angular team has been able to expand Angular from a frontend framework into this complete platform. It's a platform that allows developers to create web apps, mobile apps, desktop apps, and even server-side applications.
+
+## The problem Angular solves
+The main problem that Angular aims to solve, like all other application frameworks, is providing the developer with a consistent way to develop and deploy applications. Angular has a set approach to building a web application that is based on some best practices. The team behind Angular have created the framework, so when we (as Angular developers) build our applications using the framework, we are using the current best practices for developing web applications. We do not have to worry about whether we are writing our applications using the best approach, as the framework has these best practices already built in.
+
+Following the approach of a framework means that as a developer, you don't have to worry about some of the more mundane parts of building an app (for example, making HTTP calls to an API). This is something that is becoming a standard feature in web apps. Having to create a service that makes your HTTP calls over and over again every time you start a new project is a waste of time if you have a framework that can take this away from you; in that case, all you need to do is make a call to the framework's HTTP service. This saves you plenty of time to worry about other parts of your application.
+
+Angular, unlike other popular web frameworks, provides you with a lot of out-of-the-box features that they think you will need when building modern web applications. This includes things like HTTP access services, a module system, a build system, a way to package your app for production, and a routing system, so that your users can navigate around the application you've built.
+
+The second main problem that Angular aims to solve is providing developers with a set approach to how to build modern web applications. By having this prescribed approach, Angular developers can simply focus on the domain-specific problems of the application and not have to worry about how they will handle the more common features of an application (like navigation, for example). When I say domain-specific problems, I mean the problems that the web application is trying to solve. The time that is spent trying to work out a method of navigation for your application can now be spent working on the problems that the app is trying to solve.
+
+Another problem that Angular solves is a collaboration between developers. Having a framework like Angular is like following a map for how an Angular application is set out. As you'll see when we look into the architecture of the Angular and Ionic apps that we are going to build throughout this book, there are many similarities between the applications' structures. Someone that is only an Angular developer would be able to go through the code of an Ionic application and know how the application works, and vice versa; a developer who is mainly an Ionic developer can go through the source code of an Angular application and have an idea of how the app works.
+
+This common knowledge of how an Angular application works helps developers to collaborate on a different project far faster than an application that's not built using a framework. This is great not only for onboarding new developers to a team, but for open source development, as well.
+
+So, to recap, Angular gives you a set approach based on the best practices for modern web development. It gives you many out-of-the-box features that you will need to build an application. Its common patterns make learning how a new Angular application works quicker, and onboarding new developers to your project/team is easier and smoother.
+
+Now, we are going to create a small demo application, which we will use to look at the basic structure of an Angular application; however, we first need to install the Angular CLI, which is the main tool you'll use to create Angular applications.
+
+# Installing the Angular CLI
+To install the Angular CLI, we need Node, so we need to go to the Node website and install it. So, let's go to the Node website at [https:/​/​nodejs.​org/​en/](https:/​/nodejs.org/en/)​. Once we're there, we need to click on the download link for the **Long Term Stable (LTS)** version of Node.
+This version of Node is recommended for most users and is ideal for our needs.
+
+Once the download has completed, click through the installation wizard and complete the installation of Node. Then, when that has finished, we need to open up our Terminal or Command Prompt and check the version of Node we've just installed. To do this, run `node -v` you should see the version number come up, which confirms that Node has been installed.
+
+OK, that's done; now, to install the Angular CLI.
+
+> Why do I need to install the CLI when I've just installed Node? The answer is, we need Node Package Manager (NPM), to install the Angular CLI for us.
+
+Again, in your Terminal or Command Prompt, run the following command:
+
+`npm install -g @angular/cli`
+
+This command is telling npm to go and install the Angular CLI package globally (so that it's available from anywhere, within any folder). Then, npm goes off and downloads the latest version of the Angular CLI and installs it for you. The days of CDs or floppy disks are long gone; it's all command-line magic now.
+
+Now, we should have the Angular CLI installed, and it's time to create our first Angular app. This isn't going to be the Client Contact demo app that I mentioned earlier; this is just going to be a small app with which we can look through the code and see how an Angular app is made and what the structure of the app is.
+
+To create an Angular application, we need to go back into our Terminal or Command Prompt and navigate to a folder in which we can work. Once we have navigated to our development folder, we simply run the command `ng new`, along with the name of the Angular app we're building. So, for this, type in the following:
+
+`ng new angular-architecture`
+
+This will create a new folder within the **development** folder, called `angular-architecture`. The CLI uses the name you provide to create a new folder in which to create the application. Once that has run, you should see the following message:
+
+`Project 'angular-architecture' successfully created`
+
+Congratulations! You've created your first Angular app.
+
+So, let's recap on what we've done. We've installed Node, because we need `npm` to install the Angular CLI. We installed the CLI, and then we created a new Angular application. We are going to leave the Angular CLI for now; there will be more on what the CLI is and how you will use the CLI as an Angular developer later, in *Chapter 3, Getting Started with the Angular CLI*. Now, we need to start looking at the code the CLI has generated; to do that, we need to open the `angular-architecture` folder in our favourite editor.
+
+
