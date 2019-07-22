@@ -13,14 +13,14 @@ In this chapter, we'll be looking at the architecture of an Angular application 
 - Why TypeScript is used, and the benefits it brings
 - The structure of the app being built throughout the first part of this book
 
-# Overview of Angular
+## Overview of Angular
 Angular is more than just a framework; it's now both a framework and a platform. In the previous version, AngularJS was just a frontend framework, but now, with more advanced frontend tools, Angular has grown from a frontend framework into a complete platform.
 
 Being a complete platform, Angular can now be used to create a wider variety of applications; before, AngularJS was used for creating **Single-Page Applications (SPAs)**. As more and more teams used AngularJS as the basis for their tools, AngularJS could be used to develop different types of applications.
 
 With Angular (the second version of AngularJS), as there are more mature tools for frontend development, the Angular team has been able to expand Angular from a frontend framework into this complete platform. It's a platform that allows developers to create web apps, mobile apps, desktop apps, and even server-side applications.
 
-## The problem Angular solves
+### The problem Angular solves
 The main problem that Angular aims to solve, like all other application frameworks, is providing the developer with a consistent way to develop and deploy applications. Angular has a set approach to building a web application that is based on some best practices. The team behind Angular have created the framework, so when we (as Angular developers) build our applications using the framework, we are using the current best practices for developing web applications. We do not have to worry about whether we are writing our applications using the best approach, as the framework has these best practices already built in.
 
 Following the approach of a framework means that as a developer, you don't have to worry about some of the more mundane parts of building an app (for example, making HTTP calls to an API). This is something that is becoming a standard feature in web apps. Having to create a service that makes your HTTP calls over and over again every time you start a new project is a waste of time if you have a framework that can take this away from you; in that case, all you need to do is make a call to the framework's HTTP service. This saves you plenty of time to worry about other parts of your application.
@@ -37,7 +37,7 @@ So, to recap, Angular gives you a set approach based on the best practices for m
 
 Now, we are going to create a small demo application, which we will use to look at the basic structure of an Angular application; however, we first need to install the Angular CLI, which is the main tool you'll use to create Angular applications.
 
-# Installing the Angular CLI
+## Installing the Angular CLI
 To install the Angular CLI, we need Node, so we need to go to the Node website and install it. So, let's go to the Node website at [https:/​/​nodejs.​org/​en/](https:/​/nodejs.org/en/)​. Once we're there, we need to click on the download link for the **Long Term Stable (LTS)** version of Node.
 This version of Node is recommended for most users and is ideal for our needs.
 
