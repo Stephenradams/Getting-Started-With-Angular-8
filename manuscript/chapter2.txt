@@ -79,5 +79,379 @@ If you don't already have Visual Studio Code (more commonly called VSCode), go t
 
 You should see the following screenshot:
 
-![VSCode](/images/chapter2/vscode.png "VSCode")
+![VSCode showing our Angular application](/images/chapter2/vscode.png "VSCode showing our Angular application")
 
+This is VSCode with our new app loaded. We can now use the features of VSCode to go through the app and see how it's structured.
+
+First, let's expand the source tree folder; you should see the full `src` folder, as follows:
+
+![VSCode showing the src folder](/images/chapter2/source-folder.png "VSCode showing the src folder")
+
+There are a few main parts to the app; the first thing you'll notice is that there are two main folders, the `src` folder and the `e2e` folder. The `src` folder contains all the source code for your app. It will contain all the HTML, CSS, and TypeScript code of your app. The `e2e` folder contains all your end-to-end tests, and these tests can be run to test how your app runs in the browser. However, we are looking at the architecture of an Angular app, so let's carry on with that.
+
+Within the `src` folder, you'll see the app folder, and inside of that you'll see the following files:
+
+- app.component.css
+- app.component.html
+- app.component.spec.ts
+- app.component.ts
+- app.module.ts
+
+We now have a small Angular app, which we can take a look at while we go through the architecture of an Angular application.
+
+## The architecture of an Angular app
+Okay, now we have discussed the problems Angular solves, and we've even created our first Angular application; it's time to discuss how an Angular app is structured.
+
+Angular is essentially a framework and a platform, written using HTML and TypeScript. The functionality of the application is written in TypeScript files that can be imported throughout the app as libraries, adding functionality throughout the app.
+
+When the Angular application app is run in the browser, these TypeScript files are converted into JavaScript files, which are then bundled up into the payload that is delivered to the browser (there are ways that this payload can be separated into smaller, separate files in order to keep its size down, but this is something we will briefly look at in *Chapter*
+*3, Getting Started with the Angular CLI*).
+
+There are three main parts to an Angular application, and they are as follows:
+
+- **Modules**: Modules are the glue that holds an application together. They are single TypeScript files that reference all the other files used within the application. They allow us as Angular developers to group the functionality of our application together.
+- **Components**: Components are the building blocks of the application. They are single pieces of functionality in our application, which are linked together under a module. Components can have visual elements to them, which allow the user to interact with the application.
+- **Services**: Services are single TypeScript classes used to access information and share it between components.
+
+When you think of an Angular application, you can think of it as a tree; the module is the trunk of the tree, and the components are the branches of the tree, branching out of the module, with services being passed into components to share data throughout the application. Everything is tied together through the module, and as the complexity of your Angular application grows, the number of modules you'll have in your application will grow.
+
+Now let's take a more in-depth look at each of these three parts, starting with modules.
+
+### What are modules?
+We've now provided an overview of the general structure of an Angular app, so we're going to be looking further into **modules**, or, as they are known in the Angular world, **NgModules**. To see an example of a module, open the `app.module.ts` file of our Angular app.
+
+You should see the following:
+
+```import { BrowserModule } from '@angular/platform-browser';
+   import { NgModule } from '@angular/core';
+   import { AppComponent } from './app.component';
+   @NgModule({
+       declarations: [
+           AppComponent
+       ],
+       imports: [
+           BrowserModule
+       ],
+       providers: [],
+       bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+   ```
+   
+   This is the main `App` module; as you can see, it's made up of four main parts: the `declarations` array, the `imports` array, the `providers` array, and the bootstrap array. There is another part to a module that is not shown in this example: the Exports array.
+   
+   So, what do all these different arrays do? Well, let's look at each one, as follows:
+   
+- `declarations`: This contains the components, directives, and pipes that are part of this module.
+- `imports`: This contains other modules, whose classes are needed by components of the module they are being imported into.
+- `providers`: This contains any services that are required by components. If a service is added to the module level, it is available to all components that are part of the module, but services can also be imported at just the component level.
+- `bootstrap`: This contains the main component, or the root component, which starts the whole application. Only the root module (in our architecture application it's the `app.module.ts` file) that we have opened can have a Bootstrap array.
+- `export`: This contains a list of declarations that are available by components in other modules.
+
+One of the first things to point out is the use of a decorator to tell Angular about the details of this module. As you can see, the `@NgModule` is a decorator. Angular sees this and knows that this TypeScript class is a module, and, that the details within the `@NgModule` decorator are all parts of this module. So, through this decorator, Angular knows that this module has its own version of `AppComponent` that belongs to this module. It then imports another module called `BrowserModule`, and when Angular boots up, it should use the `AppComponent` as part of this Bootstrap process.
+
+`NgModule`'s main role is to tell the framework what components belong where when the application is being compiled. For example, suppose that I have a component called `ComponentOne.ts`, and in the same application, another developer working on the project also creates a new component and decides to call it `ComponentOne.ts`, adding it to the same project. The compiler wouldn't know which `ComponentOne` to use when the application was running. By using a module, we can say that one `ComponentOne` belongs to this module, and the other one belongs to another module. Then, when the compiler is running the application and it is running the code that belongs to a module, the compiler knows which `ComponentOne` file to use. This helps to group functionality together and allows a different developer to work on separate parts of an application without affecting the part of the application that another developer is working on.
+
+With `NgModule`, we can say that one `ComponentOne.ts` belongs to the admin
+modules, `admin.module.ts`, and the other `ComponentOne.ts` belongs to the ordering module, `ordering.module.ts`; so now, each component has a context of where it belongs. So, Angular knows where each `ComponentOne` belongs and that they are separate components. Although naming components the same name is never a good idea, it's sometimes unavoidable, especially when incorporating a third-party library into your project.
+
+We will be going further into `NgModule` in *Chapter 5, NgModules*, where we will not only look into a more complex module file, but will also start to create modules for our demo app.
+
+### What are components?
+We've already mentioned components; they are one of the main building blocks of an Angular application. Again, going back to our `angular-architecture` demo application, if we open `app.component.ts`, we will see the following:
+
+```import { Component } from '@angular/core';
+   @Component({
+       selector: 'app-root',
+       templateUrl: './app.component.html',
+       styleUrls: ['./app.component.css'
+   })
+   export class AppComponent {
+       title = 'app'
+   }
+   ```
+   
+This is the entry component of our application. If you look at the `app.module.ts` file, you'll see that `AppComponent` is set to be the Bootstrap component for the application. That means that this component will be the start of the application, and the template for this component will be the first thing a user will see when the app has loaded in the browser.   
+
+Again, the component is a TypeScript class that is using the `@Component` decorator to tell Angular about the details of the component. In this `@Component` decorator, we can see that the component has an HTML template called `app.component.html` and a CSS file called `app.component.css`.
+
+The `@Component` decorator also tells Angular that the selector, or HTML tag, for this component is `app-root`; this is the HTML that the selector generates:
+
+```<app-root></app-root>```
+
+The selector name is used to create the HTML tag that Angular knows about, so when that HTML tag is seen in other component templates, Angular knows what component to use and what component's template to display.
+
+In our example component within the class, we can see a property of the component class called `title`. This property is available in the associated template of the component, which you can see in the following section of `app.component.html`:
+
+```
+<div style="text-align:center">
+       <h1>Welcome to {{ title }}!</h1>
+</div>
+```
+
+There's more that can be added to the component class besides properties that are available to the associated template/view. The functionality of the template is defined in the component class, as well as data and common functionality provided by Services is loaded into the component class, making it available to the component template.
+
+We'll be looking at components more closely in a later chapter. We'll be creating new components for our demo application and looking more closely at the relationship between the component class and the component template. But for now, this should give you an understanding of the basic structure of an Angular component.
+
+Now, we are going to look at Services: how they are structured, and how Decorators are used to define what a Service is in Angular.
+
+### What are Services?
+You now know what NgModules are and what components are, so we're going to take a look at another major part of an Angular application: Services.
+
+A Service is simply a TypeScript class, similar to how a component has a TypeScript class. The main difference between a component class and a service is that services are used to create more modularity and reusability within the application. They are used as a way to share functionality that may be needed more than once throughout the application. This helps to improve the modularity of the application by dividing functionality into reusable and standalone services that components call in to do a single piece of the app's functionality. This leads to the app being divided up into these smaller services, rather than having all the logic of the app in one large, monolithic service or component.
+
+Services are there to do one thing and one thing well. This means that the component can load in Services to do the one piece of logic the component requires; then, the component can call another service to perform another piece of logic that the component needs. This leads to a component needing to have access to multiple services. Angular loads services into components through Dependency Injection.
+
+**Dependency Injection (DI)** is the method that Angular uses to tell components what services the component can consume. DI is not just an Angular-specific concept; there are many frameworks that use Dependency Injection, and not just frontend frameworks.
+
+Angular has always used DI. Even from the early versions of AngularJS, DI has been the method that Angular has used to inject Services into components.
+
+In our `angular-architecture` project, we don't have a service automatically generated for us by the Angular CLI. This is because (as we know), services are used to manage data and logic within our application. This changes from application to application. The Angular CLI team couldn't get the CLI to generate a service for us that fits the needs of our application, it's impossible. So, they don't provide a service for a very basic Angular application (although, as we will see in *Chapter 3, Getting Started with the Angular CLI*, the CLI can generate Services); we have to create one ourselves.
+
+While the `angular-architecture` application doesn't have a service, we can still take a look at an example to see the structure of a Service.
+
+In the Angular official documentation, there is an example application called *Tour of Heroes*, and it is possible to download and view the source code of this example application. (It's well worth doing this, as the Tour of Heroes application has great examples of the various parts of an Angular application. It was written by some of the leading experts within the Angular community, so it's a great example of some best practices for building Angular apps.)
+
+In this *Tour of Heroes* application, there are many Services that we can take a look at to see how a Service is structured. This is one of the main services, which loads a list of Heros from an external API:
+```
+ export class HeroService {
+       private heroes: Hero[] = [];
+       constructor(private backend: BackendService, private logger: Logger) {
+   }
+       getHeroes() {
+           this.backend.getAll(Hero).then( (heroes: Hero[]) => {
+             this.logger.log(`Fetched ${heroes.length} heroes.`);
+               this.heroes.push(...heroes); // fill cache
+           });
+           return this.heroes;
+       }
+}
+```
+
+As you can see, it is a simple TypeScript class with a Constructor and a single method called `getHeros()`. It also calls another service, called `BackendService` (showing an example of this modularity that services provide, where one service does one single task and uses another to perform another task, in this case providing data).
+
+What's missing from this Service is the Decorator that tells Angular that this class can be consumed/injected into Components. The Decorator that provides Angular with this information is called the `Injectable` decorator, and it looks like this:
+
+`@Injectable({`
+       `providedIn: 'root',`
+   `})`
+   `export class HeroService {}`
+   
+When the `@Injectable` decorator is added to a class, this tells Angular that this class and its functionality can be passed into components and other services, using Dependency Injection.
+
+To get a better understanding of how a service is linked to a module, let's create a simple Service for our `angular-architecture` app. Within VSCode, we need to open the Terminal panel (if you open the **Terminal** drop-down menu in the main navigation, you should see the **New Terminal** link). This is shown in the following screenshot:
+
+![VSCode Showing Terminal Menu ](/images/chapter2/VSCode-Terminal-Menu.png "VSCode Terminal Menu")
+
+This will open a new Terminal window at the bottom of VSCode, with the folder of our project already loaded. In this new window, type the following:
+
+`  ng generate service demo`
+
+This will tell the Angular CLI to create a new service called `demo` within our source code. We will be looking at the commands of the CLI in more detail later on, in *Chapter 3, Getting Started with the Angular CLI*.
+
+So, you should have a nice new service called `demo.service.ts`, which looks like the following:
+
+```
+import { Injectable } from '@angular/core';
+   @Injectable()
+   export class DemoService {
+       constructor() { }
+  
+     }
+ }
+ ```
+ 
+ Pretty impressive? Well, not really, because it doesn't actually do anything yet, but it does demonstrate how the TypeScript class is using the `@Injectable` decorator so that Angular knows that this class can be injected into components and other services via DI.
+ 
+ Now that we have this service, let's add it to our `app.module.ts` file so that Angular knows what context this service belongs under.
+ 
+ Open the `app.module.ts` file, which should look like this:
+ 
+ ```
+ import { BrowserModule } from '@angular/platform-browser';
+   import { NgModule } from '@angular/core';
+   import { AppComponent } from './app.component';
+   @NgModule({
+       declarations: [
+           AppComponent
+       ],
+       imports: [
+           BrowserModule
+       ],
+       providers: [],
+       bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+To add the service, we type the name of the service to the `providers` array, like this:
+
+```
+providers: [
+    DemoService
+],
+```
+
+VSCode should automatically set the import statement at the top to where the service TypeScript class is stored, as shown here:
+
+```
+import { AppComponent } from './app.component';
+import { DemoService } from './demo.service';
+```
+
+The final stage is to have the `app.component.ts` consume the new DemoService. To do that, we add the service to the constructor of the component class, as follows:
+
+    import { Component } from '@angular/core';
+    import { DemoService } from './demo.service';
+    
+    @Component({
+       selector: 'app-root',
+        templateUrl: './app.component.html',
+       styleUrls: ['./app.component.css']
+       })
+       export class AppComponent {
+           title = 'app';
+           constructor(public demoService: DemoService) {} 
+        }
+
+Here, we have given the `DemoService` a local name of demoService, so if we want to access any of the functions of the service within our component class, we simply use the following local reference:
+
+`this.demoService.methodCall();`
+
+So, we've now created a service using the CLI, added it to our module so Angular knows about it, and added it to our main component class; that's quite a lot. Now, we are going to take a look at why Angular is built with TypeScript and what benefits this brings to us as Angular developers.
+
+### Why use TypeScript?
+In AngularJS, everything was written in JavaScript; with the new version of Angular, the decision was made to write everything using Typescript. Why was there this change from JavaScript to TypeScript? Well, there are many reasons, but first, let's take a look at what TypeScript is.
+
+TypeScript ([https:/​/​www.​typescriptlang.​org/](https:/​/www.typescriptlang.org/​)​) is from Microsoft, and according to the official website, it's a superset of JavaScript that compiles down to plain JavaScript. What this means is that TypeScript has a larger set of features that JavaScript doesn't have, but when you save your TypeScript file, the TypeScript compiler transforms the TypeScript code you have written to just plain JavaScript. But why do we need TypeScript?
+
+Well, the simple reason is that JavaScript, while a fantastic language, moves slowly when adding new features. For a new feature to be added to the language, it has to be discussed by all the relevant committees (JavaScript, while not being owned by anyone, is governed by a committee of community leaders and representatives for the various web browser developers). These committees need to discuss a new feature: how it'll be implemented, how it'll be used by developers, and the benefits it brings. Then, they make it part of the ECMAScript standard, which is a document that sets out what languages based on ECMAScript should be able to do.
+
+Then, all the various browsers need to start adding support for these new features of JavaScript into their browser, and the JavaScript engine, which is part of the browser. Therefore, when one browser supports a new feature, this allows a developer to use that feature and for it to work in the browser. Another browser company may not have implemented it, so when a user views a website or web application using this new feature, it won't work for them.
+
+The introduction of new features is a slow process in JavaScript. It has become faster over the last few years as the popularity of JavaScript has grown, but there are still a lot of hurdles for a new language feature to be added to plain JavaScript.
+
+Microsoft decided that they would create a new language—not to replace JavaScript (like they tried with JScript a few years ago), but so that this new language would have the features that they believed a modern web language should have. With their knowledge and experience in developing tools, they would create a compiler for this new language that would generate JavaScript that used its set of features to replicate the new features of this new language. This would allow the developer to use the latest features of a modern web language and leave the compiler to work out how to mimic these features in JavaScript.
+
+This is what TypeScript aims to do; Microsoft can add all the new features they want to TypeScript—features they believe a language should have (based on their experience with other languages, such as C#). These features include types, interfaces, and modules (although these are now available in JavaScript), and there is no wait for these features to be available to developers. Developers know that support for these new language features is made by the TypeScript compiler.
+
+### Why is Angular written in TypeScript?
+Angular is written in TypeScript because it provides so much insight and powerful tooling. One of the core developers of Angular, Victor Savkin, said the following:
+
+*"The biggest selling point of TypeScript is tooling. It provides advanced autocompletion, navigation, and refactoring. Having such tools is almost a requirement for large projects. Without them, the fear changing the code puts the code base in a semi-read-only state and makes large-scale refactorings very risky and costly."*
+
+*– Victor Savkin, Angular: Why TypeScript?*
+
+> You can find the article here: [https:/​/​vsavkin.​com/​writing-​angular-​2- in-​typescript-​1fa77c78d8e8](https:/​/vsavkin.com/writing-​angular-2-in-typescript-1fa77c78d8e8)
+
+Not only does TypeScript provide great features that aren't available in JavaScript, it also provides great tooling for developers to use in order to find issues and bugs within their code before it's even run in the browser.
+
+For example, we are using VSCode throughout this book to build both our Angular and Ionic applications, and both applications use TypeScript. As we go through building out these applications, TypeScript, and more specifically the TypeScript compiler, is inspecting our code and is aware of all the different parts of our code. If we add a property to a class then use that class in another class (as we did when we added our demo service to our main component class), the TypeScript compiler knows what functions are available from this demo service. Therefore, when we go to use the service in the component class, VSCode knows what is available and gives us developer insight into what functions are available as we type.
+
+For me, the main benefit that TypeScript provides is this insight into our code as we write. An application can become more and more complex, and trying to remember all the moving parts is extremely hard, but with TypeScript and the great tooling it gives us, there is less we need to remember and a lower chance of bugs appearing in the code.
+
+As well as great tooling, TypeScript allows us to make abstractions when we are defining the model of our application. Using interfaces, which TypeScript provides us, allows us to define how our application will be structured and the relationships between the parts of the data model that our application uses. This is something we will be looking at in the next section, where we'll go over the architecture of our *Client Contacts* application.
+
+Moving from JavaScript to TypeScript can be difficult, to start with. When you start writing TypeScript, the compiler keeps telling you the mistakes and problems with your code as you type, while JavaScript would just let you get away with these simple mistakes. Therefore, you would think that JavaScript is quicker to develop with, but the more and more you work with TypeScript, the better your code becomes and the better you become. Soon, you'll be writing code that is easier to read and understand.
+
+## The architecture of our Client Contacts application
+We've already spoken about it a couple of times, but throughout this book, we'll be building a *Clients Contacts Manager* application for both the desktop browsers, using Angular. Since we've been looking at the Angular architecture, we are now going to take a high-level look at the architecture of the Angular version.
+
+The main features of this application are as follows:
+
+- View a list of contacts
+- Search through the available contacts 
+- View the details of a selected contact 
+- Edit the details of a contact
+- Add a new contact to the system Remove a contact
+
+There's also going to be a Company section, because each contact must belong to a company, as our fictional salesperson needs to be able to find the contacts for a particular company.
+
+So, in the Company section, the salesperson will be able to do the following:
+
+- View all the companies
+- Search for a company by name
+- View the details of a selected company 
+- Edit the details of a selected company 
+- Add a new company to the system 
+- Remove a company from the system
+
+If we think about the model behind this application, there are three main data models: the contact, the company, and the salesperson who uses the application. Each of them can have an Interface that defines the details of the model and what each model representation can do.
+
+So, the interface for the salesperson could be as follows:
+
+```
+interface SalesPerson {
+       firstname: string;
+       lastname: string;
+       email: string;
+       password: string;
+       jobtitle: string;
+       startDate: Date;
+       active: boolean;
+       accessLevel: number; 
+       relatedCompanies: Companies[];
+       relatedContacts: Contacts[];
+   }
+ ```
+   
+Here, we have set some properties that a salesperson will have: `firstname`, `email`, `startDate`, and so on. We've also created properties that they may have for relatedCompanies and `relatedContacts`. Both of these are defined as arrays with a type of `Companies` and `Contacts`, which are Types we define for the data model of the other sections of the application.
+
+The Contact interface looks as follows:
+
+```
+ interface Contact {
+       id: number;
+       firstname: string;
+       lastname: string;
+       email: string;
+       jobtitle: string;
+       status: string;
+       isActive: boolean;
+       relatedCompany: Company;
+       notes: string;
+}
+```
+
+Here, we are defining the model of a contact to have an ID; a first name and last name; some details about their job, such as the status; and the Company they belong to, which is set as the relatedCompany property that is a type of Company.
+
+Finally, our Company Interface will look as follows:
+
+```
+interface Company {
+       id: number;
+    name: string;
+    address1: string;
+    address2: string;
+    town: string;
+    city: string;
+    postCode: string;
+    country: string;
+    contactEmail: string;
+    numberOfStaff: string;
+    industry: string;
+    isActive: boolean;
+}
+```
+
+As you can see, we've created a `Company` type that has a name, address details, some information about the number of staff, and the industry the company works in. This Company type is the type that is used for the `relatedCompany` property of the `Contact` type. Now that we have a few interfaces mapped out, it shows how the features of TypeScript allow us to abstract the model of the application into types that our application will use.
+
+What else do we need for our application? Well, here's an initial list of the components and services we need for this application:
+
+- Main `app` component
+- Main `nav` component
+- Header component
+- Login form component
+- Contact form component
+- Company form component
+- Add a new contact button component Search form component
+- List of contacts component
+- Service to manage the salesperson's access
+- Service to manage the contacts
+- Service to manage the company
+- Service to manage saving data to an external data source All the CSS for styling the app
+
+That's a lot of components and services, and there may be more! We won't create these now; instead, we'll start to create these components and services using the Angular CLI, which is what we will be looking at in *Chapter 3, Getting Started with the Angular CLI.*
+
+## Summary
+In this chapter, we set up a new Angular application using the CLI, and we reviewed the main parts of the application. We discussed how modules, components, and services are the building blocks of an Angular application. Then, we looked at why the Angular team made the decision to use TypeScript as their language of choice for Angular. We took a look at the architecture for the demo Angular application that we are going to start building in *Chapter 3, Getting Started with the Angular CLI*, when we will be taking a more detailed look at the Angular CLI.
