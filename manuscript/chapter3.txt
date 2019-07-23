@@ -1,9 +1,282 @@
-# Chapter 3
+# Chapter 3: Getting Started with the Angular CLI
+In the previous chapter, we took a quick look at the Angular CLI; we used it to create our `architecture-application` project. Now, we're going to be taking a closer look at the CLI.
 
-We hope this manuscript contains all the basic things you need to know to get started writing a book using Leanpub-Flavored Markdown.
+We'll be using the CLI to create our demo project and to run the application in the browser. Then, we will see how to use the CLI to create new components and templates. We'll also look at other commands you can pass to the CLI, and see what other tasks it can perform. Once we've gone through all this, we'll take a look at schematics, the latest feature of the CLI. We'll cover what schematics are, and how they are being used.
 
-If you switch to writing in the Markua syntax instead of Leanpub-Flavored Markdown, please be sure to rename the `images` folder in your `manuscript` folder to `resources.`
+In this chapter, we will cover the following:
 
-If there is anything simple that you think we should add, please email us at <hello@leanpub.com>.
+- What is the Angular CLI?
+- Installing the Angular CLI
+- Creating an application using the CLI
+- Running the application in the browser
+- Updating packages in your application using the CLI An overview of other CLI commands
+- Using the CLI to package an application for production What are Schematics?
 
-We recommend you take a few minutes to explore all the options in the Book Tools menu for your book on Leanpub. We've built a lot of powerful features that can help you write and sell your book!
+## How a CLI helps Angular developers
+A CLI is a tool that is designed to provide features that will help a developer in their day-to-day work. The Angular CLI, which is written in Node, is a tool that runs in your Terminal or Command Prompt that will be running in the background as you develop your application.
+
+It’s there so you can use it as you work; the type of things it can do for you include the following:
+
+- Generating a new Angular application
+- Creating new components, services, and files for your Angular application
+- Running the application in the browser
+- Reloading the browser every time there is a change, so you always see the latest version
+- Running your Unit Tests Running the end-to-end tests
+
+These are just a few of the features of the Angular CLI. As you can see from this list, having a tool that you can use to run these tasks as you are developing is beneficial.
+
+Now that you can build an Angular application without a CLI, you can create all the files yourself, set up a build tool that'll minimise all your files, and run the application in the browser. You can set up Karma to run all your unit tests. But all these tasks would take a lot of time within a project to set up and manage.
+
+## Installing the Angular CLI
+In the previous chapter, we went through the steps for installing the latest version of the Angular CLI, but it's worth going through these steps again (in case you missed them in the previous chapter).
+
+Anyway, here's how to install the Angular CLI. First, we need to install Node, as we will be using NPM to install Angular. So, go to the NodeJs website, [https:/​/​nodejs.​org](https:/​/​nodejs.​org).
+
+Select the latest Long Term Support (LTS) version of Node, which, in this screenshot of the NodeJS website, is version 10.13.0.
+
+Once Node has downloaded, run the installation wizard. Once that has finished, open Terminal or Command Prompt, and let's look at the version number to check that everything has been installed successfully.
+
+To check the version number, run this command:
+
+`node -v`
+
+You should see the version number appear in Terminal/Command Prompt, which should be the same as the version you have just downloaded.
+
+OK; now that Node is installed, it's time to get the Angular CLI. To do this, in the Terminal/Command Prompt window, type the following:
+
+`npm install -g @angular/cli`
+
+In this command, we are telling Node to use the **Node Package Manager (NPM)** to install globally, so that it is available in any folder you choose.
+
+Once this has run, we can check that the Angular CLI has been installed by typing this command:
+
+`ng -v`
+
+This will tell us what version of the Angular CLI we have installed, which, at the time of writing, is version 8.0.2.
+
+That's it; the Angular CLI has been installed. Now, we're going to look at how we can use it, and we'll start to create our Client Contacts Angular app.
+
+## Creating the Client Contacts Manager application
+We now have the Angular CLI installed, and we know it's working, because we've seen the version number. So we're going to start to create the *Client Contacts Manager* application.
+
+*So, let's get started!*
+
+First, let's go to our main working folder. I like to keep my projects under a `Dev` folder, so again, in Terminal, let's navigate to this working folder. So, type the following command:
+
+`cd Dev`
+
+That has taken us to our Dev folder; what we should do next is create a folder for our Angular apps. So, in Terminal, type the following:
+
+   `mkdir Getting-Started-With-Angular-8`
+   
+This will create a new folder called Getting-Started-Angular-8. This is where we will build both of our Angular applications. Now, you need to cd into this new directory using the following command:
+
+   `cd Getting-Started-With-Angular-8`
+   
+Once we're there, we need to tell the Angular CLI to create a new Angular application. To tell the Angular CLI to create an application, we simply use the following command:
+
+   `ng new Client-Contacts-Manager`
+
+This will create a new folder within the `Getting-Started-Angular-8` folder called `Client-Contacts-Manager`, where the CLI will create all the shell code of the application. As the CLI runs, it will ask you the following two questions:
+
+1. Would you like to add Angular routing?
+2. Which stylesheet format would you like to use?
+
+![Project Setup Commands](/images/chapter3/Project-Setup-Terminal.png "Project Setup Commands")
+
+Basically, the CLI is asking: *Do we want to add routing to the application?* Routing is how you set up navigation throughout an application, and by saying yes, we are asking the CLI to create a Routing module, where all our links can be added to a separate module. We will be going over Routing in *Chapter 6, Routing and Navigation*; but for now, say `Yes`.
+
+The second question is asking: *What CSS format do we want to use in this application?* We can use just plain CSS for the application, but we are going to choose SASS.
+
+After agreeing to these two questions, the CLI will create a folder called `Client-Contacts-Manager` and add all the scaffolding code for the application. Once the CLI has finished, cd into the folder that has just been created:
+
+`cd Client-Contacts-Manager`
+
+Then, type the following:
+
+`code .`
+
+This will open Visual Studio Code, with our newly created Angular application loaded. You should see the following screenshot:
+
+![VSCode showing our new project](/images/chapter3/VSCode.png "VSCode")
+
+This screenshot shows Visual Studio Code with the `Client-Contacts-Manager` folder loaded in the left-hand side project view.
+
+### Exploring VSCode
+Let's take a minute here to explore VSCode. From the preceding screenshot, we can see that there are two main panels in the VSCode editor. On the left side, we have the Project Explorer, which shows us all the files of our project, or the project opened in VSCode. On the right-hand side is the editor, where we can see any files that have been opened.
+
+If we double-click on a file listed in the left-hand side Project Explorer, the selected file opens in the right-hand Editor view. We can also use the shortcut command of Ctrl/Cmd + P to open the quick access tool, which allows us to start typing in the name of a file we want to open. Once we've found the file we want to access, all we do is press Enter, and that file will open in the Editor view. This is another way to open files, and it's a lot faster than searching through the Project View panel.
+
+The panel below the Editor view shows the built-in Terminal, which is an application that all computers have, whether it's macOS or PC, which allows us as developers to type commands to tell the computer to do something. We've used Terminal a few times now when installing the Angular CLI and creating our development folder, but now we can see we have access to this Terminal tool within VSCode, which makes it easy to access while we are building our application.
+
+Now we've had a brief overview of VSCode, we can carry on building our Angular application.
+
+**Awesome, we are on our way to Angular mastery!**
+
+## Running your application in the browser
+Now that we have our application generated by the CLI, it's a perfect time to run the application and see what the CLI has created for us. Not only will the CLI build an application for us, but it will run the application in the browser for us. To do this, we need to open Terminal within VSCode and then run this command:
+
+`ng serve`
+
+Or alternatively you can run this command:
+
+`npm run`
+
+You should see that the application has compiled successfully as shown in the following screenshot:
+
+![Terminal Running Our App](/images/chapter3/Terminal-Running-App.png "Terminal Running Our App")
+
+The Angular CLI has compiled all the source code of the application and started running a new Node server making the application accessible at this web address: `http://localhost:4200`.
+
+If you open this URL in your favourite browser, you should see the newly generated Angular app as follows:
+
+![Our app running in the browser](/images/chapter3/Localhost.png "Our app running in the browser")
+
+What we have here is our application running in the browser. As part of building a new application, the CLI generates an initial page with some helpful links. These links are as follows:
+
+- **Tour of Heroes**: A demo application created by the Angular team, which you can read about in the Angular documentation and see a live demo
+- **CLI Documentation**: A link to the wiki page of the Angular CLI team with details on how to use the CLI and a list of other commands
+- **Angular blog**: The Medium blog of the Angular team, well worth reading and checking regularly to see what the team are up to
+
+Now as we've seen, running the app and then opening the browser is easy, but there is an even easier way to get the application running in the browser. We can tell the CLI to not only start the application but open the browser and load the application for us.
+
+So now, close the browser and in VSCode terminal use *CMD/CTRL + C* to stop the Node service running. Then, within the same Terminal window, type the following command:
+
+`ng serve -o`
+
+This tells the CLI to compile the application, start the Node service running again, and even open the browser loading the application again at `http://localhost:4200`.
+
+You should now see the same web application running in your browser as we did before, but this time, there was no need to go and open the browser and enter the URL of the site, the Angular CLI has done all this for you.
+
+This is a small example of how the Angular can help improve the development processes. There are many commands that the CLI provides, which you can use to tell the CLI to help you as you build out your Angular application. Let's pause for a minute to look at some of these commands and how they can help.
+
+## Commands of the Angular CLI
+So we know the Angular CLI can be used to start a new application and also run the new application in the browser, but that's not all it can do. There are other commands we can use as Angular developers as we are developing our applications.
+
+> A command is a term for instructions we type into the **Command Line Interface (CLI).**
+
+Let's now go to the official Angular website to find the official documentation for the CLI as shown in the following screenshot:
+
+![The Angular CLI Documentation](/images/chapter3/Angular-CLI-Site.png "The Angular CLI Documentation")
+
+Once the site has loaded, we will see a list on the left-hand side of all the available commands. There are the following:
+
+- `ng add`: Used to add third-party libraries to an existing application, we will be using this soon to add Angular Material.
+- `ng build`: Used to compile the complete application into a /dist folder or a folder provided by an argument.
+- `ng config`: Allows you to either view or set configuration settings for your app, these configuration settings can be passed as JSON.
+- `ng doc`: Opens the official Angular docs website, if you want to find a specific topic, add the keyword as an argument
+- `ng e2e`: This will run the end-to-end tests of the application.
+- `ng generate`: Command to create/generate new components, services, and other parts of your Angular application. This command we will be using a lot over the next few chapters.
+- `ng help`: This provides you with a help menu for the Angular CLI. 
+- `ng lint`: Runs linting over your application's codebase.
+- `ng new`: This starts the process to create a new Angular application, we've already used this command.
+- `ng run`: This starts running a custom target for your application. In your package.json file, you can add custom commands that ng run will start for you.
+- `ng serve`: Starts the local Node server so you can access the site in the browser. ng test: Starts the running of all the Unit Tests you create for your application.
+- `ng update`: This will update the application and any dependencies in the application, very useful when a new version of Angular is released.
+- `ng version`: Tells you the version number of the Angular CLI currently being used.
+- `ng xi18n`: Extracts any xi18n messages within your application, used as part of adding multi-language support to your application.
+
+Wow, that is a lot of commands, 15 in total, and there may be more coming in future releases of the Angular CLI. This shows how much you can do with the CLI and how you will rely on it as part of your day-to-day Angular development. We are now going to take two of these commands and use them with our newly created Client Contacts Manager application.
+
+### Using ng add to add Angular Material
+Angular Material ([https:/​/​material.​angular.​io/](https:/​/​material.​angular.​io/)​) is a UI library that provides a set of UI components you can use in your Angular application. They give the application a Material look; when I say Material, I don't mean like carpet, but using the Material look that Google has been using in many of its web applications and in the Android mobile platform. You've already seen this Material look in the official Angular website.
+
+So why are we going to be adding this to our application? Well, the Angular Material UI does give a nice polished look to web applications, and we don't want to be spending the time creating loads of CSS to create a half decent looking application. Also, this does give us an opportunity to use the Angular CLI and add Angular Material via the CLI.
+
+To do this, we need to open up the terminal and navigate to the newly created `Client-Contacts-Manager` folder. Once there, you need to run this command:
+
+`ng add @angular/material`
+
+This will start a process where the CLI will install all the dependencies and libraries needed for Angular Material, it will also install the main CSS file into our main `index.html` file.
+
+After running this command, the CLI will be asking you a series of questions as follows:
+
+- What pre-built theme do you want to use?
+- Do you want to use HammerJS for handling gestures? This gives you support for gestures on mobile.
+- Do you want to use animations? This will give your app the smooth effects that you'd expect with that Material design style
+
+![Adding Angular Material](/images/chapter3/Adding-Angular-Material.png "Adding Angular Material")
+
+This shows the Angular CLI after it has asked its setup questions and updated the modules automatically. As you can see, `main.ts` has been updated, so has `app.modules.ts`. This is where the CLI has added the links and modules of Angular Material to our project automatically.
+
+So now that this is complete, let us run our application to see how it looks in the browser. Again we can use the CLI to run the app, using the following command:
+
+`ng serve -o`
+
+This will open the browser with the updated application, looking like the following screenshot:
+
+![Client Contacts Manager using Material](/images/chapter3/Contacts-Manager-Using-Material.png "Client Contacts Manager using Material")
+
+Now, the site doesn't look completely different, but that's because we haven't started adding Material specific components, but you can see that the fonts are different and the padding around the side of the application has been reduced. This is all because of the newly installed CSS file of the Angular Material library the CLI has installed.
+
+### Using ng test to run Unit Tests
+Unit Tests are an extremely important part of modern web application development. So much so, Angular creates tests for every component or service automatically for you when you use the `ng generate` command (though you can pass an argument to the generate command to not create a test). If you look at the codebase of our `Client-Contacts-Manager` application, you'll see many examples of these files ending `spec.ts`, these are the test files that the Angular CLI has created for us.
+
+We will be going further into Unit Testing in a later chapter, but what we really want to look at is how we can use the CLI to run these (and our future tests for us).
+
+Again, open Terminal and navigate to our `Client-Contacts-Manager` folder, once there, enter the following command:
+
+`ng test`
+
+Two things should happen; first, the Terminal window should show that it is compiling the application, the same way the CLI compiles the application when running it in the browser.
+
+![Terminal Running ng test](/images/chapter3/Command-ng-test.png "Terminal Running ng test")
+
+In here you'll see that it says **TOTAL: 3 SUCCESS** in green and **Executed 3 of 3 SUCCESS**, this three of three is in reference to the three unit tests that have been created by the Angular CLI and that these three tests have passed.
+
+> Unit tests can pass or fail, a test that is passing means the code that the test checks does what the test expects it to do. The code passes the tests checks. A failed test means the code doesn't pass the tests checks. We will go into this further in *Chapter 10, Testing* later.
+
+The second thing you should see is the browser opens; this is caused by the Angular CLI opening the browser to show the output of the Karma test runner the library Angular uses to run the tests. The Angular CLI uses Karma, a popular testing framework, to go through and perform all the available tests on the main code base. You should see the browser looking like this screenshot:
+
+![Browser Showing Test Results](/images/chapter3/Browser-Showing-Tests.png "Browser Showing Test Results")
+
+This is the browser window that the Angular CLI has opened for us, showing the report Karma generates; as you can see at the top, we have a nice green bar and this shows all our tests have passed; if they hadn't, it would be red. In the world of Unit tests, green is good, red is bad.
+
+One of the things you can do is have two Terminal windows open or one window divided into two sections if your Terminal of choice does that; in one window have the Angular CLI running the app and in the other have the Angular CLI running the `ng test` command. This will lead to your tests being run continuously as you code, which means you'll see immediately if a small code change you've made has failed to pass one of your tests.
+
+### Using the CLI to package an application for production
+The final Angular CLI command we are going to look at is the `ng build` command, which generates a release version of the application. This release version can then be hosted on your live server for clients to access.
+
+To run this command, all you need to do is again navigate to your `Client-Contacts-Manager` folder and use the following command:
+
+`ng build`
+
+Now the CLI won't show much in Terminal once this has finished running, but if we look in the project directory of Visual Studio Code, we can see a new `dist` folder as shown in the following screenshot:
+
+![The generate Dist folder](/images/chapter3/dist-folder.png "The generate Dist folder")
+
+This `dist` folder, which stands for distribution, has all the compiled JavaScript files of the application and one `index.html` file. You'll see there are no TypeScript files, no other HTML files because everything has been compiled. Now if we want to make our release of the application even smaller and faster to download, there are other arguments we can pass into with the `ng build` command.
+
+> Angular CLI Documentation on build command: [https:/​/angular.io/cli/​build](https:/​/angular.io/cli/​build)
+
+There is an argument we can pass in with the build command if we add `--aot` to our build command as follows:
+
+`ng build --aot`
+
+**AOT** stands for **Ahead of Time** compilation; this is a feature where the application only loads what the user needs to access. For example, if an app has a News section and a Messages section without AOT, Angular would load both the News and Messages section before the user can access either part of the application. With AOT, the News section would be downloaded into the browser, and the Message section wouldn't be download, that is until the user clicks on the Messages link. Then, the Angular compiler builds all the components of the Message section just before the user needs to use them.
+
+The benefits of this AOT feature is that a user does not have to wait for all of the application to load in the browser before they can access the application.
+
+Along with lazy-loading where only parts of the application that are being used are loaded into the browser, we will be looking at how to set up lazy loading when we go through routing in *Chapter 6, Routing and Navigation*. The end result of using both AOT and lazy-loading is that it appears that the application loads faster for the user. A faster loading application keeps users happy.
+
+So as you can see, there are many features and commands that the Angular CLI supports, but now we are going to have a look at a new feature in the Angular CLI called Schematics.
+
+## What are Schematics?
+Schematics is a workflow tool that can be run through the CLI. These workflow tools can be called through the CLI in order to perform a series of tasks for you. We've already seen an example of this when we use `ng generate` to create components and services. This is a predefined Schematic that creates the files we need for a new component.
+
+The benefit schematics bring is that these Schematics can be written to create more than just components; they can be set up to create parts of the application or even the shell of a complete application. This is something the company NativeScript have been working with the Angular CLI team to add to the CLI. This means, as Angular developers, we can get the CLI to create for us a shell of the application through one command. So they are obviously powerful.
+
+But that's not all, we as an Angular developer can create our own Schematic workflows by using the CLI to create a new Schematic project. Then we could set up our own workflow, which can be run through the CLI. This can be really helpful for large companies who use Angular; they can create a series of Schematics that any new developer can run when creating a new Angular application. This Schematic workflow could create the application, add Angular Material, and add any company-specific UI components. So the newly created application can have the company's UI style right from the beginning.
+
+Now we aren't going to go through how to create a Schematic workflow in this book, it's an advanced feature of the CLI and we need to move on to building our Angular application, but to read more about Schematics, here are some links you can check out:
+
+- [https:/​/​blog.​angular.​io/​schematics-​an-​introduction-​dc1dfbc2a2b2](https:/​/​blog.​angular.​io/​schematics-​an-​introduction-​dc1dfbc2a2b2)
+- [https:/​/​www.​telerik.​com/​blogs/​the-​what-​and-​how-​of-​angular-schematics-the-​super-​simple-​version](https:/​/​www.​telerik.com/​blogs/​the-​what-​and-​how-​of-​angular-​schematics-the-​super-​simple-​version)
+- [https:/​/​material.​angular.​io/​guide/​schematics](https:/​/​material.​angular.​io/​guide/​schematics)
+
+## Summary
+So what have we covered in this chapter? Well, we've had a look at the Angular CLI and how important it is for Angular developers to use as part of your day-to-day development. It has so many features that are available as we've seen; we can create new components, run the application in the browser, and we can run our unit tests.
+
+We've also seen how to add new features to our application and we installed the UI framework Angular Material through the CLI. We've seen that the CLI can update our packages and dependencies, which is extremely helpful when new versions of Angular are released. We can even open the official Angular documentation and search for a specific keyword using the Angular CLI.
+
+The Angular CLI is a really powerful and useful feature of Angular and should be seen as an important part of our Angular development. Next, we are going to be looking at the building blocks of our UI, using Components, Templates, and Forms.
