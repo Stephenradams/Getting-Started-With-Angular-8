@@ -1,0 +1,958 @@
+# Chapter 4 Components, Templates, and Forms
+
+We've covered a lot over the last few chapters. We've looked at the architecture of an Angular application, we've gone through the Angular CLI, what it is, what it can do, and how, as Angular developers, we can use the CLI. Now, we are going to start looking at the building blocks of an Angular application – that is, its components.
+
+In this chapter, you will learn about the following topics:
+- What components are and how they are structured What smart and dumb components are
+- How to pass data between components
+- What the different types of templates Angular supports Why you should categorise your components
+- How to add support for forms to the application
+
+## Components
+We've already seen what a component looks like in *Chapter 2, Angular Architecture*, but we've only looked at one component – one that doesn't have a great deal of functionality. In this chapter, we are going to be delving further into components. We are going to look at the structure of a component, the supporting component classes, as well as component templates. Then, we are going to look at how we can use components within our Angular application, how to pass data between components, and how to use components to structure our application.
+
+Once we've been through what components are, we will look at templates in Angular, how they are linked to components, and the different ways templates can be defined, as well as how events within a template can be set up, allowing you to add interactivity to your templates.
+
+Then, we will go through forms in Angular, looking at the various types of forms that Angular supports, and how you can add forms to your application.
+
+Finally, we will start adding components and templates to our demo application in order to start building out the application.
+
+## What are components?
+In the AngularJS years, there was no concept of a component. All we had was HTML templates and controllers which were attached to the HTML templates we created. There were directives, which although not exactly like components, they did allow us to create reusable elements that we could use over and over again within our applications.
+
+Then, the Angular team started talking about what was coming in Angular 2, and they introduced the idea of components instead of controllers. A concept that, at the time, sent the Angular community into meltdown, the thought of not having controllers was too much for some people.
+
+Thankfully, the Angular team released AngularJS 1.5, where they added the concept of components for the first time. In AngularJS version 1.5, components were very similar to directives, but with better support for controllers and life cycle events as part of the component.
+
+> For more information on AngularJS 1.5 components, read the following article by Todd Motto: [https:/​/​toddmotto.​com/​exploring-​the-​angular- 1-​5-​component-​method/​](https:/​/toddmotto.​com/​exploring-​the-​angular- 1-​5-​component-​method/​).
+
+In Angular 2+, components control a section of your application's UI through the HTML template of the component. The business logic that supports this UI element is defined in the component's class, which is a corresponding TypeScript file. This component class interacts with the template through properties and methods that are defined in the class, which we will look at later in this chapter.
+
+Angular 2+ has moved away from this template/controller model and moved to the more modular approach of components. Making this change has meant that there is no longer the need for scope and controllers, which are core parts of AngularJS.
+
+## Why do we have components now?
+Why the move to components in Angular 2+? Well, this is due in part to the emergence of Web Components. Web Components are a series of web APIs, which allow you to create your own HTML tags.
+
+> For more information on Web Components, visit [https:/​/​www. webcomponents.​org/​](https:/​/​www. webcomponents.​org/​).
+
+Creating your own tags isn't actually new. As AngularJS developers, we can create our own "tags" using directives, and later in AngularJS 1.5+ using components. But now, Web Components allow us to create HTML tags that the browser understands without the need for a third-party JavaScript library or server-side rendering if you used languages like ASP.Net or ColdFusion.
+
+Web Components are native to the browser and are built using standard web technologies (HTML, CSS, and JavaScript). You can use them to build HTML tags that are more relevant to your application's needs. For example, if you are building an application for a medical insurance company, and this application takes in patient details, you would probably create a form for adding in these details. If you wanted to reuse this form in another part of the application, you could either use a third-party framework such as AngularJS to create a directive that generates the form. Then, you would use this directive in all the places you wanted this form, which is fine, but this means that you would need to have this third-party library as a dependency in your application. You can create a tag such as the following with Web Components:
+
+`<patient-information-form></patient-information-form>`
+
+When the browser sees this new Web Component, it knows how to render it without the need for a JavaScript library. As a web developer, you can create a series of these native Web Components that are all related to the problem your application is trying to solve. You could have a whole set of HTML tags for your patient app. This allows you to create a library of tags for your application, and when you need to add new parts to the application as it grows, you can reuse tags from this library. If another web developer starts working on the same application, when they look at the source code, they will see tags such as `<patient-information-form>` and know what this tag does instead of seeing just `<form>` tags, which doesn't tell them anything about what they do.
+
+> Examples of this can be seen in the collections in the Web Components website, and in the Polymer Project, at [https:/​/www.​polymer-​project.org](project.org).
+
+Another extremely important part of Web Components is that due to them being native to the browser, they are extremely fast to render. With older ways of creating custom tags, there was always a lag where the browser had to render what the third-party library had generated. Now, there is no need for this lag time when rendering native tags.
+
+So, if Web Components allow us to create our own tags, why do we need Angular? Well, Angular provides so much more than what Web Components do on their own. Angular also provides services, HTTP request services, testing, a built-in build system, routing and navigation, as well as RxJs, which is built into Angular. Web Components don't provide any of this but is what you need in order to build a powerful web application.
+
+The Angular team were very smart; they saw that Web Components are a fantastic new way of creating HTML components. They make web apps so much faster, and instead of trying to compete with Web Components, the Angular team saw that this component approach was the way forward for modern web development. In order to make Angular a framework for modern web development, they need to move Angular away from the template/controller approach of AngularJS to the component approach of Angular 2+.
+
+This is why we now have components in Angular. They allow Angular to be a framework for building modern web applications – applications that now work on so many more platforms than was possible around the time AngularJS was started (mobile, tablets, TVs, games consoles – the web now runs everywhere) by using Web Components, Angular takes advantage of the built-in functionality of the browser meaning that any application built using Angular is extremely fast. Components are at the core of Angular so understanding how to write components and use them effectively is extremely important in making fast, powerful Angular applications.
+
+## The structure of a component
+A component is made up of two main parts – the `@Component` decorator and the component class. The following example shows a component. As you can see, there is the `@Component` decorator, which has three parts to it:
+
+- The selector
+- The template URL 
+- The styles URL
+
+The selector is the name that's used to create the tag name of the component. For example, in this component, we have a selector called `app-root` that will generate the following tag:
+
+`<app-root></app-root>`
+
+Let's change the selector to the following:
+   
+   `selector: 'my-app-root'`
+   
+The HTML tag it would generate would be as follows:
+ 
+   `<my-app-root></my-app-root>`
+   
+You can actually set the tag prefix for your application.
+
+For example, here is a `Component` class:
+
+```
+import { Component } from '@angular/core';
+   @Component({
+       selector: 'app-root',
+       templateUrl: './app.component.html',
+       styleUrls: ['./app.component.css']
+    })
+   export class AppComponent {
+       title = 'Welcome to your component';
+       yourName: string;
+       showForm = false;
+       constructor() {}
+       displayYourName(name: string) {
+           this.yourName = name;
+}
+       toggleDisplay() {
+           this.showForm = true;
+} 
+}
+```
+
+In this `Component` class, we have a few things going on. First, in the `@Component` decorator (a Component class uses the `@Component` decorator to tell Angular what it is), we set what template this `Component` class uses by defining a URL to the template HTML file. We then define the CSS file(s) that defines the style for this component.
+
+Below the `@Component` decorator, we have the TypeScript class of our component.
+
+Here, we have a few properties (title, yourName, and showForm). These properties are available for use in the HTML template we linked in the `@Component` decorator. Then, we have some methods (`displayYourName` and `toggleDisplay`), which are also available in the template. For example, the `toggleDisplay` method could be attached to a click event of a button in our template. So, every time the button is clicked, the toggleDisplay method is run and the showForm property is set to true (this is not a great example of a method, but it's really here to show how the `Component` class is used to define the business logic of the component).
+
+## The Component class
+Inside the `Component` class, we write the main business logic of the component. If we think of the common MVC pattern, the template HTML file is the view, our objects are the model, and the component class is the controller, which is the central point connecting the view and the model together.
+
+In the preceding example, you can see that we've added some business logic to our application by creating events that can be attached to click events in the view. A button can have an event like the `displayYourName()` function in the Component class if we use the built-in `(click)` event, like this:
+
+`<button id='myButton' (click)='displayYourName(name)'>My Button</button>`
+
+Here, we have added logic from our component class into the view using the built-in click event that Angular provides for us.
+
+Now, we could add a few more *event* handlers like this to our component class, but there's more that can be done within the Component class. This is done through the component's own life cycle. Here, we are able to run logic as the component is being created and is displayed in the UI. This is all possible due to the component life cycle hooks.
+
+## The component life cycle hooks
+Angular manages all the components we make for our applications in the same way it manages all of its components, whether they are ones we've created or third-party components, such as Angular Material. All components go through the same life cycle, where Angular creates the component, renders it, then creates and renders any child components. Angular also handles whether any data properties within our component change and also handles when a component is removed from the view, for example, when navigating to a new view.
+
+All of these stages have life cycle hooks that we can tap into and add our own logic to so that we can have our application do something while a component is going through one of these stages. For example, we may want to load some data before the component is rendered to the view. We could do that as part of the `OnInit` life cycle hook, but if we want to make sure that the latest data is loaded, we might want to use the `OnChange` life cycle hook, which is run many more times than the `OnInit ` life cycle hook.
+
+Here is a table of the available component life cycle hooks:
+
+**ngOnChanges()** - Responds when Angular either sets a data property or when an existing data property is reset. For example, a dynamic label on a page.
+
+**ngOnInit()** - This hook initializes the component after Angular has set all the data properties. This hook is only called once, while ngOnChanges is called many times throughout a component's life.
+
+**ngDoCheck()** - This hook can be called to detect and act upon any changes we need Angular to know about that Angular can't actually deal with. We can use this if we know there is an event that we want Angular to act upon, but Angular doesn't know about. For example, `ngOnChange` doesn't pick up on an event. We can use `ngDoCheck` as we know it will be run after every `ngOnInit` and `ngOnChange`.
+
+**ngAfterContentInit()** - This hook is available after Angular has added content to a component. This is useful any time we want to do something as soon as any content has been injected into a component from an external source. We could translate text in this hook as an example of what we could do in this step.
+
+**ngAfterContentChecked()** - This hook is available once content has been added to a component. With this hook, we can check whether the content that's been loaded into a component is correct or contains something we require.
+
+**ngAfterViewInit()** - This is available after Angular has initialised the view of a component. We could update the model if a certain components UI has successfully loaded, maybe as part of the application's security.
+
+**ngAfterViewChecked()** - This hook is available after the component's view has been checked and the component's child components views have been checked. We could use this to run a check to make sure a complex UI component's children components have loaded properly.
+
+**ngOnDestroy()** - This hook is available to us when a component is about to be removed from the UI. Here, we usually perform a lot of cleanup code, unsubscribe from Observables, and clean up event handlers. All of this helps improve application performance.
+
+When I say that we can hook into these life cycle hooks/events, I mean that we can add our own code for `ngOnInit()` because we know Angular will run `ngOnInit` for a component. By creating our own `ngOnInit()` event handler in our `Component` class, we know that Angular will also call our business logic as part of the component's life cycle.
+
+For example, in a `Component` class, we could do the following:
+
+```
+ export class AppComponent implements OnInit {
+    title = 'Client-Contacts-Manager';
+       ngOnInit() {
+           console.log('My component is alive');
+    } 
+}
+```
+
+Here, we have hooked into the `ngOnInit()` life cycle hook of this component and added a simple console log statement, which we will see when the component is displayed in the view, as shown in the following screenshot:
+
+![Showing OnInit Lifecycle Hook](/images/chapter4/Oninit-example.png)
+
+We're not replacing the component's life cycle hook; instead, we are extending what is already there. In the preceding example, the Angular `ngOnInit()` function is run with our code as part of the life cycle event.
+
+We know that we have this set of life cycle hooks we can extend upon with our own code, but how does Angular handle data displayed properties in our component's template? This is all part of interpolation.
+
+Interpolation, or string interpolation, is where you see the text within the `{{ }}` brackets, telling Angular that it should interpret the text within these brackets and use one-way data binding to replace the text within the `{{ }}` brackets with the value of the property of the same name.
+
+So, what does that mean? Well, when we talk about interpolation, we need to look at one-way data binding.
+
+One-way data binding is where you have a property in your Component class and when the value of that property is updated, this value is passed to the view. The flow of data is one way from the Component class into the view, which is why it's called one-way data binding. If we look at the following example, we can see string interpolation in action:
+
+```
+import { Component, OnInit } from '@angular/core';
+   @Component({
+       selector: 'app-interpolation-demo',
+       template: `<div>{{ name }}</div>`,
+       styleUrls: ['./interpolation-demo.component.css']
+})
+   export class InterpolationDemoComponent implements OnInit {
+       name: string;
+       constructor() { }
+       ngOnInit() {
+           this.name = 'Interpolation is weird';
+       }
+}
+```
+
+> The full code for this small demo is available at [https:/​/stackblitz.​com/edit/​interpolation-​demo-​app](https:/​/stackblitz.​com/edit/​interpolation-​demo-​app).
+
+In this simple component, we have an inline template that is using the `{{ }}` brackets to display the name property. In the Component class, we define the name property and then in the `ngOnInit()` life cycle hook (an example of how we can start to use these life cycle hooks we mentioned earlier), we set the value of `this.name` to Interpolation is weird. Here, we can see that one-way data binding is where the name property has been defined. Then, in `ngOnInit()`, we set the property. Angular then triggers an update on the text that's displayed in the view by setting the property's value and sending this update one-way to the view.
+
+This mechanism of updating properties in the view from the `Component` class is one-way (component class to view). If we want to have the view update a property in the component class, we have to use other approaches for this, which we will look at later in this chapter.
+
+Now that we know what one-way data binding is, we can see that string interpolation is the mechanism that Angular uses to change a string within the view. Angular knows that a section in the template can be updated when it sees the `{{ }}` brackets.
+
+But Angular can do more than just update string properties when it sees the `{{ }}` brackets in a template. It can also read JavaScript within these brackets and display the returned value to the template. For example, let's say that Angular sees the following in the template:
+
+`<label>{{ 10 + 20 }}</label>`
+
+Angular knows that it should add *10* and *20* in order to return *30*. So, when you view the template that this line is a part of, you'll see *30* and not *10 + 20*. Let's say that this line is in the template instead:
+
+`<label>{{ '10' + '20' }}</label>`
+
+Here, you would see *1020* in the view. This is because Angular has seen that these two values are a string and has added them together as one large string, while in the previous code, we saw that *10* and *20* are two numbers and so Angular added them together to make *30*.
+
+Interpolation, while an important part of Angular, is not something you have to think about all the time when you are writing your Angular application. It's just good to know what it is and that the Angular framework is taking care of this, but it is also good to have an understanding of how Angular updates the view.
+
+Now, we are going to start looking at ways components can start passing data between each other, and data that the component may take and display in the view using one-way data binding and interpolation.
+
+## Passing data into and out of components
+There are actually four different ways to pass data in and out of components. Choosing which approach to take depends on the complexity of the application you are developing and the relationship between the components.
+
+The first approach we're going to look at is the parent/child relationship, where one component has a child component.
+
+The flow of data in this instance is from the parent to the child. We use the `@Input()` decorator to pass data from the parent to the child component via the template of the child component. For example, look at the following parent component:
+
+```
+import { Component } from '@angular/core';
+
+@Component({
+     selector: 'app-parent-comp',
+     template: `
+       <app-child-comp [messageForChild]="messageFromParent"></app-child>
+     `,
+     styleUrls: ['./parent.component.css']
+   })
+   export class ParentComponent{
+     parentMessage = "Tidy your room"
+     constructor() { }
+}
+```
+
+Here, we are using an inline template, which has the child component's tag passing the `messageFromParent` property to the child component via the `messageForChild` property:
+
+```
+import { Component, Input } from '@angular/core';
+   @Component({
+     selector: 'app-child-comp',
+     template: `
+         Say {{ messageForChild }}
+    `,
+    styleUrls: ['./child.component.css']
+   })
+   export class ChildComponent {
+       @Input()
+       messageForChild: string;
+       constructor() { }
+   }
+   ```
+   
+In this example code, which is the child component, you can see that we've set the `@Input()` decorator on the `messageForChild` property. Now, this property is recognised by Angular as a way to pass properties into the child component.
+
+This is a one-way relationship: the parent gets the data, and it can manipulate the data before passing it into the child component. The child component has no way of getting data; that is the job of the parent.
+
+There are different ways that a child component can pass data to the parent. One way is through using the `@ViewChild()` decorator. This decorator is used in the parent component to define a property that is a reference to the child component.
+
+Using our parent/child components from the previous example, we could add a reference in the `ParentComponent` like this:
+
+```
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+   import { ChildComponent } from "../child/child.component";
+   
+   @Component({
+     selector: 'app-parent-comp',
+     template: `
+       Message: {{ message }}
+       <app-child-comp></app-child-comp>
+     `,
+     styleUrls: ['./parent.component.css']
+   })
+   export class ParentComponent implements AfterViewInit {
+     @ViewChild(ChildComponent) childComp;
+     constructor() { }
+     message:string;
+     ngAfterViewInit() {
+       this.message = this.child.message
+    } 
+}
+```
+
+Here, we are using the `@ViewChild()` decorator to set the childComp property as the reference to `ChildComponent`, thus making it and its public properties available to the parent. Then, in the `ngAfterViewInit()` life cycle hook, we're setting the parents' message property to be the same as the child's message property.
+
+The second way data can be passed from the child component to the parent is by using the `@Output()` decorator and the `EventEmitter` class. This approach involves defining events that can be subscribed to. The child component defines what events it emits and the parent listens for these events, which can contain data. This approach is ideal for when the child component needs to let the parent component know of button clicks or when form fields are changed within the child component.
+
+Here's our `ParentComponent`:
+
+```
+import { Component } from '@angular/core';
+   @Component({
+     selector: 'app-parent-comp',
+     template: `
+       Message: {{message}}
+       <app-child-comp (messageEvent)="receiveMessageFromChild($event)"></app-child-comp>`,
+       styleUrls: ['./parent.component.css']
+   })
+   export class ParentComponent {
+    constructor() { }
+    message:string;
+    receiveMessageFromChild($event) {
+    this.message = $event
+    }
+}
+```
+
+In the parent, we've created an event handler called `receiveMessageFromChild($event)`, which takes in a `$event` object. In the template, you can see that when messageEvent from the child is fired, the `receiveMessageFromChild($event)` handler is fired.
+
+To create `messageEvent` in the child component, we use the following code:
+
+```
+import { Component, Output, EventEmitter } from '@angular/core';
+   @Component({
+     selector: 'app-child-comp',
+     template: `
+         <button (click)="sendMessage()">Send Message</button>
+     `,
+     styleUrls: ['./child.component.css']
+   })
+   export class ChildComponent {
+     message: string = "I don't want to tidy my room"
+     @Output()
+       messageEvent = new EventEmitter<string>();
+     constructor() { }
+     sendMessage() {
+       this.messageEvent.emit(this.message)
+    } 
+}
+```
+
+As you can see, we're using the `@Output()` decorator (the opposite of the `@Input()` decorator) to define an output, which is sent using `EventEmitter` (the `<string>` part of EventEmitter is saying that the message/data being passed in the event should be a type of string. This is another way TypeScript does type checking).
+
+When the user clicks the button, the `sendMessage()` function is called. This emits messageEvent, which the parent is listening for.
+
+We can use this method to define other events that the child component emits/sends out. It is up to the other components to register that they are interested in listening for and handling these events.
+
+So, out of these two approaches for sending data from child components to parent components, which is better? Well, it depends. The first approach clearly sees that this child component is a child of the parent component it is referenced within. There is a tighter cohesion between the two.
+
+In the second approach, where the child component just sends out events that the parent or any other component can listen for, this makes the relationship between the components more separated, leading to more flexibility if a codebase needs refactoring. It also leads to more separation of concerns.
+
+> In computer science, **separation of concerns (SoC)** is a design principle for separating a computer program into distinct sections so that each section addresses a separate concern ([https:/​/​en.​wikipedia.​org/​wiki/Computer_​science](https:/​/​en.​wikipedia.​org/​wiki/Computer_science)).
+
+Using the approach of passing data from parents to child components using the `@Input()` decorator, and data from the child to the parent component using events makes the flow of data is our application one-way data flow.
+
+What really matters is that whatever approach you choose, you have to be consistent throughout the application.
+The final way of passing data between components is used for components that are unrelated – that is, components that don't have this parent/child relationship.
+
+Passing data between unrelated components can be done through shared services. The following is a service that contains some data:
+
+```
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class DataService {
+   private message: string;
+     constructor() { }
+     changeMessage(newMessage: string) {
+       this.message = newMessage;
+     }
+     getMessage(): string {
+       return this.message;
+     }
+}
+```
+
+This service simply contains a private property called message which can be changed by calling the `changeMessage()` function, and retrieved using the `getMessage()` function.
+
+The important part of this service is the `@Injector()` decorator. This tells Angular that this class can be injected into other classes, both component classes and other services. 
+
+We will be looking at services in more detail *Chapter 7, Dependency Injection, Services and HttpClient*, but for now, all you need to know is that this class is injectable into other classes.
+
+This is an example of a component using this service:
+
+```
+@Component({
+     selector: 'app-parent-comp',
+     template: `
+       {{message}}
+     `,
+     styleUrls: ['./sibling.component.css']
+   })
+export class ParentComponent implements OnInit { 
+
+    message:string;
+    constructor(private data: DataService) { }
+     ngOnInit() {
+       this.message = this.data.getMessage();
+       console.log(this.message);
+    } 
+}
+```
+
+Here, we are injecting `DataService` using the component class's constructor, then calling the DataService's `getMessage()` function to set the component's message property to the value in DataService:
+
+```
+import { Component, OnInit } from '@angular/core';
+import { DataService } from "../data.service";
+
+@Component({
+     selector: 'unrelated-comp',
+     template: `
+        {{message}}
+        <button (click)="newMessage()">New Message</button>
+        `,
+        styleUrls: ['./sibling.component.css']
+   })
+export class UnrelatedComponent implements OnInit { 
+    message:string;
+    constructor(private data: DataService) { }
+    
+    ngOnInit() {
+       console.log(this.data.getMessage());
+    }
+    
+    newMessage() {
+        this.data.changeMessage("Hello from a unrelated component");
+    } 
+}
+```
+
+In this unrelated component, we are also injecting `DataService`, but when the user clicks the button from the template, the DataService's `changeMessage()` function is called, passing in a new message. This will then update the message property in DataService, changing the value that is available to our original parent component. The reason that this data is the same for both components is that service in Angular is using a singleton design pattern. This means that both components are accessing the same data from the same class.
+
+Using a service means that you can load data from an external source and share that data between components. When we look at services in more detail later, we will see how to load data from external sources, how services are designed, we will go more in-depth about this singleton design pattern, explaining how data is shared by the service.
+
+So far, we've explored four different ways data can be passed between components. Now, we are going to take a break from looking at the Component class and we're going to take a quick look at the HTML templates of our components.
+
+## Component templates
+We've spent a lot of time looking at the component class, but now we're going to be looking at the template of the component. The template is the visual part of the component that a user of your application will see. A template can be as simple as a single line of HTML, to a fully featured web page. Within the template, we can define all the parts of the application the user can interact with, including forms, buttons, images, and even other Angular components – either one you've created yourself or third-party library components.
+
+There are two ways a template can be attached to a component: by the external template file approach or by using the inline template approach. Let's have a look at each version.
+
+### The external template file
+Let's look at an example component to see how the template is linked to the component:
+
+```
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html', 
+    styleUrls: ['./app.component.css']
+})
+
+export class AppComponent {
+    title = 'Welcome to your component';
+    yourName: string;
+    showForm = false;
+    
+    constructor() {}
+    
+    displayYourName(name: string) {
+        this.yourName = name;
+    }
+    
+    toggleDisplay() {
+        this.showForm = true;
+    } 
+}
+```
+
+This example component is from the `Angular-Architecture` project we created earlier when we were first exploring how an Angular application is structured. It is a simple component with just a couple of methods and properties. The important part is in the `@Component` decorator, where we set the component's selector, templateUrl, and styleUrls. It's within the `@Component` decorator that we set out what type of template we are going to be using for this component.
+
+Angular components support two types of templates: the external template, where the template is a separate HTML file linked to the component, and the inline template, where the HTML file is set in the `@Component` decorator definition. The preceding example is using the external template version. As you can see, the templateUrl is a path to the external HTML file and has the same name as the component. The following is the HTML contained within the templated file:
+
+```
+<div style="text-align:center">
+        <h1>Welcome to {{ title }}!</h1>
+</div>
+   <h2>Here are some links to help you start: </h2>
+   <ul>
+       <li><h2><a target="_blank" rel="noopener"
+   href="https://angular.io/tutorial">Tour of Heroes</a></h2></li>
+       <li><h2><a target="_blank" rel="noopener"
+   href="https://github.com/angular/angular-cli/wiki">CLI
+   Documentation</a></h2></li>
+       <li><h2><a target="_blank" rel="noopener"
+   href="https://blog.angular.io/">Angular blog</a></h2></li>
+   </ul>
+  ```
+  
+### The inline template
+Now, we can look at the second way a template can be added to a component – that is, by using the inline approach. The following is the same component as the preceding one, but this time using the inline style:
+
+```
+@Component({
+    selector: 'app-root', 
+    template: `
+           <div style="text-align:center"><h1>Welcome to {{ title}}!</h1></div>
+           <h2>Here are some links to help you start:</h2>
+           <ul>
+               <li><h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2></li>
+               <li><h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2></li>
+               <li><h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2></li>
+           </ul>`,
+   styleUrls: ['./app.component.css']
+})
+```
+
+We're only seeing the decorator section of the component because this is where the template is defined. As you can see by the highlighted section, the main difference is that there is no templateUrl; instead, we have a template property in the component decorator. Within this new template property, we don't have a link to an external file; instead, we have the same HTML that would be in the external file.
+
+So, how does the component interpret template property as HTML? As you can see, the HTML is contained within two backticks, ` `. Anything within these is seen by the component as HTML and used by the `@Component` decorator for the template of the component.
+
+> By using the backticks, which is a new feature of ES6/TypeScript, we can add in line breaks within our code. There is no need to concatenate the strings of HTML within the template property as one long line.
+
+### Which template approach is best?
+This is a difficult question to answer since both approaches have their pros and cons. The external template approach allows us to separate out the view of our component, which we can expand on by using separation of concerns, where each file has one single job that it is responsible for. The component class has all the business logic of our component, while the template HTML file has all the UI elements for the component and the CSS file styles for the UI of the component.
+
+The drawback of using the external approach is that if we have a component that has a very simple template, then there is a completely separate file just for this small amount of HTML. The following example shows this:
+
+`<div><button (click)="displayName()">Show My Name</button></div>`
+
+If we have an application that has a large amount of these "simple" template HTML files, this leads to a lot of files within our codebase, which we have to manage and be aware of.
+
+> There are extensions you can install for Visual Studio Code that help you navigate between the TypeScript component class and the HTML template of a component. One is called Angular Switcher, which can be found in the Extensions section of Visual Studio Code.
+
+The inline template approach allows you to add simple templates like the preceding one in the same file as our `Component` class. This is great since it reduces the number of files for our application, makes it easy to find the HTML for a component, and we can see all the references to properties and click events defined in the component class in the template, all within the one TypeScript file.
+
+The drawback of the inline approach is when we have larger, more complex templates. Templates can become quite complex, and having all that complexity in the same TypeScript file as the `Component` class makes this, even more, the case. This can lead to large TypeScript files that are hard to read and understand what's happening within the file. Imagine having this complex file being passed to another developer or you yourself being given a complex TypeScript file to make updates to the template. It can soon become troublesome. Using the external template file helps separate out the parts of the component into three sections, making it easier to manage.
+
+> As we've seen, the Angular CLI generates the HTML template for you when it creates a new component or directive. Therefore, we don't need to worry about creating the template file – just amending it for our needs.
+
+Each approach has its pros and cons, and either can be the best choice for your application – it's really a question of which version you and your team prefer. One thing you shouldn't do is mix both the internal and external approaches. This would lead to confusion as the application grows, especially if you are working as part of a team and in one section of the application all the components are inline templates and another part of the application is using external templates. For this book, we will be using the external approach for the reason that it keeps all our files small enough for us to read them and understand exactly what they do, which is important as we are learning Angular. Also, if you are going to be building enterprise level applications with Angular, using the external template gives you better code completion, and one member of your team can work on the template files while another works on the CSS or TypeScript file.
+
+### Styling components
+Styling our components is handled by the external (and it is always an external file) CSS file(s), which are linked to the component through the `stylesUrl` array. This is part of the `@Component` decorator definition:
+
+```
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html', 
+    styleUrls: ['./app.component.css']
+    })
+    export class AppComponent {
+       title = 'app';
+    }
+```
+
+The highlighted line shows that the related CSS file is set as the only item within the stylesUrls array. This means that a component can have more than one CSS file attached to it in case you have a CSS file that defines some global styles you want to use within your component, as well as its own component-specific styles. There are other ways CSS can be loaded into a template. For example, you can use the `stylesUrls` array to inline CSS in our template and use the `@import` statement to import styles into a component's CSS file. Angular doesn't just support CSS – you can also use **Sass** and **Scss** files. So, if you or your team prefers to use either of these CSS languages, you can.
+
+> We can tell the Angular CLI that every time it generates a component or directive for us, it can also generate a Sass or Scss file if we decide to use either of these languages for our CSS instead. It's a setting that you can access in the `Angular.json` file.
+
+## Categories of components
+When planning out your Angular application, it helps to think of components belonging to certain categories. These categories define the type of action that the component has been designed to perform. For example, a component that just shows visual elements like a form or a button could be categorised as a **visual component**, while a component that performs non-visual tasks like loading data via a service can be categorised as a **smart component**.
+
+Thinking of the types of categories that our components can belong to help when we are planning and designing how our application will work so that we can break down the functionality of the application into small, manageable chunks or components. Let's have a look at some of the types of categories we can use for our components.
+
+### Presentational components
+The role of a presentational component is to show something visually to the user. For example, you may have a list of items you want to show. This could be in a simple `<ul>` list, as follows:
+
+```
+<ul>
+       <li>Item One</li>
+        <li>Item Two</li>
+       <li>Item Three</li>
+       <li>Item Four</li>
+</ul>
+```
+
+Great! This could go into a component, but what if this list is generated by repeating over a list of items in an array? That's still fine – we can amend our list to look like this:
+
+```
+<ul>
+       <li *ngFor="item of items">{{item.name}}</li>
+</ul>
+```
+
+This is even cleaner – just the one line of HTML, which Angular generates for each item in the array of items. But now we need to think about how that array of items is loaded into the component. Do we want to use a service to load them? Do we want to pass them in through an `@Input()`? Do we want to make the call to the API directly in the component to load the list? What if we want to use this array of items in another component on the same page? There are many questions regarding the best approach.
+
+Through planning out our application beforehand, we can see that we will need to use this array of items is a few places in our application. So, in order to make this list component only do one thing, as any good application that follows the separation of concerns methodology should do. We will create a simple **presentational component** that shows just the `<ul>` list and pass in the data for the list into the component.
+
+All this presentational component does is display a `<ul>` list – it doesn't know where the data comes from, it doesn't know what the data is, it doesn't care where the data came from. Its only job is to display a `<ul>` of items.
+
+
+We could then create other presentational components that display this array of items in other formats. We could have one that shows the items in a table, or one that shows the array in a bar chart or a pie chart. Each of these components is very simple – they just present something to the user.
+
+But this leads to the question of how the same data should be passed into all these different presentational components – especially if they are all used on the same page within the application. This is where a **smart component** could be of use.
+
+### Smart components
+The role of a **smart component** is to provide all these **presentational components** with data and/or manage when a certain presentational component would be used. A great example of a smart component is a page component. What I mean by a page component is a component that is the page of an application.
+
+This page component could be the component that is loaded as part of a route in our application. Being a smart component, the page components role is to load data, such as our array of items, and provide them to all the various presentational components that the smart component loads within its template. The smart component doesn't actually show anything directly in its template to the user (though it could do). The smart component's single job is to manage its presentational components, whether that's loading data from a service and passing it into the presentational components or managing when certain components are shown or hidden from the user, or managing what the user sees if there is no data to be displayed.
+
+The smart/presentational component relationship is very much like a parent/child relationship. The smart component is the parent component, and the presentational component is the child component. The smart component will usually load in data via a service, then pass it into the child components using the `@Input()` decorator.
+
+If we look at our Client Contacts Manager application, we can see an example of one of these **smart components**. Let's go to the Clients section:
+
+`src > app > clients > client-page`
+
+In this folder, we have the following:
+
+- client-page.component.html
+- client-page.component.ts
+- client-page.component.spec.ts
+- client-page.component.sass
+
+Now, if we open the template file of this component, we'll see that there isn't much here, except a single presentational component:
+
+`<app-client-form></app-client-form>`
+
+This presentational component doesn't do a lot at the moment. We will be adding a form to the `client-form` component in the next section, but what we have done here is started creating the parent/child relationship, with our `client-page` being the parent component of the `client-form` component.
+
+We will be adding to this parent component as we build out the application. Now, we're going to look at forms, which are an important part of any application.
+
+## An introduction to forms
+Forms are an extremely important part of any modern web application. Forms are used for logging into an application, updating a user profile, submitting an application, and so on. In our Client Contacts Manager application, we will be using forms to add new Clients and new Companies to it.
+
+Angular provides two types of forms: Reactive and Template-driven. In many ways, both types work in the same way – they can both be used in the UI, they allow the user to validate input fields, and they both provide a data model of the data being added via the form, but it's how each form type handles and processes the data that's submitted through the form that separates the two types.
+
+The template-driven form is probably the one you've already used, even if you haven't used a JavaScript framework before. An example of a template-driven form could be something like a simple login form, or a small sign up form.
+
+Reactive forms use the Reactive programming approach, which is something we will explore more in the `RxJs` section. Reactive forms are reusable, testable, and scalable because of this Reactive programming approach.
+
+In order to see the differences between the two types of forms, it's best to go through a working example. In our Client Contacts Manager application, we are going to start adding two forms to the application. One is a simple template-driven search form, while the other is an Add Client form.
+
+### Creating a template-driven Search form
+This simple search form will be used in the Clients section of our application. It will allow the user to search for a client of theirs using the client's last name. However, before we even start building out the template form, we need to make some changes to our application.
+
+The first thing we need to do is update the routing of our application so that we can navigate to the Clients section. To do this, we need to open the routing module the CLI created for us during the initial application build process we went through. We did this by running the following command:
+
+`ng new Client-Contacts-Manager`
+
+Now, we need to open our routing module, `app-routing.module.ts`.
+
+> In Visual Studio Code, use `Ctrl/Cmd + P` and type in the name of the file you want to open as a quick way to open files.
+
+You should see the following:
+
+ ```
+ import { NgModule } from '@angular/core';
+ import { Routes, RouterModule } from '@angular/router';
+ 
+ const routes: Routes = [];
+ @NgModule({
+     imports: [RouterModule.forRoot(routes)],
+     exports: [RouterModule]
+ })
+ export class AppRoutingModule {}
+ ```
+ 
+ This is a very basic routing module. It has no routes currently defined, but we will add a new route that loads the clients section. The reason we've jumped into adding a route is so that we can navigate to the clients section of our application. We will be expanding on this routing module as
+ we add more modules and components to our application.
+ 
+To add a simple route, we need to update the routes array and add an object that defines the new details of our client route, like this:
+
+```
+import { NgModule } from '@angular/core';
+   import { Routes, RouterModule } from '@angular/router';
+   import { ClientPageComponent } from './clients/client-page/client-
+   page.component';
+   const routes: Routes = [
+       {
+           path: 'clients',
+           component: ClientPageComponent
+       },
+{
+path: '',
+           redirectTo: '/clients',
+           pathMatch: 'full'
+       }];
+   @NgModule({
+       imports: [RouterModule.forRoot(routes)],
+       exports: [RouterModule]
+})
+
+export class AppRoutingModule {}
+```
+
+The main change we've made is that we've created two new routes. The first is the clients route, which will load `ClientPageComponent` (a smart component) into the view when called. If we run our application using `ng serve -o`, the application will run in the browser. If we then add `/clients` to the end of the URL of our application, it will
+load `ClientPageComponent` in the browser:
+
+![Client Contacts Manager, showing the Client Page Component](/images/chapter4/App-In-Browser.png "Client Contacts Manager, showing the Client Page Component")
+
+Here, we can see that the path of our application is
+`http://localhost:4200/clients` and that the Client page is being displayed within the view of the application, but what about this second route we've added? If we change the URL of the application to just `http://localhost:4200`, we will see that the Client page has been reloaded again. But why? This is where our second route comes into play.
+
+The second route we defined is basically a default route:
+
+```
+ const routes: Routes = [{
+       path: 'clients',
+       component: ClientPageComponent
+   },
+   {
+       path: '',
+       redirectTo: '/clients',
+       pathMatch: 'full'
+   }];
+```
+
+This second route has a path property that says that there is no path at the end of the app's URL, for example, it's `http://localhost:4200` instead of `http://localhost:4200/clients`. Angular redirects the user to the `/clients` path, which we know will then load `ClientPageComponent` into the view.
+
+There's a lot more to routes and navigation in Angular than just this, and we are going to look more at the ways Angular supports routing in a later chapter, but I wanted to use this now as a way of showing you how we can set up a smart component, `ClientPageComponent`, how we navigate to this smart component, and how we can create a presentational component to display our simple template-driven form.
+
+Let's get back to creating this Search form.
+
+The first thing we need to do is create our new search form presentational component. Let's go back to the Angular CLI, which will do this for us.
+
+We're not going to have all our components in the same folder. Instead, we're going to start creating folders per functionality.
+
+> To get an idea of how you can structure your application, Angular has provided a Style Guide that's worth looking through. You can find this style guide at [https:/​/​angular.​io/guide/​styleguide](https:/​/​angular.​io/​guide/​styleguide).
+
+In our current folder structure, we have a Clients section, and within that, we have a `client-page` component. What we are going to do is create a new folder for our search form above the Clients section. To do this, we need to navigate to the app folder in VSCode and create a new folder called `search`:
+
+![Client Contacts Manager, showing the search folder](/images/chapter4/Search-Folder.png "Client Contacts Manager, showing the search folder")
+
+Now that we've created this folder, we need to navigate to it in the terminal. You can do this in the built-in terminal of VSCode. Once you have navigated to this folder, run the following command to generate a component called `search-form`:
+
+`ng generate component search-form`
+
+Now, within the search folder, we have our new component. Let's open up the HTML file of this component and make some changes by adding in a simple form. By default, the Angular CLI creates a template with just a paragraph tag and the title of the newly generated component, so our `search-form` template currently looks like this:
+
+```
+<p>
+       search-form works!
+</p>
+```
+
+Let's update this template a bit. Here's our updated search form template:
+
+```
+<form class="search-form" (ngSubmit)="onSubmit()">
+       <p><label for="searchBox">Search</label></p>
+       <input type="text" id="searchBox" placeholder="Search...."
+   name="searchField" [(ngModel)]="searchField" />
+       <p><button type="submit">Submit</button></p>
+</form>
+```
+
+What have we done here is to add a new input field called `searchBox`. We've also added a submit button and a label for this new form, but you'll also see we introduced two new Angular-specific attributes. We've added `(ngSubmit)` and `[(ngModel)]`, which are two new Angular attributes we've not encountered yet.
+
+If we just copy this code into our template, we'll find that there are some errors when we run the application. This is because we need to add FormsModule to our application. Angular uses modules to the core framework to improve functionality, and FormsModule contains all the classes we need to add support to our application for both the template-driven forms and the Reactive forms.
+
+> This concept of adding modules to our application in order to add new functionality is something we have seen already when we added Angular Materials to our application in *Chapter 3, Getting Started With The Angular CLI*. It is also something we will explore further in *Chapter 5, NgModules* chapter.
+
+Here is the updated `app.module.ts` file with the forms module imported:
+
+```
+import { BrowserModule } from '@angular/platform-browser';
+   import { NgModule } from '@angular/core';
+   import { FormsModule } from '@angular/forms';
+   import { AppRoutingModule } from './app-routing.module';
+   import { AppComponent } from './app.component';
+   import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+   import { ClientPageComponent } from './clients/client-page/client-page.component';
+   import { SearchFormComponent } from './search/search-form/search-form.component';
+   
+   @NgModule({
+   declarations: [
+           AppComponent, 
+           ClientPageComponent, 
+           SearchFormComponent],
+    imports: [
+        BrowserModule, 
+        AppRoutingModule, 
+        BrowserAnimationsModule, 
+        FormsModule
+   ],
+   providers: [],
+   bootstrap: [AppComponent]})
+   export class AppModule {}
+```
+
+You can see that the two important parts are highlighted where we've added the `FormsModule` to the imports array and where `FormsModule` was imported into the `app.module.ts`. By adding this to the imports array, Angular knows that this module and the functionality it contains is available to our application.
+
+Now, we will make some updates to our TypeScript component class:
+
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+    selector: 'app-search-form',
+    templateUrl: './search-form.component.html',
+    styleUrls: ['./search-form.component.scss']
+})
+   
+export class SearchFormComponent implements OnInit {
+    searchField: string;
+    
+    constructor() {}
+    
+    ngOnInit() {}
+    
+    onSubmit() {
+           console.log(this.searchField);
+    }
+}
+```
+
+As you can see, there are a couple of changes here. The first change was made to the searchField property. This is a simple string, but through the use of `[(ngModel)]`, we have bound the input field to this property and made a one-way data binding to this searchField property. Now, when we type anything into this text field, the value we type into this input field is set as the value of searchField.
+
+The second change we've made is that we've added a new event, the `onSubmit()` event, which we have set as the event that's fired when the form is submitted. Through the `(ngSubmit)` event binding in our form, we've set that this `onSubmit()` event is fired when the form is submitted.
+
+In this `onSubmit()` event, we are just writing the value of the local searchField property to the browser console. When we submit the form, any value that's written in the input field is displayed in the browser console.
+
+This is the basics of a template-driven form – we simply create a model (in this case, a simple string) which is bound to our form using the `ngModel` to set our local model to the form. Then, anything that's submitted through this form is written to the model we create.
+
+The idea of having a model behind the form is also used in a Reactive form, but it's how the form works with this model that differs in the Reactive form, which we will explore in the next section.
+
+## Creating a Reactive form
+
+So, how do Reactive forms differ from template-driven forms? As we've seen, the template-driven form is closely bound to its model. Our new Search form has a simple model of a string property, and as soon as we submit the form, that property is set. Reactive forms differ from template forms through their use of observables to stream form data to the model, while the template form is bound directly to the form.
+
+In order to show the differences between the two approaches, it's best to create a Reactive form so that we can look at how the two variations of forms differ. Let's start by creating a new form for our application.
+
+The form we're going to create is our `client-form`, where the user will enter the contact details of the new client they are adding to the Client Contacts Manager application. The first thing we need to do is create a component that will contain this form. This component will be within our clients folder of the application and not in a separate folder like the Search form is.
+
+Within the terminal in VSCode, let's navigate to the client folder and run the following command:
+
+`ng generate component client-form`
+
+This will create our new component, ready for the new form to be built. Before we start building out the HTML of the form, we need to do two more things. First, we need to add a new module to our `app.module.ts` file. This new module is
+called `ReactiveFormsModule`.
+
+In the imports array of our `app.module.ts` file, we simply add **ReactiveFormsModule**. It will look like this:
+
+```
+imports:[
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    FormsModule, 
+    ReactiveFormsModule
+],
+```
+
+You should see that VSCode automatically adds the import statement for this module to the top of the `app.module.ts` file:
+
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+```
+
+The second thing we need to do is add this new component to `ClientPageComponent`, like this:
+
+```
+<h2>Add a new Client</h2>
+<app-search-form></app-search-form>
+<app-client-form></app-client-form>
+```
+
+We've also changed the title of the page. Great! Now, let's open the template of our new `client-form` component and build out the HTML of the template:
+
+```
+<div class="client-form">
+<form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+    <p><label> Firstname </label> 
+        <input type="text" name="firstnameTxt" formControlName="firstname" required />
+    </p>
+    <p><label> Lastname </label> 
+        <input type="text" name="lastnameTxt" formControlName="lastname" required />
+    </p>
+    <p><label> Email </label> 
+        <input type="email" name="emailTxt" formControlName="email" required />
+    </p>
+    <p><label> Telephone </label> 
+        <input type="tel" name="telephoneTxt" formControlName="telephoneNumber" />
+    </p>
+    <p><label> Company Name </label> 
+        <input type="text" name="companyTxt" formControlName="companyName" required />
+    </p>
+    <p>
+        <button type="submit" [disabled]="!clientForm.valid">Save</button>
+    </p>
+</form>
+</div>
+```
+
+At first glance, this Reactive form does look similar to the template form, but there are some slight differences. First, you can see that we've created something called a `formGroup` and added a `formControlName` attribute to each input element.
+
+`formGroup` allows Angular to keep track of all the changes that happen to any of the `formControl` elements in our form. You can also see that we are using a property of the `formGroup `in the submit button. We're checking to see if the form is valid, that is, it has passed all our checks before the Submit button is enabled. This stops the user from being able to submit the form until all the required fields have been completed.
+
+Now, let's look at the Component class for this template, `client-form.component.ts`:
+
+```
+import { Component, OnInit } from '@angular/core';
+import { Form, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+
+    @Component({
+       selector: 'app-client-form',
+       templateUrl: './client-form.component.html',
+       styleUrls: ['./client-form.component.scss']
+    })
+   
+   export class ClientFormComponent implements OnInit {
+       // new FormGroup is defined here
+       clientForm: FormGroup;
+   
+       // creating new FormControls, with validation
+       firstname = new FormControl('', Validators.required);
+       lastname = new FormControl('', Validators.required);
+       email = new FormControl('', Validators.required);
+       telephoneNumber = new FormControl('');
+       companyName = new FormControl('', Validators.required);
+   
+       // in the constructor we create the a FormGroup and set the properties of
+       // the formGroup to the FormControls then set it to be the clientForm we use in the template.
+       constructor(fb: FormBuilder) {
+            this.clientForm = fb.group({
+               firstname: this.firstname,
+               lastname: this.lastname,
+               email: this.email,
+               telephoneNumber: this.telephoneNumber,
+               companyName: this.companyName
+            }); 
+        }
+        
+       ngOnInit() {}
+       
+       // event called when form is submitted, displaying the output of the form
+       saveClient() {
+           console.log(this.clientForm);
+        } 
+}
+```
+
+So, what's happening here? Well, we created a new `FormGroup` object called `clientForm`, which is exposed as a public property to the template. Then, we created a series of `FormControl` objects, one for each form field, setting the default value (currently an empty string) and the validation options, which we've set as Required.
+
+Then, in the constructor, we created a new FormBuilder instance and set the `FormControl` objects as properties of the new Group we created using the `FormBuilder`. Finally, we have an event, `saveClient()`, which is called when the form is submitted. This event simply outputs the values of our form fields, which are stored in the clientForm object, so that we can see them in the browser console.
+
+But what does all this mean? Well, let's start with `FormControls`. We've made a series of them – one for each of our form's input elements. By doing this, we are telling Angular about these form elements and Angular can now observe these form fields. Angular can check what values have been added to them if they pass the validation rules that have been set.
+
+Next, we use Angular's FormBuilder class to create a new group object. This group is a representation of the values entered in the form fields, similar to how we used `ngModel` in the template-driven form. This group allows us to get the values out of the form. It then creates the model of the form. Then, we set this model representation of the form to the `clientForm` public property, which we then set as the `formGroup` of the template.
+
+When the form is submitted, all the values of the form fields are set to this clientForm object, so when we write the `clientForm` object to the browser console, we see an object with all the form values as properties of this `FormGroup` object.
+
+The difference between the template-driven form and the Reactive form is that the template form binds closely to a model through `ngModel`. As the form is submitted, the model is already set.
+
+Reactive forms take a different approach – they create a model of the form, which is attached to the form using the `FormGroup`. This model then observes the form and as data is entered into the form, the model updates. This makes the state of the model available at any time so that if the user has just entered the first part of the form, we have a model representation of this. With each change to the form, we have a new instance of our form model.
+
+The benefits this brings is that through separating out the model of our form, we can start taking advantage of the Reactive programming model which Angular now embraces, instead of waiting for the user to complete and submit the form before we can access the data of the form as we do in the template-driven approach. Through this Reactive approach, we can start using the data in the form as the user types (you can see this in action with the form's `Valid` attribute that we check for in the Submit button. The form is being checked as the user types into form, and once all the Required fields have been completed, the Valid attribute of the form is set to true). We can start checking the value of a form field as the user types. This is helpful for forms where we need to start filtering data based on the value being entered, for example, a form field that filters a list of companies. It sounds like we need to start building out our application so that we can add a reactive form to our **Company** section.
+
+Now that we know about the differences between the two types of forms, we can look at the reasons why we would use either.
+
+## When to use template forms
+We would use a Template form when we have to build a very simple form or our project has the need for a simple form as part of simple scenarios. Template forms are ideal for simple forms, such as login forms.
+
+If your project is not heavily reliant on Unit Testing, then template forms are an option. Template forms are hard to test, but if that's not an issue for your project, then template forms are an option.
+
+With a template form, all the data handling is managed by Angular, and two-way binding is handled using the `[(ngModel)] ` syntax. As we've seen in the examples so far, the TypeScript code needed for a template form is far less complex than it is for a Reactive form.
+
+## When to use Reactive forms
+Reactive forms offer a lot more features, and they make testing far easier. If your project requires good testing coverage (when all the code that's been written has an associated unit test), then Reactive forms are a better option.
+
+They are ideal for more complex scenarios in applications. With Reactive forms, we can build complex signup wizards where each page of the form is a new step of the signup process. With Reactive forms, new form elements can be added dynamically. So, if a user selects an option, we can change the next step in the process based on the value of a previous option.
+
+There is no data binding, so we can make an immutable data model of the form that we can work with. This produces more TypeScript code, but less HTML code. This is something to consider if you are happier working in TypeScript than HTML.
+Generally, template forms are ideal for small simple forms. They are very similar to how forms were handled in AngularJS, but not ideal for more complex forms, which a lot of modern web applications use.
+
+Reactive forms are hard to use at first, but with practice, you'll find they soon become your default choice for creating forms in Angular. They offer so much more functionality, flexibility, and ways of handling data that it is worth investing in the time to understand them.
+
+## Summary
+We've covered a lot in this chapter. We've looked at what components are in Angular, why components are part of Angular, how they are structured, and the various parts of a component. 
+
+Then, we looked at the Component class and how the `@Component` decorator is used to link all the parts of the component together. We then looked at how we can use `@Input()` to pass data into components and what other methods are available to us to share data between components.
+
+We also looked at the component template and how there are two options for where we set the template for our components, as well as the differences between the two approaches and which one is best for the types of components you may build in your application.
+
+Then, we spent some time looking at how we could categorise our components when we are planning out the functionality of our application. We briefly explored the idea of passing data between unrelated components using services, which we will be looking at further in *Chapter 7, Dependency Injection, Services and HttpClient*.
+
+Finally, we explored forms in Angular and how Angular now has two types of forms: template-driven and Reactive. We created two small forms for our application using these approaches. Then, we looked at their differences and how a reactive form allows us to start using this Reactive programming approach in our applications.
+
+Next, we are going to start looking at modules in depth. Now that we know about components, we need to start using modules in order to group our components into sections of functionality.
