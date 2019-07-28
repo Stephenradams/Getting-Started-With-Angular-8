@@ -1,4 +1,5 @@
 # Chapter 3: Getting Started with the Angular CLI
+
 In the previous chapter, we took a quick look at the Angular CLI; we used it to create our `architecture-application` project. Now, we're going to be taking a closer look at the CLI.
 
 We'll be using the CLI to create our demo project and to run the application in the browser. Then, we will see how to use the CLI to create new components and templates. We'll also look at other commands you can pass to the CLI, and see what other tasks it can perform. Once we've gone through all this, we'll take a look at schematics, the latest feature of the CLI. We'll cover what schematics are, and how they are being used.

@@ -1,4 +1,4 @@
-# Chapter 4 Components, Templates, and Forms
+# Chapter 4: Components, Templates, and Forms
 
 We've covered a lot over the last few chapters. We've looked at the architecture of an Angular application, we've gone through the Angular CLI, what it is, what it can do, and how, as Angular developers, we can use the CLI. Now, we are going to start looking at the building blocks of an Angular application – that is, its components.
 
