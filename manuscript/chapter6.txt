@@ -1,0 +1,728 @@
+# Chapter 6: Routing and Navigation
+
+So far, we've looked at what Angular is, how to get started, and how to use the Angular CLI to help us build our first Angular application. However, the application we've built so far doesn't have a lot of functionality. Over the next couple of chapters, we will start adding to our application in order to make it more interactive.
+
+In this chapter, we will start by looking at Routing and Navigation in Angular, and how we can use the features that Angular provides for routing to create complex and sophisticated navigation systems to support the needs of our application.
+
+In this chapter, we will cover the following topics:
+
+- What are routes?
+- How routes work in Angular
+- How to set up routes for your Angular application
+- How to add navigation to an Angular application
+- What route guards are and how to use them
+- What asynchronous routing is and what benefits it can bring to your Angular application
+
+
+We will be expanding on our Client Contact Manager application by adding navigation to it so that a user can to navigate between the sections of the application.
+
+## What are routes?
+A route is when the user navigates from one section to the next. The reason we call them routes is because all the navigation in an Angular application is set up and managed through the Angular Router. This Angular Router is another module that allows us as Angular developers to set up the navigation within our application.
+
+There are various ways in which the browser supports navigation:
+
+- When the URL in the browser's address bar is changed and the browser navigates to the new section
+- When the user clicks on a link in a page of the application, forcing the app to navigate to a new page
+- When the user clicks on either the back or forward buttons of the browser, navigating through the local browser history
+
+When the URL of the browser changes, the router can take that new URL as an instruction and navigate to the relevant section of the application.
+
+We can add links within our views so that the user can click on these links to navigate to different parts of the application. The router has been designed to keep a log of the activity in the browser's history, so support for the back and forward buttons is available in the Angular Router.
+
+When we originally started our Client Contacts Manager application, the Angular CLI asked us whether we wanted to set up routing in our application, to which we said "yes". Therefore, the CLI created a very basic routing module in a TypeScript file called `app- routing.module.ts`. If we open that file, we can see how routes are set up:
+
+```
+const routes: Routes = [
+   {
+        path: 'clients',
+        component: ClientPageComponent
+    },
+    {
+        path: '',
+        redirectTo: '/clients',
+        pathMatch: 'full'
+    }
+];
+   @NgModule({
+       imports: [RouterModule.forRoot(routes)],
+       exports: [RouterModule]
+   })
+   export class AppRoutingModule {}
+```
+
+There isn't a lot going on here at the moment – the important part is seeing how `Routes` are defined and what modules are involved in building the routes of the application.
+
+As you can see, there is an array called routes, and this array is passed into the `forRoot()` function of `RouterModule`. This `RouterModule` is then exported out of our `AppRoutingModule`. `AppRoutingModule` is then imported into the main `AppModule`:
+
+```
+ imports: [
+    BrowserModule,
+    AppRoutingModule, 
+    BrowserAnimationsModule, 
+    CustomMaterialModule, 
+    ClientModule, 
+    CompanyModule, 
+    SharedModule
+]
+```
+
+That's all great, but what does this actually mean? Well, in our `AppRoutingModule`, we create an array of objects that have a type called `Route`. These objects have properties that are used to create a model of all the possible routes the application needs to support. This array is passed to the Angular framework's `RouterModule` so that the framework registers the patterns we've set up in the array. Let's have a closer look at the `Routes` array.
+
+### The Routes array
+The `Routes` array contains Route objects. If we quickly look at the interface that defines what `Route` object properties are, we can see that there are a number of properties available to us:
+
+```
+interface Route {
+       path?: string
+       pathMatch?: string
+       matcher?: UrlMatcher
+       component?: Type<any>
+       redirectTo?: string
+       outlet?: string
+       canActivate?: any[]
+       canActivateChild?: any[]
+       canDeactivate?: any[]
+       canLoad?: any[]
+       data?: Data
+       resolve?: ResolveData
+       children?: Routes
+       loadChildren?: LoadChildren
+       runGuardsAndResolvers?: RunGuardsAndResolvers
+}
+```
+
+> This is the interface that defines what a Route is in Angular.
+
+As you can see, there are a lot of different properties we can use to create a route object. This array of `Route` objects makes up a model of how the application will handle different paths into the application. For example, in `AppRoutingModule`, we have a Route that has two properties: one called path and another called component. When the browser loads a URL with clients after the domain name, for example, `http://localhost:4200/clients`, as the client's part of the URL matches the path property, the router knows to read from the other properties of the matching object. The other property of this object is the Component property. The Route module takes the value of this component property, which in this case is `ClientPageComponent`, and loads it into the main view the Component that has the same name.
+
+We can add to this `Routes` array and add other route objects (*the Routes array contains a set of objects that define the details of the Route*) with path properties so that they can match other paths our application may need. For example, let's add a new object with a path of company, and a component of `CompanyPageComponent`, like this:
+
+```
+const routes: Routes = [
+    {
+       path: 'clients',
+       component: ClientPageComponent
+    },
+    {
+        path: 'company',
+        component: CompanyPageComponent
+    },
+    {
+        path: '',
+        redirectTo: '/clients',
+        pathMatch: 'full'
+   }];
+```
+
+Here, when `http://localhost:4200/company` is entered into a browser address bar, the company route will match that path and the `CompanyPageComponent` will load.
+
+As we saw from the Route interface, there are more than just path and component properties available to the `Route` object, which we will be using as we go further into routing and the navigation of Angular, but from the current `AppRoutingModule` we have in our application, we can see how routes are set up. Next, we need to see where the component is loaded and how a user can see the related component of a route.
+
+### The Router Outlet component
+The Router Outlet is a directive that's part of the Router module. Its main role is to be a placeholder within our application where the Angular framework should place any components within a template.
+
+Currently, we are using this directive in the `app.component.html` file of our Client Contacts Manager application. If we open this file, we will see the following:
+
+```
+<mat-toolbar> {{ title }} </mat-toolbar>
+<div class="container">
+    <router-outlet></router-outlet>
+</div>
+```
+
+Here, we can see that the `<router-outlet></router-outlet>` selector is placed in the containing div, underneath the new Material Toolbar component we added in *Chapter 5, NgModules*.
+
+So, what does this directive do? Well, in the Routes array, we specify what path the `RouterModule` needs to be aware of, and when it matches one of these routes it needs to load a component, which is set as the `component` property of the `Route` object we're creating.
+
+When Angular sees that path, it knows what component to load and uses the placeholder Router-Outlet directive as the place in our template to load the template of the specified component.
+
+In our `app.component.html` template, we've put the Router-Outlet selector in a `div`, underneath the toolbar. This shows that it can be part of a complete template – it doesn't need to be in a template on its own. If you want to have a header and footer, which is always displayed to the user as they go from section to section in your application, you would add them to the main app.component.html template and then put the `<router-outlet></router-outlet>` selector between the header and footers so that when a new route loads, the header and footer are always displayed.
+
+The Router-Outlet directive, while it looks simple, is a powerful and important part of how navigation works within Angular.
+
+### Wildcard routes
+Another important part of defining Routes in our application is setting up wildcard routes. Wildcard routes are how we tell Angular how to handle invalid URLs and what to do with them.
+
+An invalid URL could be where the user mistypes the name of a path. For example, we know that `http://localhost:4200/clients` is a valid path in our Client Contact Manager application, but `http://localhost:4200/client` isn't because we don't have a route in our Routes array that matches that exact `/client` route. If the user was to add that into the browser's address bar, our application would throw an error saying that this path is not recognised.
+
+So, does this mean that we need to add routes for every eventuality? Thankfully, no – the Route module has a solution to this problem, and that is wildcard routes.
+
+A wildcard route has a path set as `**`, which will then match all routes into the application. This doesn't mean that it will run every time a path is added to the browser address bar. What happens is the Angular route takes the URL from the address bar, runs it through the list of Routes we define in the Routes array, and goes through all the other routes. If one of them matches the URL, it runs it. If the URL doesn't match any of the standard routes, it runs the wildcard route.
+
+This is what a wildcard route will look like in the routes array of our Client Contacts Manager application:
+
+```
+const routes: Routes = [
+    {
+        path: 'clients',
+        component: ClientPageComponent
+    },
+    {
+        path: '',
+        redirectTo: '/clients',
+        pathMatch: 'full'
+    },
+    {
+        path: '**',
+        component: PageNotFoundComponent
+    }
+];
+```
+
+As you can see, we've added a different component, `PageNotFoundComponent`. This can be a simple component that just displays a message to the user stating that the URL they have entered can't be found. We could show them an image to highlight what's gone wrong, and we could also add a link in the `PageNotFoundComponent` component back to the `/clients` section, which we know is a valid URL of our application.
+
+Let's build this `PageNotFoundComponent`. This will be part of the main `app.module.ts`, so we don't need to navigate to one of our sub-sections. All we need to do is use the following command:
+
+`ng generate component page-not-found`
+
+This will create a new `Component` under the app folder. In the template of this folder, we can add the following code:
+
+ `<h1>Sorry, the page you are looking for has not been found</h1>`
+ 
+ When we go through how to add links to our application, we can update this template so that we have a link back to the `Clients` section so that our user doesn't get stuck in the `PageNotFound` view of the application.
+ 
+ There is also another type of route that we already have in the routes array of our application. This is the `redirectTo` route.
+ 
+### The redirectTo route
+So, we know about the wildcard route handler and how it runs when a URL is entered into the address bar that doesn't match one of our defined routes, but what if we don't want the user to go to the page not found section? For example, what if the user enters `http://localhost:4200/client` instead of `http://localhost:4200/clients`? It seems a bit unfair to send them to a page not found when they were so close to the correct route. Well, this is where `redirectTo` routes come in. 
+
+A `redirectTo` route is a route that we set up as a way of capturing these edge case URLs that the user may put in. For example, here is a `redirectTo` path for the `/client` URL:
+
+```
+{
+   path: 'client',
+   redirectTo: '/clients',
+   pathMatch: 'full'
+}
+```
+
+In this example, we're saying that if the user enters `http://localhost:4200/client` in the address bar, then redirect them to the real path of `http://localhost:4200/clients`.
+
+This means that we don't need to add loads of routes for the many variations of the `http://localhost:4200/clients` URL or give the user a bad experience if they slightly misspell the URL by missing a letter off the end of a path. It's better to redirect them than show a page not found error just because they're missing a letter off the correct path.
+
+The redirectTo route has two properties that separate it from the standard type of route:
+
+- redirectTo
+- pathMatch
+
+The `redirectTo` property is where we set the actual path we want to redirect the user to if this route is fired. In the preceding example, you can see that we are redirecting the user to the `/clients` path if this redirect route is fired.
+
+The `pathMatch` property is interesting. Its role is to set what part of the URL matches before the redirectTo route is triggered.
+
+There are two values for the `pathMatch` property: **full and prefix**. When pathMatch is set to **full**, Angular will look at the entire part of the remaining URL. When we say the remaining URL, we mean the part of the URL that comes after the domain name. http://localhost:4200` is our domain name, while `/clients` is the remaining part of the complete URL.
+
+If `pathMatch` is set to **full**, then Angular will look at the full part of the remaining domain and see if that matches one of its `redirectTo` defined routes.
+
+The other type of `pathMatch` is **prefix**. If this is set, then the Angular router matches the `redirectTo` route with the beginning of the entered URL. So, if the user entered `http://localhost:4200/clientsHome`, then the `/clients` redirectTo route would fire because the beginning of `/clientsHome` has `/clients` in it.
+
+`redirectTo` routes become really useful when the user enters just the domain name in the URL, but we actually want them to go to a specific route when they first go to our application. This type of `redirectTo` route is set up like this:
+
+```
+{
+    path: '',
+    redirectTo: '/clients',
+    pathMatch: 'full'
+}
+```
+
+In this `route`, we are telling the Angular Router that if there is no remaining part of the URL, that is why the path property is set to `''`. This then redirects the user to the /clients section.
+
+So, when the user first enters the domain name of our application, that is, `http://localhost:4200`, we want to actually redirect them to `http://localhost:4200/clients` as this is the starting point of our application.
+
+As you can see, through the use of wildcard routes and `redirectTo` routes, we can set up routes to cover most edge cases. Wildcards are used when the user enters a URL that is not like anything we've defined as a route, while `redirectTo ` routes are for when the user has entered a URL that is close to what we expect or if they have entered just the domain name and we want to redirect them to the starting point of our application.
+
+If we look at the `app-routing.module.ts` file of our Client Contacts Manager application, we can see both the `wildcard` and the `redirectTo` routes already set up:
+
+```
+const routes: Routes = [
+{
+    path: 'clients',
+    component: ClientPageComponent
+},
+{
+    path: '',
+    redirectTo: '/clients',
+    pathMatch: 'full'
+},
+{
+    path: '**',
+    component: PageNotFoundComponent
+}
+];
+```
+
+In these three routes, we have the main clients path, the redirectTo route that directs the user to the `/clients` section if they don't enter any after the sites domain name and, finally, we have a wildcard, which displays a `PageNotFoundComponent` component if the user enters a completely incorrect URL.
+
+Run the application using `ng serve -o` and try this out. Enter `http://localhost:4200` and you should be redirected to `http://localhost:4200/clients`.
+
+Then, try `http://localhost:4200/company` – you should be shown our page not found component.
+
+Now that we know what routes are and how to set them up, we're going to go through how to set up navigation in our application.
+
+## Creating our navigation component
+Now that we know more about `Routes`, the `RouterModule`, and how to structure a route, it's time to put what we've learned into practice. In this section, we will add a new component to our Client Contacts Manager application. This will be the navigation for the application. First, though, we need to look at the component Angular Material provides to decide what layout and approach we will use.
+
+### Angular Materials Menu
+If we go to the Angular Material website again ([http:/​/​material.​angular.​io](http:/​/​material.​angular.​io)), under the **Components** section, you'll see they are grouped by category. The category we are interested in is the **Navigation** category:
+
+![Angular Material site showing the Components section](/images/chapter6/1.png "Angular Material site showing the Components section")
+
+Under the **Navigation** category, Angular Material provides three components we could use for our menu, as follows:
+
+- Menu 
+- Sidenav 
+- Toolbar
+
+The **Menu** component gives us a floating menu, which has the links in the menu open below the menu item. You might use this if you have a complex application that has many sections with sub-sections under each section that you want a user to be able to access.
+
+The **Sidenav** gives us a side draw layout where the menu slides out from the side when the user has clicked a menu icon. This is a common navigation system for applications that need to work on both the web and mobile. The Angular website ([http:/​/​angular.​io](http:/​/​angular.​io)) uses this type of navigation.
+
+The final type is the **Toolbar**, where a bar is drawn across the top of an application. We are actually using this now in the Client Contacts application. It's where the title of the app is displayed.
+
+It is possible to combine these three components. For example, your application could have a toolbar across the top, then have an icon which opens a **Sidenav**, and you could also have a Menu item in the toolbar that opens a login/logout icon. To see an example of this type of approach, look at the Angular docs website ([https:/​/​angular.​io/​docs](https:/​/​angular.​io/​docs)):
+
+![Angular Docs site showing sidebar and toolbar components](/images/chapter6/2.png "Angular Docs site showing sidebar and toolbar components")
+
+In the preceding screenshot, you can see how the layout of the site is using a Sidenav for all the links to the main sections of the documentation, while the Toolbar is used to hold the Angular logo and the Menu links to all the other parts of the Angular Docs website.
+
+For our Client Contacts application, we are going to keep the Toolbar we currently have and add some Menu items in order to create the links to the sections of our application.
+
+### Updating the Toolbar
+Next, we're going to update the Toolbar of the application. The Toolbar component gives us a place within the application to house the navigation of the application. Here, we add the links to the other sections of the application, which as we will see makes use of the Routes to move between sections.
+
+Currently, our toolbar is in the `app.component.html` template:
+
+```
+<mat-toolbar> {{ title }} </mat-toolbar>
+<div class="container">
+   <router-outlet></router-outlet>
+</div>
+```
+
+While we could leave the Toolbar component here, it would be better if we created a new navigation component that not only shows the title in the Toolbar but also has our Menu items.
+
+> There are many approaches we could take when looking at how to structure our application. What we are aiming to do here is split functionality into as many reasonable components as we can in order to make it so that we can see what each component does, as well as its role is within the application.
+
+The first thing we need to do is create our new Navigation component. Navigate to the `app` folder of our application in the Terminal and run the following command:
+
+`ng generate component navigation`
+
+Then, something strange will happen. The Angular CLI will give us an error saying *More than one module matches. Use skip-import option to skip importing the component into the closest module*. 
+
+This is where the Angular CLI is saying that it doesn't know what module to add this new component to. Since we now have a few modules, the Angular CLI can't do what it normally does when creating a component, that is, add it to a modules declaration array.
+
+This is fine – we can still create the component, but we now need to add the component to a module ourselves. In order to create the Navigation component, we need to run the following command:
+
+`ng generate component navigation --skip-import`
+
+We are using the Skip Import option for the generate command of the CLI to tell the CLI not to try and automatically import the component for us. Adding this option will allow the CLI to just generate the component.
+
+Now that the new Navigation component has been created, we can open `app.module.ts` and add it to the `declarations` array:
+
+```
+@NgModule({
+    declarations: [AppComponent, NavigationComponent], 
+    imports: [
+           BrowserModule,
+           AppRoutingModule,
+           BrowserAnimationsModule,
+           CustomMaterialModule,
+           ClientModule,
+           CompanyModule,
+           SharedModule
+       ],
+       providers: [],
+       bootstrap: [AppComponent]
+})
+export class AppModule {}
+```
+
+Great! Next, we need to update the `app.component.html` file so that we can use our new Navigation component:
+
+```
+<mat-toolbar> {{ title }} </mat-toolbar>
+   <app-navigation></app-navigation>
+   <div class="container">
+       <router-outlet></router-outlet>
+    </div>
+```
+
+If we run the site, you should see the words *navigation works!* under the toolbar.
+
+Next, we need to move the current `<mat-toolbar>` into this new Navigation component. In `navigation.component.html`, replace all the HTML in there with `<mat-toolbar>{{ title }}</mat-toolbar>`. 
+
+Now, you'll see another error appear (*it doesn't seem like things are going well, but this is just Angular trying to let you know that there are some problems*). The issue we can see now is that the title has a red line underneath it. This is where Visual Studio Code is telling us that the Navigation component doesn't know what the property title is.
+
+To fix this, we need to add a new `@Input()` to our Navigation component in order to pass the **title** into the **component**. (We discussed what `@Input()` was in *Chapter 4, Components, Templates, and Forms.*)
+
+Let's add a new property to `navigation.component.ts`:
+
+```
+export class NavigationComponent implements OnInit {
+    
+    @Input()title: string;
+    
+    constructor() { }
+    ngOnInit() {} 
+}
+```
+
+Then, we can update where the `Navigation` component is used to pass in a value for the title property. In `app.component.html`, we need to add this title property to the `<app-navigation>` selector:
+
+```
+<app-navigation title="Client Contacts Manager"></app-navigation>
+ 
+<div class="container">
+    <router-outlet></router-outlet>
+</div>
+```
+
+After the Angular CLI has rebuilt and reloaded the page, you should see the title of the Client Contacts Manager back in the Toolbar.
+
+### Adding Menu components to our Toolbar
+Now, we are ready to add the Menu components inside the Toolbar to create our menu. Here are the changes we're going to make to `navigation.component.html` in order to add a simple menu:
+
+```
+<mat-toolbar>
+<p>{{ title }}</p>
+<button mat-button [matMenuTriggerFor]="clientmenu">Clients</button>
+        <mat-menu #clientmenu="matMenu">
+           <button mat-menu-item>Add New Client</button>
+           <button mat-menu-item>View All</button>
+       </mat-menu>
+<button mat-button [matMenuTriggerFor]="companymenu">Company</button>
+       <mat-menu #companymenu="matMenu">
+           <button mat-menu-item>Add New Company</button>
+           <button mat-menu-item>View All</button>
+       </mat-menu>
+       <button mat-button>About</button>
+</mat-toolbar>
+```
+
+We should see the following in our menu:
+
+![Client Contacts Manager with Toolbar](/images/chapter6/3.png "Client Contacts Manager with Toolbar")
+
+Here, we've added a series of Menu components. `<mat-menu> `creates the dropdown menus. In each of these, we've added two button components. By using the `mat-menu-item` directive, we are telling Angular that these buttons are part of a menu and should look and behave as drop-down menu items.
+
+In-between each `mat-menu` component is another button component, but these ones are just using the `mat-button` directives to apply the Material style.
+
+When we run the application in the browser, you'll find that when we click on one of these buttons, the menu expands, but what is making that happen? Well, it's the local models we created by using the `#` symbol. There are two of these models, `#clientmenu` and `#companymenu`, and are used to tell Angular Material that when the button is clicked, its matMenuTriggerFor should open the corresponding menu. As you can see, the `#clientmenu` property is passed to the `matMenuTriggerFor` input of the Client's button.
+
+By adding these local models of `#clientsmenu` and `#companymenu`, we are creating a model that is passed into the Material Button's `matMenuTriggerFor` function. When that fires off, Angular knows what model to use and display.
+
+We now have a menu in place, alongside some buttons, but it's currently not doing anything. Now, we need to update the router so that there are some new routes for the application. Then, we need to add links to these new routes before creating a new Company section page component, which will be the destination of one of the new routes we're adding. First, let's update `app-routing.module.ts` with some new routes.
+
+### Adding new routes
+Now that the Navigation component is in place, we can move on to making some Routes within the application. The route is how a user will navigate through an application. From the Toolbar component, a user will click on one of the links in the component. This link will fire off a *route* that the user can take through the application.
+
+In this section, we're going to add a new Route to our demo app. This new route will allow the end user to navigate from a link in the toolbar component to the Company section. Once we've been through this, you'll understand how to add Routes into an Angular application and how they link with the navigation of your applications.
+
+Let's add the new company route to our `app-routes.module.ts`:
+
+```
+const routes: Routes = [
+   {
+       path: 'clients',
+       component: ClientPageComponent
+   },
+   {
+       path: 'company',
+       component: CompanyPageComponent
+   },
+   {
+       path: '',
+       redirectTo: '/clients',
+       pathMatch: 'full'
+   },
+   {
+       path: '**',
+       component: PageNotFoundComponent
+   }];
+```
+
+As you can see, we've added a nice new route, but there isn't a `CompanyPageComponent`, so now we need to create that using the Angular CLI. First, we need to navigate to the **company** folder in the Terminal so that when we add the new component, it is created in the right place:
+
+`cd src/app/company`
+
+`ng generate component company-page`
+
+These commands will create the `CompanyPageComponent` within the correct place and add it to the `CompanyModule`. All we need to do now is add the import statement to the `app- routing.module.ts` file:
+
+```
+import { CompanyPageComponent } from './company/company-page/company-page.component';
+```
+
+Now, if we change the URL of our site to `http://localhost:4200/company`, we will see our new component displayed on the page:
+
+![Client Contacts Manager with new Company Page](/images/chapter6/4.png "Client Contacts Manager with new Company Page")
+
+As you can see, we can still see the header and the navigation. That's because these are part of the `app.component.html` template, but the new `CompanyPageComponent` is being displayed within the `<router-outlet></router-outlet>` component, which is also part of the `app.component.html` template.
+
+### Adding links to the navigation
+Now that we have the new page set up and the new route added, we need to have a way of triggering these routes. Since we've added buttons to our menu, we are going to add click events to these buttons, which will call a function that uses the Router module to navigate to the URL we set.
+
+The first thing we need to do is add the click events to the buttons in the `navigation.component.html` file:
+
+```
+<button mat-button [matMenuTriggerFor]="clientmenu">
+    Clients
+</button> 
+<mat-menu #clientmenu="matMenu">
+    <button mat-menu-item (click)="goTo('clients')">
+        Add New Client
+    </button> 
+    <button mat-menu-item>
+        View All
+    </button>
+</mat-menu>
+<button mat-button [matMenuTriggerFor]="companymenu">
+    Company
+</button>
+<mat-menu #companymenu="matMenu">
+    <button mat-menu-item (click)="goTo('company')">
+        Add New Company
+    </button>
+   <button mat-menu-item>View All</button>
+</mat-menu>
+```
+
+Here, we have added two click events, and we are passing in the name of the section we want the user to go to. Next, we need to add this `goTo()` to `navigation.component.ts`:
+
+```
+export class NavigationComponent implements OnInit {
+    @Input()
+       
+    title: string;
+    constructor(private router: Router) {} 
+    
+    ngOnInit() {}
+    
+    goTo(location: string) {
+       console.log(location);
+       this.router.navigateByUrl(location);
+    }
+}
+```
+
+The `goTo()` function simply works by taking in the location and using the Router class `navigateByUrl()` function to load the URL with the location. This location matches the path of the Routes in `app-routing.module.ts`. Then, Angular loads the matching path and the component of that Route.
+
+We can also add links within pages. For these types of link, we would use `routerLink`. For example, imagine that we have a link from the Clients page to the Company page, but this link is with the Client view and not in the Navigation component. To do this, we would add a `routerLink` like this:
+
+```
+<p>
+    <a routerLink="/company">Go to the Company page</a>
+</p>
+```
+
+Here, we have a standard href tag, `<a href=""></a>`, but instead of the href attribute, we are using the routerLink directive, `<a routerLink=""></a>`, which has the link to the Company section. This link matches the route in the Routes module.
+
+As you can see, there are a number of ways to trigger links within Angular. Whichever way we use the name of the route, it has to match one of our Routes in the Route module.
+
+For a bit of extra credit, see if you can add the About page section to our application. The steps you'll need to take to add this new section are as follows:
+
+1. Create a new About folder
+2. Create a new About module
+3. Create a new `AboutPage` component
+4. Add the new `AboutPage` component to the About module
+5. Add `AboutModule` to `AppModule`
+6. Add a new route to the `app-routing.module.ts` file
+7. Add a click event to the About button
+8. Add an Angular Material component to display some text about this application
+
+## Route parameters
+A very common part of any modern web application is passing an ID or parameter as part of the URL to load data based on that parameter. In Angular, this is achieved using Route parameters.
+
+### What are Route parameters?
+Route parameters are dynamic values that are attached to the end of a URL. This value is then used to load data or a flag in the view to change how a view will look. You would probably use this to load in the details of a specific client or company, something we will be doing once we have built up the application enough to start saving data.
+
+For example, here is a standard URL: `http://localhost:4200/clients`. A URL with a parameter on the end of it would look like this: `http://localhost:4200/client/24`. The difference you can see here is that at the end of this second URL is a number, which could be the ID of a Client whose details we want to load (this is something we will be doing in the next chapter).
+
+### Setting up a route to handle parameters
+In order to access this ID, we need to add a route that will be able to handle the fact that the ID is part of the URL. To do this, we have to add another route to the Routes array in the `app-routing.module.ts` file. This is what we currently have:
+
+```
+const routes: Routes = [
+   {
+       path: 'clients',
+       component: ClientPageComponent
+   },
+   {
+       path: 'company',
+       component: CompanyPageComponent
+   },
+   {
+       path: 'about',
+       component: AboutPageComponent
+   },
+   {
+       path: '',
+       redirectTo: '/clients',
+       pathMatch: 'full'
+   },
+   {
+       path: '**',
+       component: PageNotFoundComponent
+   }];
+```
+
+Now, we need to add this new route, which can handle the ID part of the URL. Now, we have the following:
+
+```
+const routes: Routes = [
+   {
+       path: 'clients',
+       component: ClientPageComponent
+   },
+   {
+       path: 'clients/:id',
+       component: ClientPageComponent
+   },
+   {
+       path: 'company',
+       component: CompanyPageComponent
+   },
+   {
+       path: 'about',
+       component: AboutPageComponent
+   },
+   {
+       path: '',
+       redirectTo: '/clients',
+       pathMatch: 'full'
+   },
+   {
+      path: '**',
+       component: PageNotFoundComponent
+   }];
+```
+
+The only change we've made is adding this new Clients route, with `/:id` at the end. Now, when the Route sees the URL with the ID at the end, it knows has a route that matches the signature of the URL. If we didn't do this, Angular wouldn't be able to match the URL with one of the Routes and so it would go to the empty path route, which in this case would take the user to the `/clients` page.
+
+By setting up this extra route, the Angular Router knows what to do if it sees a URL with the ID. However, this is only half of the story. Now, we need to be able to access the ID.
+
+### Accessing Route parameters
+There are a few approaches you can take to access the Route parameters. The approach we are going to use allows you to access the ID from the URL. There are other ways we can access the parameters from the URL, but these involve using RxJS, which we will be exploring in *Chapter 8, Observables and RxJs*.
+
+We're going to access the ID in the `ClientPage` component so that it is available at the parent level and can be passed into the Child components if they need access to this data. First, we need to open the `client-page.component.ts` file. Here, we can use the `ngOnInit` life cycle handler to access the route parameters at the time the `ClientPage` component is being initialised/created.
+
+Let's update the `ClientPageComponent` class so that it looks like this:
+
+```
+export class ClientPageComponent implements OnInit {
+    constructor(private route: ActivatedRoute) {}
+    
+    ngOnInit() {
+           let id = this.route.snapshot.paramMap.get('id');
+           console.log('Our passed ID is', id);
+    }
+}
+```
+
+There's a couple of things going on here. First, we've created a new private argument to the constructor for the `ActivatedRoute` class, which is a class from the Router module of Angular. This gives us a set of functions we can use when working with the URL.
+
+> To find out more about what the `ActivatedRoute` class provides, read the official Angular documentation: [https:/​/​angular.​io/​api/​router/ActivatedRoute](https:/​/​angular.​io/​api/​router/ActivatedRoute).
+
+The next change we've made is updating the `ngOnInit()` function to create a local variable called ID, then using the private route property we created in the constructor to use the snapshot property of the `ActivatedRoute` class. This snapshot property is an interface itself and contains information about the route. It gives us a snapshot of the route at the time it's loaded. From this, we can access the ID that is passed in the URL.
+
+Using `ActiviatedSnapshotRoute` interfaces the `paramMap` function we get back by mapping of all the parameters in the URL (a URL could have more than one parameter to pass). This mapping allows us to get each individual parameter using the `get()` method by passing in the name of the parameter we want. So, if the URL had both ID and name as two separate parameters, we could use `paramMap` to `get('id')` and `get('name')` as two more separate parameters. Finally, we would use the `console.log` statement to display the Router parameter in the browser console.
+
+We can test that this works by changing the ID at the end of the URL. Originally, we had `http://localhost:4200/clients/24`. We could change this to `http://localhost:4200/clients/25`, and then we would see **25** displayed in the browser console.
+
+Now, we can access parameters that are passed via a URL. This will allow our application to use this data to filter lists by ID, which is a common pattern in modern web applications. But what if we want to load data before a route has completed loading? This is where Guards come into play, and is what we will be looking at next.
+
+## Route Guards
+Currently, all our routes are accessible by anyone using the application. For example, a user could go to the Clients section or the Company section and see all the data that's there, but this is something we might not want to happen in a real-world application. Say, for example, I have a set of Clients assigned to me and you as another member of the sales team have a different set. I wouldn't want you to be able to go to the application, load up the Clients section, and then see all of my Clients. There must be a way to stop this from happening.
+
+Well, there is, and that's through the use of Route Guards. Route Guards are classes that implement a set of four different interfaces.
+
+> An interface is a class that has no implementation, just a set of empty functions, but if we create a class that implements the interface, our class needs to have functions that match the signature of all the functions defined in the interface. If not, then our class has not fully implemented the interface.
+
+### Scenarios for using a Route Guard
+There are a number of scenarios when you would use a Route Guard, as follows:
+
+- Checking that the user has logged into the application before going to a route 
+- Checking that the user has the right permissions to go to a certain route
+- Loading data before a Route has fully loaded 
+- Saving data when going from one route to another
+- Checking whether the user wants to save any unsaved data before leaving to go to another route
+
+As you can see, Route Guards can be very helpful. In order to cover these different use cases, Angular has a set of five guard interfaces. These are as follows:
+
+- **CanActivate**: Checks that access is allowed going to a Route 
+- **CanActivateChild**: Check that access is allowed going to a Child Route 
+- **CanDeactivate**: Tuns when going away from a route
+- **Resolve**: Used to retrieve data before loading a route
+- **CanLoad**: Checks that access is allowed before loading a module
+
+While each Guard handles different use cases, we can have a class that implements multiple Route Guards, so we could create a Guard that checks to see if we have access to a route and, if so, load data before loading the route.
+
+## Implementing a Route Guard
+To implement a Route Guard, we need to create a TypeScript class that uses one or more of these Route interfaces. By implementing an interface, we need to have a function in our class that the interface says we should have.
+
+So, if we implement the CanActivate interface, we need to have a `canActivate()` function in our class. This function returns true or false. If true, the user can access the route; if false, then they can't.
+
+For example, here is an example class that uses a service (we will be looking at this in *Chapter 7, Dependency Injection, Services, and HttpClient*) to authenticate the user to see if they can activate a route:
+
+```
+import { Injectable } from '@angular/core';
+import { CanActivate } from '@angular/router';
+import { AuthService } from './auth.service';
+
+@Injectable()
+export class CanActivateViaAuthGuard implements CanActivate {
+     constructor(private authService: AuthService) {}
+     canActivate() {
+         return this.authService.isLoggedIn();
+    }
+}
+```
+
+Here, we are creating a new class called `CanActivateViaAuthGuard`, which implements the `CanActivate` Router Guard interface. By doing so, the class needs to have the `canActive()` function (if it doesn't, then VSCode will display an error, warning us that we need to implement the interface correctly).
+
+In the `canActivate()` function, we are making a call to an Authentication service to check if the user is logged in. This `isLoggedIn()` function would need to return either true or false.
+
+Once we have this Guard, we need to add it to the route we want to check. We do this by adding the `Guard` class to the Route in the Routes array of our `app-routing.module.ts` file. So, if we were going to add this `CanActivateViaAuthGuard` to the Clients route, it would look like this:
+
+```
+{
+    path: 'client',
+    component: ClientPageComponent,
+    canActivate: [
+        'CanAlwaysActivateGuard',
+        CanActivateViaAuthGuard
+    ]
+}
+```
+
+Here, we are stating that this Route is using the `canActivate` guard by providing the name and title of the Guard to be used by the Route when it runs its `canActivate()` function.
+
+The final step of adding in a Route Guard is to add the Guard class to the list of providers in our AppModule so that Angular knows where to find the Route Guard class:
+
+```
+@NgModule({
+     ...
+    providers: [
+        AuthService,
+        CanActivateViaAuthGuard
+    ] 
+})
+export class AppModule {}
+```
+
+In this providers array, we are setting both the Guard and the service we are using to check that a user has access.
+
+As you can see, implementing a Route Guard is quite straightforward. You create a new TypeScript class, implement one or more Route Guard interfaces, and add the implementation of the function the interface requires. Then, you register the Guard with `AppModule` providers array and add the Guard class as the Guard for the route.
+
+In the next chapter, where we will be adding Services to our application, we are going to be implementing other types of Route Guards so that we can load data before a Route has loaded. Here, you will see how similar adding this type of Route Guard is to the example we've covered here.
+
+## Summary
+In this chapter, we have focused on routing and navigating an Angular application. We've seen how to add routes to the `app-routing.module.ts` file by updating the Routes array and creating objects that define what a route is in the application. 
+
+We created a new Navigation component for our Client Contact Manager application and used Angular Material-based components to add dropdown buttons to the navigation component. We also looked at the various options Angular Material gives us to create menus in our application.
+
+Then, we went through how to build a click event handler which is added to the buttons in our menu so that when the user clicks on a button, it loads a route. We even added a new Page component for the Company section. Then, we looked at another way to load routes through standard links using the routerLink directive.
+
+Then, we looked at how to pass and access parameters in URLs, allowing us to use these parameters to load different types of data based on these parameters.
+
+Finally, we looked at how to implement a Route Guard, which gives us control over access to routes in our Angular applications and allows us to perform functions before or after a route has been loaded. We will be using this in the next chapter, where we will build out our Client Contact Manager application even further so that we can load and manipulate data through API calls and services.
