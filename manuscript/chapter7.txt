@@ -1,0 +1,729 @@
+# Chapter 7: Dependency Injection, Services, and HttpClient
+
+In this chapter, we are going to start looking at some more advanced topics of Angular development. So far, we have looked at how an Angular application is structured, how Angular components are created, and how we use the Angular CLI for almost everything we need to do in order to build an application. We've explored how to add a UI to an application and how we can add Angular Material to give a polished look and feel to the application. Now, we need to start looking at how we can add data to an Angular application.
+
+Over the next few chapters, we will be looking at how Angular manages data, how it loads external data, and how it manages the concept of state within an application.
+
+In this chapter, we will start by looking at services, what they are, and how we would make use of them in our Angular applications.
+
+By the end of this chapter, you will have learned the following topics:
+
+- What is Dependency Injection
+- Why we use Dependency Injection in Angular
+- What Services and Providers are in Angular
+- How services are used in Angular and how components make use of services
+- How to load data from an external source using the built-in services that Angular provides
+
+We will also be expanding on our demo application to make use of services in order to save and manage data within the application.
+
+Before we start making changes to our application, we need to go through some new topics that we have not discussed yet, starting with Dependency Injection.
+
+## What is Dependency Injection?
+Dependency Injection is a design pattern that sets out how objects are passed to one another. Design patterns are reusable solutions to common problems we find in developing software. These patterns set out ways we as software developers can tackle a problem we need our software to solve. There are many different types of design patterns, which the Dependency Injection is part of; if you spend time looking at these different patterns, they can provide possible solutions to issues you may come across in your development career. So, they are worth exploring.
+
+The Design Pattern of Dependency Injection states that a class can ask for it dependencies to be passed in, instead of having to create instances of it dependencies itself. Say, for example, we have a class (`ClassA`) that needs to use two other classes, one to load some data (`ClassB`) and the other (`ClassC`) to sort some data. Instead of `ClassA` having to create an instance of `ClassA` and one of `ClassB` before it uses them, `ClassA` can just say, hey, `ClassB`, can I use some of your functionality, without the overhead of having to create instances of these other classes.
+
+This is a very high-level overview of what Dependency Injection is. This ability of a class to have the other classes it is dependent on injected into it instead of having to manually create the dependencies does have a few benefits that make it ideal for Angular.
+
+### The benefits of Dependency Injection
+The benefit of **Dependency Injection (DI)**, as it is sometimes called (and will be called going forward), is that it allows us to divide a task into many different classes that, through DI, are easy for the class using these services to ingest. Again, going back to our `ClassA` example, if this class needs to handle a piece of complex functionality – user login, for example – `ClassA` might need to access an external API, check the results of an API call, store a record in local storage, update the UI, or redirect the user if login fails. There could be a number of functions that this `ClassA` needs to do. In order to make our code cleaner, we should follow the principle of single-responsibility, where a class does one thing and one thing only. We need to share this functionality across a number of classes, each doing one thing (for instance, storing data in local storage); this should lead to a number of smaller classes each doing one thing well, but if `ClassA` needs all these other classes, it would have a lot of overhead creating these classes.
+
+With DI, `ClassA` just calls in the classes it needs; there is no need to create instances of the class. So, from an architectural point of view, we can create as many classes as we need, each class just doing one thing, making them easier to test and it easier to understand what this class does.
+
+Another great benefit of DI is that it makes it easier to swap out classes, which is very helpful when it comes to testing. If in `ClassA` we inject a `ClassC` that returns from data from an external API. In our unit tests we can inject in a mock `ClassC` that returns mock data, removing the need to load data from an external API in order to test the functionality of `ClassA`. This approach means we can take individual elements/objects and test them in isolation. We will go through this in more depth when we go through testing in *Chapter 10, Testing*.
+
+Other great benefits of DI include this separation of concern, where each part of an application is not aware of other parts of the application. So, if we need to make a change or refactor a piece of the application, it being separated from the rest means that making a change in one place has less chance of breaking something somewhere else (I say less chance because there is always a slight chance something will affect something else, but this is why we have Unit Tests).
+
+## How does Angular handle Dependency Injection
+The Dependency Injection framework, which handles how classes are injected when needed, is part of the larger Angular framework. As Angular developers, we don't need to worry about how Angular handles DI; all we need to be concerned about is how we structure our application to make use of DI.
+
+When building our Angular applications, we need to remember that through the use of DI we can and should use a more modularised approach to how we structure our application, making use of services, creating common classes that can be used many times throughout our application, and providing components with everything they need, all to make our applications as efficient as possible.
+
+Angular provides the Dependency Injection framework for us; all we need to do is to set up our classes to use the DI framework, which is what we will look at now.
+
+### Creating an Injectable service
+Like so many things in Angular for creating a Service, we turn to the Angular CLI to create a service for us. For example, to create a service in our Client section of the Client Contact Manager Application, in the Terminal we would navigate to the `client` folder then run this command:
+
+`ng generate service client`
+
+This will tell the Angular CLI to create a service class for us, using the client argument as the title of the service. This is the file it has created for us:
+
+```
+import { Injectable } from '@angular/core';
+   @Injectable({
+       providedIn: 'root'
+})
+   export class ClientService {
+       constructor() { }
+}
+```
+
+There's not much here, but this is the beginning of a service. The next stage in the Dependency Injection process is to set that this class is going to be injectable. To do that, we use an Injector.
+
+### Setup of service with an Injector
+In the preceding ClientService example, you can see we are using the `@Injectable` operator at the top of our class. As we have seen with other decorators such as `@NgModule` and `@Component`, this is used to tell Angular something about this class. In this instance, the `@Injectable` decorator tells Angular that the class is designed to be injected into another class. That is all this operator is doing: making Angular aware that we want our `ClientService` class to be injected.
+
+### The hierarchy of injectors
+With these three different injectors knowing which ones to use and when can, at first, be confusing. Thankfully Angular employs a hierarchical system for how it uses the different injectors.
+
+When the Dependency Injection framework in Angular needs to find a class that is being injected into a component, it starts by looking at the `@Component` operator-level injector. If the requested class cannot be found there, Angular moves on to the `@Injector` operator level trying to find the class being referred. If Angular cannot still find the class being searched for at this level, Angular moves on to looking at the `@NgModule` operator level to see if the class is referenced there.
+
+Let's have a look at an example of how this works. If we have a component that needs a service to be injected we use the following code:
+
+```
+export class ClientPageComponent implements OnInit {
+       // add a service
+       constructor(private clientService: ClientService) {}
+       
+       ngOnInit() {}
+       
+       saveClient(clientDetails: Client) {
+           console.log('clientDetails', clientDetails);
+           this.clientService.save(clientDetails);
+       } 
+}
+```
+
+In this `ClientPageComponent`, we are injecting **ClientService** in the constructor; then we can use the `save()` function of the ClientService in the `saveClient()` method of `ClientPageComponent`. For this to work, Angular needs to find this `ClientService`. So, through the hierarchical approach for Injectors, Angular will first look to see if `ClientService` is set at the `@Component` operator level (which in this example it's not). If it is not, Angular will then move on to the `@Injector` operator level, looking through all the `@Injector` operators it is aware of.
+
+If we look at the `ClientService` code, we can see that the `@Injector` operator is there, so Angular knows that this class is injectable:
+
+```
+@Injectable({
+       providedIn: 'root'
+})
+export class ClientService {
+    constructor() { }
+
+    // save a client
+    save(client: ClientData) {
+        // ... 
+    }
+}
+```
+
+But if this class didn't have the `@Injector` operator, Angular would move onto the next level up, which is at the `@NgModule` level. So, you see Angular uses these levels to search up the codebase to find the classes we are referencing. Let's have a closer look at each of these levels to see how a class is set to be injected at each level.
+
+### The @Component level Injector
+We've already seen the structure of the `@Component` operator in *Chapter 4, Components, Templates and Forms*, and how we set the template of a component and the CSS files for it, but there is also another part of the `@Component` operator that allows users to set a list of classes that the component needs to be provided to it.
+
+This is the **provider's** array, if we take a look at our `ClientPageComponent` example again, but this time using the `providers` array:
+
+```
+@Component({
+    selector: 'app-client-page',
+    templateUrl: './client-page.component.html', 
+    styleUrls: ['./client-page.component.scss'], 
+    providers: [ClientService]
+   })
+   export class ClientPageComponent implements OnInit {
+   ...
+``` 
+
+Now, in the example, we have set it so that our `ClientService` is provided to the component through its own provider array, but why if we have the other two levels of injector would we want to use this level? Well, say for example we had a service that performs one specific action that is only needed in one place, such as authentication. We could create an `AuthService` and provide it to a single Login component. This means that we know that this `AuthService` is only being used by the one component, making it easier to make changes to the AuthService without it affecting any other components.
+
+As the **provider array** is an array, we can add other classes to this list if we wanted to, but if we have a service that provides the functionality to more than one component we would use the `@Injector` level injector.
+
+### The @Injector level injector
+When we created our `ClientService` service using the Angular CLI, it added the `@Injector` operator for us at the top of the class. As part of this, it provided an object with a `provideIn` property set:
+
+```
+@Injectable({
+       providedIn: 'root'
+})
+export class ClientService {
+   ...
+```
+
+This `provideIn` property, which is set to `root`, is telling Angular to use the root module to automatically provide this class, but we may for some reason decide that the class we create should only be a certain module, for example, `CompanyModule`. So, we could change `provideIn` to this:
+
+```
+@Injectable({
+    providedIn: CompanyModule
+})
+export class ClientService {
+   ...
+```
+
+Now the `ClientService` is only available to any components that are part of `CompanyModule` (*in a real application, it would be the ClientModule*), so if we try to add the `ClientService` into a component outside of the `CompanyModule`, the Angular compiler would throw an error and warn us that `ClientService` is not available.
+
+### The @NgModule level injector
+The final level of injector is at the `@NgModule` level; we've already been through the structure of the `@NgModule` class in *Chapter 5, NgModule*. In that chapter, we went through all the parts of the module class: one of these parts was the providers array. This, like the provider array at the `@Component` level, allows us to set what classes are available to be injected anywhere across the entire module.
+
+The following code shows us how that works in our `ClientModule`:
+
+```
+@NgModule({
+       declarations: [
+           ClientPageComponent, 
+           ClientSearchPageComponent,
+           ClientFormComponent, 
+           ClientListComponent
+       ],
+       imports: [
+           CommonModule, 
+           ReactiveFormsModule, 
+           SharedModule,
+           CustomMaterialModule
+       ],
+       providers: [ClientService]
+   })
+   export class ClientModule {}
+```
+
+You can see here that `ClientService` is now provided at the module level.
+So, `ClientService` is available to be injected to all components, directives, and other classes that are part of this module. What benefit does having these three levels of injector provide us as Angular developers? Well, having the ability to set that a class can be injected at different levels allows us to create certain levels of isolation. We can, as we briefly discussed in the @Component Injector section, set it so that a service can only be injected at a component level or is only available at a certain module level. This means we can create specialised services that perform one task and are only needed in one place if our Angular application needs to provide some business logic that is critical to the application but is very specialised. For example, if our application was to do with finance, we may have a service for working out client financial statements. This is a specialised service that is only needed in the one part of the application and therefore we need to limit the exposure of service to other parts of the application so that it is clear that this service only does the one job in the one place of our application. This isolation of concerns is a good practice to use in applications.
+
+### Tree shaking
+One of the main benefits using Injectors now gives us is the ability for the Angular compiler to use tree shaking when running the application. The idea behind tree shaking is that when an application is running, any services that aren't used at the time can be removed from the final bundle of the application. The Angular compiler shakes the application to remove all the dead leaves (or services in, Angular's case); that's why this feature is called tree shaking.
+
+The benefit that this brings is that when the application is bundled and deployed, the size of the bundle being downloaded by the user when they run out the application is as small as it can be. The less the user has to download before the application starts, the faster the application will start up.
+
+What helps Angular know about these services is the `provideIn` property we set in the `@Injector` operator of our `ClientService`. In previous versions of Angular, where tree shaking was not a feature, there was a one-way connection between the services being injected and the providers. The provider contained a list of the services within the module and the service did not know what module it belonged to. Now, with the provideIn property, the service also knows what module it belongs to. So, the module no longer needs to know of all the dependencies, and therefore when the application is running the unused dependencies (services and so on) can be removed. This new way of setting dependencies makes tree shaking possible in the latest version of Angular.
+
+We will be covering bundling and deploying an application later, in *Chapter 11, Packaging our application*.
+
+## Providers in Angular
+So, we've had a look at what Injectors are and the various levels of Injectors in Angular, but now we are going to have a look at providers. We have seen them briefly already, but it's worth having a more in-depth look at them and the role they fulfil in Angular.
+
+The Injector needs a provider to create the instances (versions) of the classes being injected into all the components, services, and directives. The way this relationship between injector and provider is set up is through a token that the injector uses at runtime to create the required class that the provider needs. So, when our application is running and a class is needed via Dependency Injection, the token that the provider gives makes sure that the class being used is the one with the correct token.
+
+In `ClientModule`, we can see how `ClientService` is itself being used as this token:
+
+```
+@NgModule({
+    declarations: [
+        AppComponent, 
+        NavigationComponent
+    ],
+    imports: [
+           BrowserModule,
+           AppRoutingModule,
+           BrowserAnimationsModule,
+           CustomMaterialModule,
+           ClientModule,
+           CompanyModule,
+           AboutModule,
+           SharedModule
+    ],
+    providers: [ClientService],
+```   
+
+Here, `ClientService` is the *token* that is being provided to the providers array. We could also write this another way to use an object to set `ClientService` as a token for the provider, like this:
+
+`[{provide: ClientService, useClass: ClientService}]`
+
+Why would you use this option? Well, you may have service that you haven't written, but you need to give it a more relevant name. For example, a third-party service called `DataSource` isn't a great name, but we could use this approach to give it a more relevant name to our application:
+
+`[{provide: ClientDataSourceService, useClass: DataSource}]`
+
+It allows us to use `ClientDataSourceService` in our components, instead of a name like `DataSource`, which doesn't give a clear idea of what the component does. This approach is called the provider object literal and it really helps if we are using external libraries, which we may be, and if we are working on large enterprise-level applications and we can't rename a service that may be being used elsewhere in the application.
+
+### Alternative class providers
+Now, sometimes we may want to use a different class for a provider, but still use the name of a provider that has already been established. For example, you are working on a large application and there is already a service that is part of your codebase called `EmailScheduler`, but in the section of the application you are working on, you need a more specific email scheduling class. So, you decide to create one that extends upon the original `EmailScheduler`.
+
+Therefore, you create a new class called `CompanyEmailScheduler` and then need to add it to your module. The problem is that there is a component you are using that is already using the original `EmailScheduler`, so what do you do to start renaming this `EmailScheduler` class everywhere that it is referenced?
+
+Well, in this instance you can use an Alternative Class Provider. This will allow you to use a different class but for the same provider token. The syntax for this Alternative Class Provider is the same as the previous example:
+
+`[{provider: EmailScheduler, useClass: CompanyEmailScheduler}]`
+
+This has allowed us to create a new class without breaking the existing codebase. Our module will work using the new specific class, and the component that has the original `EmailScheduler` as a dependency is still going to work; it will be using our new `CompanyEmailScheduler`, which extends on the original class.
+
+### Value providers
+There is another way to create a provider: through Value Providers. Value Providers give us a way to supply an object instead of an Injector to the Provider. We may use this approach if we just want to provide a simple exported function that performs a single task.
+
+In this example, we're creating a simple function, then setting it to a variable that is used in an object literal when we set the provider:
+
+```
+// exported function that performs an action
+export function SimpleFn() {
+   console.log('This is a simple function');
+}
+
+// object literal
+const simpleFunctionProvider {
+    simpleFn: SimpleFn
+};
+
+// setting the provider
+[{provider: SimpleFunc. useClass: SimpleFn }]
+```
+
+The Value Provider allows users to create a small function that can be used as a Provider. If we wanted to have a Provider that provides a piece of information as a string, we could use the Value Provider to do this instead of creating a complete class just for such a simple piece of functionality.
+
+### Factory providers
+Another way to create a provider is using a factory provider. This approach is ideal for when we need to create a provider, but the data it provides may change based on some data we don't have until runtime.
+
+A great example for when you may want to use one of these factory providers is if your application has some sort of authentication, so when a user is logged into the application, you need a provider to give you some data that is based on the user's login credentials.
+
+To do this, first we need to create a service that checks if someone can log in:
+
+```
+export class LoginService {
+       private allowUserIn: boolean;
+       canUserLogin(user: User) {
+           if(user.accessLevel === AccessStatus.AccessGranted) {
+    } 
+}
+```
+
+This very simple service checks a user's access level against an enum of access status. Next, we need to create a provider that will use this service:
+
+```
+const userAccessFactory = (userLogginIn: User) => {
+       return new LoginService(user)
+};
+```
+
+Here, we are creating a factory object that takes in a user object and returns our `LoginService`. The next stage is to set this factory and provider: 
+
+```
+export let loginServiceProvider = { provide: LoginService, useFactory:userAccessFactory };
+```
+
+So, now we have `loginServiceProvider`, which we can use in a provider array (which, as we already know, can be at the `@Component` level or the `@NgModule` level).
+
+Factory providers allow users to build up a provider that is based on data we are loading through a service. You can see many uses for this approach, not just checking user-access levels. If our service loads data via an external API (something we will be exploring more later in this chapter), we could build a provider that gets the result of the data access service, concatenates this data, and sets it as a provider.
+
+### Predefined tokens and providers
+Angular itself gives us access to some providers we can use as Angular developers to hook into when an application starts up. So, if you need to run a piece of code as the Angular framework starts up an application, we can do that through predefined tokens and providers.
+
+There are three tokens available to us:
+
+- `PLATFORM_INITIALIZER`: A callback run when the Angular platform starts
+- `APP_BOOTSTRAP_LISTENER`: A callback for each Component that is used to Bootstrap the app; these components are set in `app.module.ts`
+- `APP_INITIALIZER`: A callback for when the application is initialized
+
+So, we can create a provider that is run when these callbacks are triggered. In a `provider` array, we could create pass a factory that is run when one of these predefined stages run:
+
+```
+[{  provide: PLATFORM_INITIALIZER, 
+    useFactory: platformInitializedFactory },
+    {provider: APP_INITIALIZER, 
+    useFactory: appInitializerFactory }]
+```
+
+Hopefully, now you can see that providers give us so many options for how we structure our applications or how we can use providers in so many different ways to supply various parts of our application with data they may need. How you use these providers, and which version of provider you use, depends on the business needs of your application.
+
+We've been through all the different approaches for creating providers. Now, we are going to take a closer look at services. We've already mentioned them and seen some simple services in action, but as they are such an important part of Angular, it is worth looking at them further.
+
+## Services in Angular
+After this discussion on providers, it may be hard to see what role services provide in Angular. If, after all we've learned about providers, they can provide data to our components and modules, then why would we need services?
+
+Well, if providers give our application data and access to other modules and components, then services are where our application's business logic happens.
+
+### The role of services in Angular
+If you look through the Angular documentation, you won't see that they tell you to use services for these certain reasons anywhere. The Angular framework doesn't tell you that you have to use services, but the framework, through Dependency Injection, does make it extremely easy to write and consume services.
+
+We could write all the business logic of an application at the `@Component` level. For example, a component could have a function that takes a username and password and makes an API to check that they are correct before allowing a user to log into the application.
+
+This is fine, but what if we wanted to check the username and password somewhere else in the application? We would have to write the same code all over again in the new component that needs to check the login details.
+
+Having a service that the components can delegate this logic to makes it easier to share common functionality between them, removing the need for duplicate code, which is hard to manage and maintain.
+
+### Adding a service to a component
+Now we know that the role of a service is to handle common functionality between components, let's take a closer look at how to add this service to the component.
+
+We know that a service needs to have the `@Injectable` operator in order for Dependency Injection to be aware of the class and know that it can be injected. Then there are two steps to adding the service in the component.
+
+First, in the `@Component` file, we need to add an import statement to tell the component where the source of the service is. To do this, we add the import statement at the top of the TypeScript file of the component with all the other import statements:
+
+`import { MyFirstService } from '../services';`
+
+This tells the `@Component` class where to go to find the TypeScript class of the service.
+
+Now that this import statement is in place, we can make an instance of the service to use throughout the component code. To do this, we create a local reference to the service in the constructor of the `@Component` class, like this:
+
+`constructor( private myFirstService: MyFirstService) {}`
+
+Now we have this new `private` property to use when we want to make a call to any of the public methods of this `MyFirstService`. For example, in an `onInit` lifecycle event of the component, we could call a method from the service to log that this component has been created, like this:
+
+```
+ngOnInit() {
+       this.myFirstService.log('Component has started');
+}
+```
+
+In this code example, the lifecycle hook (we know about these lifecycle events from *Chapter 4, Components, Templates and Forms*, where we looked at all the different lifecycle events the `@Component` class has). In this initialisation lifecycle event, we call the `log()` method of our `MyFirstService` service using the local reference to this service we made in the constructor.
+
+If we want to use another public method of the service, we would use the same local reference:
+
+`this.myFirstService.checkLoginDetails()`
+
+Here, we are calling the `checkLoginDetails()` public method of `MyFirstService`.
+
+### Public and private methods in services
+We've mentioned this idea of a `public` method; it's worth just explaining what we mean by a `public` method and how a TypeScript class, which a service is, can have both public and `private` methods.
+
+In many programming languages, there is the concept of a class having both `public` and `private` methods and properties. The private keyword tells the TypeScript compiler that it's not OK for anything outside of this class to access either the `private` property or the private method. Likewise, the public keyword tells the TypeScript compiler that it is OK for other classes (services, components, and so on) to access and use the properties and methods marked `public`.
+
+#### Using private and public functions in a service
+When we are writing services for our Angular applications, it is worth thinking about when we want to use both the `public` and `private` keywords. Do we want all properties and methods to be `public`? Or do we want to make only a few properties and methods `public` and everything else `private`?
+
+A good approach to this is to think of creating a service with its own public API, in a way that other classes can access the functionality of the service.
+
+> An API can be described as a set of functions and procedures allowing the creation of applications that access the features or data of an operating system, application, or other services.
+
+A service needs to be a black box, where other classes (the other services and components) do not need to know how a service works; all they care about is that they can make a call to the service and it gives them back what they need.
+
+Why make our services *black boxes* to the other classes in our application? Well, one great benefit of this is it allows us to make changes to the way a service is implemented without affecting the API into the Service class. If we don't change how a component of another service makes calls into a service, then the internal workings can be refactored, if they need to be, without breaking existing code.
+
+We're starting to get into programming theory, which this book isn't about, but it is worth spending a bit of time investigating best practices for writing Services in order for you to know what the best approaches are when it comes to writing services for your Angular applications.
+
+Now, let's have a look at some of the services that Angular provides before we look at the HttpClient Service.
+
+## A look at the services Angular provides
+Angular provides a number of services as part of the framework and as Angular developers, we can use these services in our applications. To see what services are available, we can go to the official Angular docs ([https:/​/​angular.​io/​api?​type=class](https:/​/​angular.​io/​api?​type=class)​), where we can see all the services available to us.
+
+As you can see in this page, the services are categorised by the type of functionality they offer. For example, we have a common set of services. These are services that offer functionality that is common in all Angular applications, such as using a Location service that provides the functionality to interact with the browser's URL. There is a lot of functionality that comes as part of Angular, so it is worth looking through the API documentation to see what is available.
+
+One area of the Angular API is the common/HTTP ([https:/​/​angular.​io/​api/​common/http](https:/​/​angular.​io/​api/​common/http)) package, this contains all the functionality we may need to access external data through an API, which is a central part of building a modern web application. In the next section, we will be looking in detail at the HttpClient service, which we use to make API calls in our Angular applications.
+
+## The HttpClient service
+In modern web applications, there are a number of ways to access an external API; as we are using Angular, we have to use what the browser gives us. Thankfully, modern browsers support two ways of reaching an API, which are as follows:
+
+- The `XMLHttpRequest` Interface 
+- The `fetch` API
+
+The `XMLHttpRequest` interface is an API that uses an object's methods to transfer data from a web server. These methods are known as the Request methods and they consist of the following:
+
+- OPTIONS
+- GET
+- POST
+- PUT
+- DELETE
+- HEAD
+- TRACE
+- CONNECT
+- PATCH
+
+Normally, we use the `get`, `post`, `put` and `delete` methods when accessing an API, but as you can see, the `XMLHttpRequest` interface has a few more methods that we could use.
+
+The Fetch API is a new API that is available in modern browsers such as Chrome, Safari, Firefox, and Edge (not Internet Explorer) that allows us to access APIs through a set of objects. Each object has its own set of methods we can use to access data. The objects that the Fetch API provides are as follows:
+
+- WindowOrWorkerGlobalScope.fetch()
+- Headers
+- Request
+- Response
+
+The Fetch API has been designed to look similar to the `XMLHttpRequest` interface so developers who have used this approach before will be familiar with how to implement the Fetch API.
+
+The `HttpClient` service uses `XMLHttpInterface` as its backbone, so we as Angular developers can use the `HttpClient` service in our applications, which in turn uses the browser's support of `XMLHttpInterface` to access external APIs.
+
+### Adding the HttpClient service
+When we need to add the `HttpClient` service to one of the Angular applications, we first need to import `HttpClientModule`, in which the `HttpClient` service sits.
+
+To do this, we simply add `HttpClientModule` to our list of modules in the main `app.module.ts` file of our app. With this module part of the main module, we can import the `HttpClient` service into one of our own services:
+
+```
+@NgModule({
+       declarations: [
+           AppComponent, 
+           NavigationComponent
+       ],
+       imports: [
+           BrowserModule,
+           HttpClientModule,
+           AppRoutingModule,
+           BrowserAnimationsModule,
+           CustomMaterialModule,
+           ClientModule,
+           CompanyModule,
+           AboutModule,
+           SharedModule
+       ],
+       providers: [ClientService],
+       bootstrap: [AppComponent]
+   })
+   export class AppModule {}
+```   
+
+Without this `HttpClientModule`, if we try to just add the `HttpClient` service, the Angular compiler will throw an error. Next, we simply add `HttpClient` service to any of our own services where we wish to make API calls:
+
+```
+import { Injectable } from '@angular/core';
+import { Client } from './client';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+   providedIn: 'root'
+})
+export class ClientService {
+   constructor(private httpClient: HttpClient) {}
+}
+```
+
+## Features of the HttpClient API
+Now that we have added a `HttpClient` service to our application, let's take a look at the API of this class in order to find out what we can do before we go into the implementation.
+
+Through the `HttpClient` class, we can make REST API calls to the backend of our application. These REST API calls are as follows:
+
+- GET
+- POST
+- DELETE
+- PUT
+
+These REST calls match the Request methods from the `XMLHttpRequest` object that modern browsers support. So, we can see that the `HttpClient` class is making use of what browser's built-in API capabilities.
+
+> REST is an architectural structure for creating web services. When a web service follows the REST structure, it is known as a RESTful web service. The name REST comes from its full name, Representational State Transfer. A RESTful web service sends requests to systems so that it can access data from these systems (for example, a web server). For more information on REST, see the Representational State Transfer article on Wikipedia ([https:/​/​en.​wikipedia.​org/​wiki/​Representational_​state_​transfer](https:/​/​en.​wikipedia.​org/​wiki/​Representational_​state_​transfer)).
+
+So, let's look at how to make each of these REST calls using the `HttpClient` service in order to gain an understanding of how they are implemented before we examine how we are using them in our Client Contacts Manager application.
+
+### Making a GET request
+Making a `GET` request using the `HttpClient` service is very straightforward. Once we have injected the class into our service, we can write a function that uses the `get()` method to call an external API endpoint, then we subscribe to the Observable that the `get()` method returns. Finally, we listen to see what the response is from the API call that the Observable returns.
+
+> An API endpoint is a reference to a URL that accepts requests. These request may or may not be REST requests. For a list of great publicly accessible APIs, check out this GitHub repo: [https:/​/​github.​com/toddmotto/​public-​apis](https:/​/​github.​com/toddmotto/​public-​apis).
+
+That's the theory. This is how it looks when we implement it: let's imagine we are building an Angular application that displays the latest train times and, as part of this application, we have a page that returns all the current departure times. For this application, we may have a page Component that shows all the latest departure times in a table.
+
+As part of this component, we are using the `Component` lifecycle hook, `OnInit()`, to load the data for the page from an external API. Our `OnInit()` function would look something like this:
+
+```
+ngOnInit() {
+       this.trainTimesService.getDepartures().subscribe(response => {
+           this.departuresList = response
+       });
+}
+```
+
+In this `ngOnInit()` handler, there is a call to `TrainTimesService` using its `getDepartures()` method, which is where the `HttpClient` get function is used. Then we subscribe to the Observable that HttpClient `get()` returns and when we get the data back, we set response to a local property called `departuresList`.
+
+So, this is how we call the service in our component; let's look at the `getDepartures()` method in the `TrainTimes` service to see how we use the HttpClient `get()` method:
+
+```
+trainAPIUrl = 'https://api.trains.com/departures';
+   getDepartures()  {
+       return this.httpClient.get(this.trainAPIUrl);
+}
+```
+
+In this method, we are simply returning the Observable that the `httpClient.get` method returns. When we make the get call, we're passing in the URL of our API, which in this example is an API that returns a list of departures.
+
+As you can see from these two snippets of example code, the HttpClient service is very powerful. There isn't a lot of code here and we are managing to make a call to an external API with just the one line of code.
+
+We've spoken about Observables and subscribing to Observables when looking at how to make HTTP Get calls, and we will be going into more depth on what Observables are in the next chapter, *Chapter 8, Observables and RxJs*, but it helps to go over the concepts again, while we are looking at the `HttpClient` service that makes use of Observables.
+
+#### Observables and subscribing
+When we make an Observable using the `HttpClient` service, we are simply using an `Observable` object: this is an object that has certain properties and methods that allow it to open a connection to another data source (this data source could be an API or an event on a button). The Observable watches the data source, then when something happens on the data sources end, an API returns some data, for example. The Observable reacts to this return of data and performs an action.
+
+How does the `Observable` know when something has happened? Well, it subscribes to this data source. It basically says 'I am interested in the data or action you return, so I'm going to listen for you to return the data and when I hear that, I'll perform an action'. So, in the previous example in the Component, we subscribe/listen to the Observable that the `HttpClient` Get method provides and when we hear the Observable return the data, we respond.
+
+This approach is different from the previous version of Angular, where when we made API calls we would get some data and then stop listening for data to be returned. Using an Observable allows us to listen to when data is available so we can load data over time, instead of the previous approach, where loading data was a one-time action. With Observables, we can listen for data to be returned over time and react when data is returned.
+
+This use of Observables in Angular is part of a more reactive programming approach that modern web applications use. We will be looking into this approach in the next chapter, but for now, we just need to understand that when we use an `HttpClient` method, it is returning an Observable object we can subscribe to and listen out for the response.
+
+### Making a POST request
+After getting data, the second most common function we perform with APIs is posting data. This is where we send some data to an API endpoint, for example, posting some data from a form or sending an update to a record in a table. For this, we use the `HttpClient` Service `POST` method.
+
+The POST method is very similar to the `GET` method. Again, using our fictional train service, making a `POST` method call looks like this:
+
+```
+trainAPIUrl = 'https://api.trains.com/buyticket';
+   
+buyTicket(ticket: TicketInformation)  {
+   return this.httpClient.post<TicketInformation>(this.trainAPIUrl,ticket, httpOptions);
+}
+```
+
+The `POST` method returns an Observable that we can subscribe to in the components `buyCustomerTicket()` method:
+
+```
+buyCustomerTicket(ticket: TicketInformation) {
+       this.trainService.buyTicket().subscribe((savedTicketInfo) => {
+           console.log(savedTicketInfo);
+       })
+}
+```
+
+A couple of things to notice here: the first is that in the `post` method call, we are setting the return type, `<TicketInformation>`, so that when the API returns some data, it is returned as an object with the properties of a `TicketInformation` object, which is an object we have defined in our code.
+
+The second thing to notice is that we are passing in some `httpOptions` in our post method. These options are what the API is expecting when making an API call, for example, setting the headers for `HTTP` calls, which you would do like this:
+
+```
+import { HtppHeaders } from '@angular/common/http';
+const httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json',
+   'Authorization': 'authentication-token' })
+};
+```
+
+The next `REST` method to look at is the `DELETE` method.
+
+### Making a Delete request
+Again, making a Delete request using the HttpClient service is very straightforward (having Angular provider Services such as HttpClient really makes performing complex tasks like HTTP request very easy).
+
+To make a Delete request, we follow the same pattern: have a method in our service that uses a `HttpClient` method and returns an Observable. Then, at the Component level, we subscribe to this Observable, and when we subscribe the method is called.
+
+Going back to our fictional train service, a Delete request would look like this:
+
+```
+trainAPIUrl = 'https://api.trains.com/ticket';
+
+deletePassengerTicket (ticketReference: number): Observable<{}>{
+       const url = `${this.trainAPIUrl}/${ticketReference}`;
+       return this.httpClient.delete(url, httpOptions)
+}
+```
+
+Here, we are taking in a ticket reference number as an identifier that the API needs to find the record to delete. We add this reference number to our `trainAPIUrl`, to make a new API path ( `https:/​/​api.​trains.​com/​ticket/​21` ), then we call the `Delete` method of `HttpClient`.
+
+At this point, nothing has happened. It's only when the `deletePassengerTicket()` method has been subscribed to that this code runs. So, again at the Component level, we need to have a method that subscribes to the Observable that this method returns.
+
+So, we could have a `deleteTicketRequest()` method in our component like this:
+
+```
+deleteTicketRequest(ticketRef: number){ 
+    this.trainService.deletePassengerTicket(ticketRef).subscribe()
+}
+```
+
+This will call the `deletePassengerTicket()` method because we are subscribing to it. Even if the Observable returns nothing, as in this example, we still need to call `subscribe()` to make it run.
+
+The final `REST` method call is the `PUT` method.
+
+### Making a Put request
+The Put request is slightly different from a Post request. A Put request will replace an item with the data that is passed as part of the Put request. With a Post, we're sending some data to a backend via the API, then the backend can decide what to do with the data it has received. From my experience, I have seen Post used a lot more for data updates than a Put request, but it is still a valid approach. 
+
+Again, we follow the common pattern for using the `HttpClient` service. We create a method in our service, but it's not until the Observable of that method is subscribed to that the Put method will be called.
+
+Here's an example using our mock train service:
+
+```
+updatePassenger (passenger: Passenger): Observable<Passenger> {
+       return this.httpClient.put<Passenger>(this.trainsAPIURL, passenger, httpOptions) ;
+}
+```
+
+In this `updatePassenger()` method, we pass in an object that has a Type of Passenger, so it has all the properties we expect a Passenger object to have. Then, when we subscribe to the Observable this method returns, the data it returns will be set to the same Passenger type, because we have set it like this `Observable<Passenger>`.
+
+Then, again, at the Component level, we need to call this `updatePassenger()` method and subscribe to the Observable it returns.
+
+```
+updateCurrentPassenger(currentPassenger: Passenger){
+    this.trainService.updatePassenger(currentPassenger).subscribe();
+}
+```
+
+So, now we've seen how to make the standard `REST` calls, we can move onto the more advanced features of the `HttpClient` service and start to see the benefits it brings.
+
+## Advanced features of HttpClient service
+As we have seen, the `HttpClient` service makes is very easy to call a RESTful API, but there is more we can do with our `HttpClient` calls. We're now going to look at some of the more advanced features to see how we can use them in our Angular applications.
+
+### Setting the HttpHeader options
+One of the first things we can do is set the header options just before we make an Http Request. For example, we may have a Request that requires a different set of header options from the other Http Requests we're making in a service: maybe when we are making a Post request we need to provide a different authentication token from the other Http requests we have in service.
+
+To do this, we can use the `set()` method of the httpOptions object to create a new set of options. In our earlier example, we created `httpOptions` like this:
+
+```
+import { HttpHeaders } from '@angular/common/http';
+
+const httpOptions = {
+       headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'authentication-token' })
+};
+```
+
+Here, we've created a const variable with `HttpHeader` options that can be used in all our Http Requests, but if we want to make a new header option, we have to use the `set()` method to change the options:
+
+`httpOptions.headers = httpOptions.headers.set('Authorization', 'new-auth-token');`
+
+This ability to update the header options allows us to easily set them if we need to make a change. If your application uses a temporary authentication token for an initial request, and is then returned a new token, we can set the new authentication token using this method.
+
+### Using HttpParams
+Another useful class available to us in Angular is the HttpParams class. This allows us to create an object of all the parameters we may pass in an API call. Why would we want to do this? Well, one reason is we may want to URL-encode our parameters before passing them in a request.
+
+> URL-encoding means we convert the parameter to a format that can be passed as part of a URL. If we have parameters that have characters in them that will break the URL of the request – special characters and so on – encoding them means these characters do not break the API URL.
+
+To use the `HttpParams` class, we create an object that will contain all the parameters we have. This object is then passed as our *options* argument in our Get or Post requests:
+
+`const paramOptions = new HttpParams().set('orderBy','lastname').set('limitTo': '100');`
+
+In this example, we are creating a new set of parameter options, one called orderBy and one called `limitTo`, which would return some JSON from an API ordered by the last name and consisting of only 100 records.
+
+You can see that we are chaining these parameters together one after the other. We could do this with a few more `HttpParams` in this object to build up a larger set of options. Eventually, they all will be passed to the API request as the `paramOptions ` object.
+
+### Intercepting Requests and Responses
+Wouldn't it be great to be able to intercept all the API requests that your application makes, in order to manipulate the request and to ensure that all responses from the API request go through the same process? Well, you can by writing an interceptor class for your application.
+
+To write an interceptor, we need to write a TypeScript class that implements the HttpInterceptor ([https:/​/​angular.​io/​api/​common/​http/​HttpInterceptor](https:/​/angular.io/api/​common/http/HttpInterceptor) ) interface.
+
+This example shows how we can add a new header to all our requests:
+
+```
+@Injectable()
+export class AuthenticationInterceptor implements HttpInterceptor {
+       constructor(private authenticationService:AuthuenticationService) {}
+       
+       intercept(req: HttpRequest<any>, next:HttpHandler):Observable<HttpEvent<any>> {
+           const authRequest = req.clone({
+               headers: req.headers.set('X-CustomAuthHeader',authenticationService.getToken())
+           });
+       return next.handle(authRequest);
+    } 
+}
+```
+
+Now, with this service, all HttpRequests will go through interceptor and have `X-CustomAuthHeader` set to the token the Authentication Service returns. The important thing to notice here is the `intercept()` function, which the class needs to provide because it is implementing the `HttpInterceptor` interface.
+
+This function takes in two arguments: the request and the next handler. The request (called `req` in this example) is the Http request being made. It is an object that contains information about the request. As you can see from the example code, we're setting the headers of the request being made. The next argument is an HttpHandler that needs to be called for the interceptor to move onto the next Http request in the queue. This is why at the end of the `intercept()` function we call `next.handle(authRequest)`.
+
+To add this Http Interceptor class to our application, we set it as an `HTTP_INTERCEPTOR` Provider in the main `app.module.ts`:
+
+```
+@NgModule({
+   declarations: [ AppComponent ],
+   imports: [ BrowserModule, HttpClientModule ],
+   providers: [{ 
+       provide: HTTP_INTERCEPTORS, 
+       useClass: AuthenticationInterceptor, 
+       multi: true } ],
+       bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+```   
+
+Now that this is set, the `AuthenticationInterceptor` class will be used. The great thing about the HttpClient class, as opposed to the original `HTTP` class from Angular 2, is that we can add multiple `HTTP_INTERCEPTORS` to our application. We simply write a new class that implements the `HttpInterceptor` interface, then set it as a new provider in `AppModule`.
+
+Other benefits of `HttpInterceptor` are that it can look for error codes returned from Http requests, then if it sees an error the interceptor can redirect the user to an error page or update a log of errors.
+
+We can also use `HttpInterceptor` to add a prefix to all Http requests if our API demands that all Http requests have a prefix on them, instead of having to remember to add this prefix on every HTTP request we make in our Services. This prefix can be added via an Http Interceptor so that when a request is made it goes through this interceptor, which adds the prefix.
+
+### Listening for Http events
+The last thing we are going to look at is Http events. The HttpClient service provides us with events that we can look out for as part of a request being made. With these events, we can do some clever things like informing the user of the status of a request as it's being made. This would be especially helpful in larger Http requests such as downloading a large file or a set of large images.
+
+In this example, we are making a request and in the `subscribe()` handler of the request we are looking for the events in the request:
+
+```
+downloadFullReport() {
+    const apiUrl = '/company.com/reports/summer2018report';
+    
+    this.httpClient.get(apiUrl,{},{ reportProgress:true }).subscribe( (event) => {
+        if(event.type === HttpEventType.DownloadProgress) {
+            console.log('Download progress is', event)
+        }
+        
+        if(event.type === HttpEventType.Response) { 
+            console.log('The response from the server is', event)
+        } 
+    })
+}
+```
+
+A couple of things to note here: firstly, we are passing the `reportProgress` argument in the request in order for the HttpClient service to provide these Http events. We are also using the `HttpEventType` enum ([https:/​/​angular.​io/​api/​common/​http/​HttpEventType](https:/​/​angular.​io/​api/​common/​http/​HttpEventType)) to check for the type of event. The use of an enum lookup removes the chance of spelling errors when looking for an event. There are more than just two event types, we also have access to the following:
+
+- `Sent`: Fired when the request was sent 
+- `DownloadProgress`: Download status event 
+- `UploadProgress`: Upload status event
+- `Response`: The full response comes back as an event
+- `ResponseHeader`: The response headers
+- `User`: A custom event
+
+This list of events can be really useful for our applications to monitor how our Http request is progressing. If a download progress event is taking too long, we can add some error handling to inform the end user that there is an issue with the download or we can tell them how much of upload has been made.
+
+## Summary
+In this chapter, we have covered a lot of advanced features of Angular, which can be used for accessing and providing data to the UI of our applications. At the beginning of the chapter, we looked at what Dependency Injection is so that you can see how to make use of it within your applications. Then we spent some time looking at providers and services within Angular, looking at what they are, what role they provide, and how to make use of them within an application. Finally, we focused on the HttpClient service, a service that allows us to access external data via an API. This service is extremely useful and one you'll find yourself using over and over within any Angular application you work on, so it is important to understand how to use this service.
+
+Understanding Dependency Injection, services, and providers is a core part of using Angular, allowing us to turn our applications from a simple UI layer to a full-featured application. Throughout this chapter, we've used RxJs a couple of times in our example code and we've briefly discussed Observables and subscribing to Observables when making calls to the functionality our services provide.
+
+Next, we will take a detailed look at RxJs: what it is, why is it so important in Angular, and how we can make use of it to create more reactive applications. We will also go through the Observer/Observable pattern, which, as we've seen a few times, is a common approach to how we write Angular applications.
+
