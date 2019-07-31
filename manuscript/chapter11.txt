@@ -1,0 +1,452 @@
+# Chapter 11: Packaging Our Application
+In this chapter, we're going to look at the last part of developing an Angular application, and that is how we take the code we've written and make it ready for production. We will then go through the ways that you can make the package of the application small so that when users access the application, the time they have to wait for the application to load is minimal.
+
+Then, we will delve into the topic of Ahead of Time compilation, looking into what it is, as well as the benefits it can bring to an application so that you can decide whether you want to make use of it within your applications. Finally, we will look at the various configuration settings that are available in Angular and how they can be used to make the fastest, smallest Angular application possible.
+
+In this chapter, you'll learn about the following topics:
+
+- How to use the Angular CLI to generate a production release
+- The configuration settings we have access to
+- The various settings for the TypeScript compiler and how we can optimise the code that's generated
+- What the Ahead-of-Time compiler is and how to make use of it
+- How to deploy an Angular application and how to configure the application for production
+
+## Building a release version with the CLI
+The first thing we're going to be looking at is how we can use the Angular CLI (hopefully by now you know how helpful the Angular CLI is) to build a production build.
+
+So far, we've seen commands such as `ng serve` and `ng test` that we can use to either run the application locally in the browser or run through all our unit tests. There is another command we can run against the CLI that will create a release version of the application. The new command is as follows:
+
+`ng build`
+
+This will take our application code and make a release build in a new folder, which can be found in the `dist` folder in the project tree:
+
+![VSCode Showing our new Dist folder](/images/chapter11/1.png)
+
+In the preceding screenshot from VSCode, you can see the new `dist` folder, which has a sub-folder that uses the name of our project as its name. In this sub-folder is all the minified code the build process has made. Notice that there are no TypeScript files here – all our sub-folders have gone and all of our component and service folders are no longer there. This is because the build process has compiled all our code into one single JavaScript file, the `main.js` file.
+
+> If you open the `main.js` file in VSCode and scroll through it, you'll see how the TypeScript compiler has converted our TypeScript into JavaScript. You'll also notice some of the TypeScript we've written, but now it's in JavaScript.
+
+The `ng build` command will generate this distribution folder, but like so many other Angular CLI commands, we can pass an argument along with this build command. If we use `ng build --watch`, this will tell the CLI to create a `dist` folder and then watch for any further changes to our code. If we make any amends to the codebase, the CLI will automatically generate a new version of the `dist` folder by first clearing out what is already there and then generating a new version from the latest code. This is extremely helpful when you're getting a final release ready and you have to make those final, small amends for the release.
+
+### The environment settings files
+Within our application, we have two environment files as standard. There's one for development,`environment.ts`, and one for production, `environment.prod.ts`. Both of these files can be found in the `/environments` folder of our application. Within these files, we can add any environmental settings we want to access within our code. For example, we could set the main API URL. Then, in the development version, we have a development URL, which points to a dev server, and in the production environments file, the same URL points to the live product URL.
+
+This is what the `environment.ts` file could look like with an API URL for development:
+
+```
+export const environment = {
+    // set to false to show that not a production version
+    production: false, 
+       
+    baseApiURL: 'https://dev.api.example.com'
+};
+```
+
+In the following code, we have the same properties, but this time in the `environment.prod.ts` file:
+
+```
+export const environment = {
+   production: true,
+   baseApiURL: 'https://api.example.com'
+};
+```
+
+Within our code, we can access these environmental properties by importing the `environment` file, which gives us access to the properties within the file:
+
+```
+import { environment } from 'src/environments/environment';
+...
+ngOnInit() {
+   console.log(environment.baseApiURL);
+}
+...
+```
+
+### Creating alternative environment files
+While, by default, Angular provides us with two environment files (development and production), we can actually create other environment files if we need to have a different set of values for our environment properties on another server. For example, we may have a situation where the project we're working on has a QA server. So, our `baseApiURL` property for the QA server might be different and we need to have an environment file for that QA server.
+
+In order to add a new `environment.ts` file, we need to make two changes. First, we need to create our new QA version of the environments files. To do this, we can simply create an `environment.qa.ts` file in the `/environments` folder. This QA version needs to have all the same properties as the other two files, but with values that work on our QA server.
+
+The next step is to add the details of this new environment to the `angular.json` file. Within this file, there is a section called configurations (somewhere around line 35 of the JSON file). This is where we can add alternative configuration settings:
+
+```
+"configurations": { "production": {
+    "fileReplacements": [{
+           "replace": "src/environments/environment.ts",
+           "with": "src/environments/environment.prod.ts"
+       }
+    ],
+    "optimization": true,
+    "outputHashing": "all",
+    "sourceMap": false,
+    "extractCss": true,
+    "namedChunks": false,
+    "aot": true,
+    "extractLicenses": true,
+    "vendorChunk": false,
+    "buildOptimizer": true,
+    "budgets": [{
+       "type": "initial",
+       "maximumWarning": "2mb",
+       "maximumError": "5mb"
+        }]
+    } 
+},
+```
+
+Note that in this extract from the `angular.json` file, we have just one configuration for production. In order to add the new QA settings, we just add a new entry within this configurations section:
+
+```
+"configurations": { "production": {
+    "fileReplacements": [
+       {
+           "replace": "src/environments/environment.ts",
+           "with": "src/environments/environment.prod.ts"
+       }],
+        ... 
+    },
+    "qa": { "fileReplacements": [{
+       "replace": "src/environments/environment.ts",
+       "with": "src/environments/environment.qa.ts"
+        } ],
+        ... 
+    },
+}
+```
+
+Now, we have a QA entry, as well as the production entry. The thing to notice here is the `fileReplacements` section. This is where we're telling the Angular CLI when we are running in production in order to replace the development version of the `environment.ts` file with the `environment.prod.ts` file. With the QA version, we're telling the CLI to replace the `environment.ts` file with `environment.qa.ts`. Then, when we access an environmental property in either of these configurations, the correct settings are used.
+
+### CLI commands for building different environments
+With this new configuration set up, we can use the CLI to build our application in either of these configurations. When we call `ng build`, we add extra commands to tell the CLI to build for the different environments. For example, to perform a standard build, we can use the following code:
+
+`ng build`
+
+To tell the CLI to build for production, we can run the following command:
+
+`ng build --prod=true`
+
+This will set the configuration to use the production settings (our `environment.prod.ts` file will be used), which makes use of bundling (creating those JavaScript files we saw in the `dist` folder) and uses tree-shaking to remove any unused code, reducing the size of the final output. We can also tell the CLI to use our new configuration. This is helpful if we want to test that the configuration works before committing this change to our main code branch:
+
+`ng build --configuration=qa`
+
+This command will access the QA section of the configuration portion from the `angular.json` file. If we want to actually serve the application to a local browser using this configuration, we can do so by using the `ng serve` command:
+
+`ng serve --configuration=qa`
+
+Alternatively, we can use the following command:
+
+`ng serve --configuration=prod`
+
+Again, by showing you how powerful and helpful the Angular CLI is, we can set up multiple configurations for how many environments we may have and both test them and build them before committing to the main codebase.
+
+## The angular.json file
+In the previous section, we mentioned the `angular.json` file. This is an extremely important part of an Angular application, so it is worth exploring this file some more.
+
+The `angular.json` file is always found in the root folder of a CLI generated project, along with the `package.json` file. Originally, this file was named `.angular-cli.json`, but as of Angular 6+, the file was renamed to `angular.json`, though its official name is the **Angular CLI workspace file**. This file is used as the main source of configuration for the entire project, as we've already seen in the configuration section, the environment settings file. There are many more settings that we can change within this JSON file in order to optimise our application. Let's have a look at some of the sections of this file.
+
+The first part of the JSON file defines the schema that this file should be checked against and the version of the application. After this, we have the projects section.
+
+### The Projects section
+In this section of JSON, the projects under the CLI workspace are listed. Currently, we just have one our main Angular project, but if we have a far more complex application that is made up of several projects, they are listed here, along with all the settings for each project.
+
+We could have a large enterprise application that is not only made up of the core Angular project but is also making use of multiple library projects. These library projects could contain reusable code that is being used across multiple Angular projects. In the projects section, we can define the CLI settings for each library project, along with the settings of that main project.
+
+> If you are planning a large-scale Angular application and you want to make use of library projects so that you can reuse code in your application, then Nrwl's NX solution may help. It extends the Angular CLI, so these library projects can be set up and managed through the NX Extensions ([https:/​/​nx.​dev/​](https:/​/​nx.​dev/​)).
+
+Within the Projects section, we have a single sub-section called the architect section. Not only do we have the main Angular project, but the settings for the end-to-end tests version of the application are kept in this Projects section. This project contains the settings the CLI needs in order to run the end-to-end tests of the application.
+
+So, if we have a complex application made up of the main core application, a set of the end-to-end tests, and a library project, we would have three sub-sections within the Projects section:
+
+- `Client-contacts-manager-angular`: The main application 
+- `Client-contacts-manager-angular-e2e`: The end-to-end tests settings
+- `CCM-Useable-code-library`: A reusable code library
+
+### The Architect section
+In this section, we have the settings for the various ways the application is going to be built by the CLI. In the section, for the main Angular application, we have five sub-parts, which are as follows:
+
+- build
+- serve
+- extract-i18n
+- test
+- lint
+
+The Architect section contains all the options for how the application will be built by the CLI, and where the CLI can find various files it needs when building the application. This includes the configuration settings we looked at earlier, as well as any third-party libraries we need to add to our application. These libraries can be listed in the scripts array of the options section.
+
+The `serve` section has the necessary settings so that the CLI knows what build scripts it should use. These scripts come as part of Angular and are defined in the main `package.json` file, under the scripts array:
+
+```
+"scripts": {
+   "ng": "ng",
+   "start": "ng serve",
+   "build": "ng build",
+   "test": "ng test",
+   "lint": "ng lint",
+   "e2e": "ng e2e"
+},
+```
+
+We can also add our own build scripts to this section of `package.json` if we need to have a specific build process for our environments. Next is the `extract-i18n` section. This tells the CLI to extract all the i18n messages from our application. This is the detail that is needed so that we can add internationalisation (multi-language support) to our application.
+
+> For more information on i18n in Angular, check out the official documentation: [https:/​/​angular.​io/​guide/​i18n](https:/​/​angular.​io/​guide/​i18n).
+
+Next, the `test` section is very similar to the serve section, but it is using Karma to build and run the application. Last but not least is the `lint` section. This tells the CLI to check our TypeScript files against the Lint settings that come as part of the application. These lint settings check that our TypeScript code is following the rules set out in the `tslint.json` file.
+
+### The tslint.json file
+Linting or linters will check our code for any potential problems. It will highlight what these problems are and possible ways to solve these issues. When working in large projects with multiple team members, we can define a set of rules for how we want the code of the application to be written. For example, if we want to use double quotes instead of single quotes, or tabs instead of spaces, these rules can be added to the `tslint.json` file. Then, when the application is saved or when we run `ng lint`, these rules are checked against our code.
+
+By default, there are a large set of rules already in the `tslint.json` file, but if you want to add more settings, you can. For a complete list of the rules that are available, check out the official TSLint rules page: [https:/​/​palantir.​github.​io/​tslint/​rules/​](https:/​/​palantir.​github.​io/​tslint/​rules/​).
+
+Now that we've gone through the `angular.json` file and we understand the role of it, we can start working toward creating an optimised, production-ready version of our application. One of the first optimisations we're going to look at is Ahead-of-Time compilation.
+
+## Ahead-of-Time compilation
+**Ahead-of-Time** compilation, or **AoT**, as it is more commonly called, is the ability that Angular has where it can convert our HTML and TypeScript into JavaScript before the browser downloads and uses this JavaScript.
+
+This conversion is performed by the AoT compiler, which compiles our HTML and TypeScript into JavaScript files just before they are needed. The benefit this brings is that when a user is going to access an application in the browser, they don't have to wait for the compiler to compile all the HTML and TypeScript of the application into JavaScript. If we have an application that has over 100 components and templates, plus 50 services, this is a large amount of HTML and TypeScript that needs to be compiled before the JavaScript is ready to be downloaded by the users' browser. This delays our application from being usable, making it appear as though the application is slow to start, which is not good in today's modern web applications.
+
+### JIT versus AoT
+In Angular, there are two ways that code can be delivered –either using Just-in-Time (JIT) compilation or AoT. Just-in-Time compilation is where our code is compiled within the browser at runtime. This is commonly used when we run `ng serve` and `ng build` (not `ng build --prod` – this switches to using AoT).
+
+AoT will compile the code before it is downloaded to the browser, removing this slight lag we see when the browser is compiling the code at runtime. The reason that `ng serve` and `ng build` aren't using AoT by default is that when we're running `ng serve`, for example, we're running the application locally for development purposes, and this lag is not an issue for us like it would be with end users.
+
+We can tell both the `ng serve` and `ng build` commands to switch to using AoT if we want to serve the application with AoT switched on to check how it performs. Again, by passing in an argument to these two commands, we can tell the CLI to switch to AoT:
+
+`ng serve --aot`
+
+Now, if we want to build the application so that the release version uses the Ahead-of-Time compilation, we would use the following command:
+
+`ng build --prod`
+
+This makes a build version that uses AoT instead of the JIT compilation.
+
+> It's important to remember that we use JIT compilation locally when developing our application, whereas AoT is for production. The reasons are that the code hat's generated through this `--aot` command is more secure (it's harder to read in the browser, unlike development code).
+
+Also, when you're using AoT in the build version, the Angular compiler is not part of the release package, thus making it as small as possible.
+
+### AoT in production
+When we were looking at the `angular.json` file, you may have noticed in the production sub-section of the configuration section that there is a setting for AoT:
+
+```
+"configurations": {
+   "production": {
+       "fileReplacements": [
+           {
+               "replace": "src/environments/environment.ts",
+               "with": "src/environments/environment.prod.ts"
+           }],
+        "optimization": true, 
+        "outputHashing": "all", 
+        "sourceMap": false, 
+        "extractCss": true, 
+        "namedChunks": false, 
+        "aot": true,
+        ....
+```
+
+Notice that the `aot` property is set to **true**. This means that Ahead-of-Time compilation is on by default in production. Therefore, we don't need to worry if it is or not when releasing our application to production – it's already set for us.
+
+### Why we should use AoT
+As we briefly mentioned earlier, the application is usually compiled and all our HTML and TypeScript is compiled to JavaScript files. If this compilation is performed on the browser, then this can take a short while, depending on the size of our application. Since internet connections have gotten faster and faster over the last few years, users expect to see websites and web apps load almost instantly. Studies have been conducted that state that if a website doesn't load within a few seconds, the user will leave the site.
+
+So, with the time an application loads being a big factor regarding whether a user stays on an application, being able to show the application working as soon as possible is extremely important. Through AoT, we remove this browser compilation phase, making the app appear in the browser almost straight away.
+
+> Remember that TypeScript is a superset of JavaScript and cannot actually be run in the browser. This is why we need to have TypeScript compiled down to JavaScript, which the browser understands.
+
+You can test this by running your Angular applications using `ng serve` and `ng serve --aot`.
+
+However, that's not all – there are a number of other benefits AoT brings, as follows:
+
+- **Fewer asynchronous calls**: All the CSS and HTML files are combined, reducing the number of calls the application needs to make to the server to access separate CSS and HTML files.
+- **Smaller Angular framework download**: With the application already compiled, the Angular compiler doesn't need to be downloaded to the browser. This reduces the size of the Angular framework by removing the Angular compiler.
+- **Detect template errors earlier**: Errors in our HTML templates can be found during this build step. To ensure that the end user doesn't see an error in the template, we pick these errors up earlier.
+- **Better security**: With all the code compiled to JavaScript before getting to the browser, there are no HTML templates, which injection attacks can be made through.
+
+Ahead-of-Time compilation is a great feature of Angular 8 and brings so many benefits. This is why it is switched on by default in the production version of the application.
+
+## Other various production optimisations
+As well as AoT and environmental settings, there are other options we can set in order to optimise our application for production. One of these areas is setting the browser support level you want for your application.
+
+### Browser-specific CSS
+If we're developing an internal application which is solely being used within a corporate environment and in that environment they only allow the users access one browser, we can optimise our application to work for that browser. Again, by using the CLI, we can add a setting to the `angular.json` file that tells the CLI to optimise the build for this type of browser.
+
+The Angular CLI uses Autoprefixer, which is a plugin for CSS that will automatically prefix our CSS classes with the appropriate prefix. If we have a class called `panel` and this class has some browser-specific attributes, we can create the CSS like this:
+
+```
+::panel {
+    color: blue;
+}
+```
+
+What the Autoprefixer will do is replace the `::` with a browser-specific prefix. The panel class will now look as follows:
+
+```
+::-webkit-panel {
+       color: blue;
+}
+::-moz-panel {
+   color: blue;
+}
+::panel {
+   color: blue;
+}
+```
+
+The Autoprefixer plugin uses a library called Browserslist to get a list of the browsers it should add prefixing to (we could exclude Safari if we wanted to). This Browserslist library uses a config setting called browserlist to set the list of browsers it needs to support. This config setting can either be set in the main `package.json` file or in a .browserlistrc file. The Angular CLI will then read the list from this file and add the appropriate CSS prefixes to the CSS we defined in our application.
+
+Going back to our example, we have an application that shouldn't support Internet Explorer. We can add the following to the browserlist section of these settings: 
+
+```
+"browserslist": [
+   "last 2 versions",
+   "not ie <= 10"
+]
+```
+
+In this example, we're telling `Browserslist` to support only the last 2 versions of the browser the application is running in (this could be Chrome, Firefox, or Safari) and not to run in IE.
+
+You may be wondering why this doesn't actually list the specific browsers to run in. Well, the recommended approach from `Browserslist` is to only set the number of versions that should be supported, but if your application is to run within an organisation that only allows one browser to be installed on users computers, then `Browserslist` will only allow support for the last two versions of that browser.
+
+It is rare that the CSS settings are optimised like this because, with some applications, we can't tie down the list of browsers it should support. However, with corporate applications that target a certain browser, we can make great use of this optimisation feature.
+
+### Enabling Production mode
+We've seen already some of the build optimisations that are available to us in the `angular.json` file, but we can also tell Angular to run in Production mode instead of Development mode, which is the default mode. When we run `ng serve`, the application is being run in Development mode.
+
+To switch to Production mode, all we need to do is add `--prod` as an argument to the command we're running. The following list of commands are all in Production mode:
+
+- `ng serve --prod`
+- `ng build --prod`
+- `ng test --prod`
+- `ng e2e --prod`
+
+To check whether a command can be run in Production mode, check the list of CLI commands from the Angular documentation: [https:/​/​angular.​io/​cli](https:/​/​angular.​io/​cli).
+
+#### What is Production mode?
+When any of the preceding commands are running in Production mode, it means that Angular is running the application faster than Development mode. The Angular compiler manages to do this by switching off some settings, including the following:
+
+- Dual change detection cycles
+- Stops outputting important warnings, but errors are still displayed 
+- Stops building a debugging elements tree
+
+These types of settings may speed up the application, but for debugging purposes, they are extremely helpful. This is why it's good to have Development mode enabled when developing and debugging an application, but when running the application in production, these settings can be disabled, which they are when running in Production mode.
+
+## Making use of lazy loading
+Another area where performance can be improved is through the use of lazy loading within our application. Back in *Chapter 5, NgModules*, we introduced you to the concept of modules in Angular. This is how our application is structured using a module. This contains all the Components, Services, Templates, and other files that are needed for a section.
+
+Through modules, we can create feature modules. These are modules that contain all the functionality of a section of our application (think of ClientModule or CompanyModule of our demo application). Through the use of modules, we can use lazy loading to only load the modules (and the code contained within that module) when needed.
+
+Lazy loading is configured through the Routes of our application. Usually, we would load the main component for a route like this:
+
+```
+{
+   path: 'clients/new',
+   component: ClientPageComponent
+},
+```
+
+Instead, we set up the Route so that it loads the module that the Component belongs to, like this:
+
+```
+{
+    path: 'clients/new',
+    loadChildren: './client/client.module#ClientModule'
+},
+```
+
+Then, within the `ClientModule`, we have a local route to load the individual Routes within that module, so if we need to `client/new` or `client/search`, these two Routes are defined in the `ClientModule` itself, like this:
+
+```
+const routes: Routes = [
+   {
+       path: 'new',
+       component: ClientPageComponent
+   },
+   {
+       path: 'search',
+       component: ClientSearchPageComponent
+   }];
+```
+
+Through using this lazy loading approach of setting up Routes, when a Route is loaded, the module is loaded along with all its children, and then the local route is searched for the matching component. Any other Routes not being called at that time don't load, along with any of their children components, and this reduces the size of the download in the browser. Lazy loading, along with Ahead-of-Time compilation, makes Angular load extremely fast and ideal for modern web applications.
+
+## Application size budget
+Another option for reducing the size of the download the browser needs to make, which in turn speeds up our application, is to set an application size budget. This is where we can configure a size for the application that we think is the maximum and during the build process, if our application has grown to be close to this maximum size, the Angular CLI will warn us.
+
+During the development of an application, we add more and more packages and code as the app grows. This all leads to a final compiled file size that the browser needs to download. The larger the file, the longer the browser will take to download, and the longer it takes for our application to be ready to start (this is especially an issue on mobile devices).
+
+In the `angular.json` file, under the configuration section, we can set an array of budget sizes:
+
+```
+"budgets": [
+       {
+           "type": "initial",
+           "maximumWarning": "2mb",
+           "maximumError": "5mb"
+} ]
+```
+
+There are a number of settings we can make for this section:
+
+- `type`: The type of budget – we can have more than one name: A name for the bundle budget type
+- `baseline`: A baseline size that's used to compare against the final size of our generated application
+- `maximumWarning`: The max size for displaying a warning; uses the baseline to compare
+- `maximumError`: The max size for displaying an error; uses the baseline to compare
+- `minimumWarning`: The min size for displaying a warning
+- `minimumError`: The min threshold for displaying an error
+- `warning`: The threshold for displaying a warning relative to the baseline 
+- `error`: The threshold for displaying an error relative to the baseline
+
+### Types of size budgets
+One of the settings for the budget array is `Type`. There are a few types of budgets that Angular supports, which are as follows:
+
+- `Bundle`: The size of the entire bundle
+- `Initial`: The size of the initial application itself
+- `AllScripts`: The size of all the scripts
+- `All`: The size of all the applications
+- `Any`: The size any script
+
+With these different types, we can set of different size budgets we want to check for. If at any point of a build the application is getting too big, the build process will warn us of these problems. Then, we can investigate to see what is causing the large file size and amend anything if needed.
+
+Being able to keep an eye on the final size of the download the browser needs to make is extremely important in keeping a fast, optimised production application.
+
+## Measuring performance
+After all these optimisation settings, we need a way to actually measure the performance of our Angular application. One way we can check the performance of the application is through the Chrome Dev Tools and, in particular, the Network Analysis section:
+
+![Chrome Dev Tools Network Panel](/images/chapter11/2.png)
+
+Within this section, we can see what the browser is downloading, as well as how long each file is taking to download (this is very helpful so that we can see if any individual files are slowing down the application). There is so much that can be inspected within this tool, so it is worth reading through the official documentation of the Dev Tools for your browser of choice. Here is a link to the Chrome Dev Tools: [https:/​/​developers.​google.​com/web/​tools/​chrome-​devtools/​network/​reference#timing-​breakdown](https:/​/developers.google.com/web/tools/​chrome-​devtools/​network/​reference#timing-​breakdown).
+
+# Summary
+In this chapter, we have explored a range of options that we can use in order to create a fast, optimised application. In today's world of fast internet connections, users expect any website or application they use – whether it's at work, home, or on mobile – to load almost straight away. Thankfully, Angular provides us with a number of strategies that we can use in order to make the fastest version of the application we can.
+
+We can use Ahead-of-Time compilation in order to remove the need for the browser to compile the application; this reduces the size of the Angular framework the browser downloads and reduces the time it takes for a section to run in the browser.
+
+We also covered lazy loading, which is a strategy where, due to the use of modules, we can get the browser to download only the Bundle JavaScript files needed to run a section of the application. If we have a bundle for each feature and a feature isn't being used, then the bundle JavaScript file is not downloaded until it's needed. This reduces the amount of the initial downloads the browser needs to make.
+
+We spent time exploring the `angular.json` file, which is the main configuration file for our project. Within this file, we can make a wide variety of changes, including switching out environment files for different builds. Having different configuration settings for the different environments our application may run in through the entire development process is crucial.
+
+The `angular.json` file can also be amended so that it has a set of final file sizes. We need to be warned if the application gets too big. Being aware of these issues before the application is released to the end user means that we can find ways to reduce the end file size before the user finds that the application takes too long to load.
+
+There are many ways we can tune and monitor the performance of the final production application, since Angular should never be seen as a slow framework. It just takes time and testing in order to make the ideal settings for your environment.
+
+We've come to the end of this book and we have covered a lot. We started by looking at what Angular is, how an Angular application is structured, and then moved on to how Angular prescribes a modularised approach to how we can structure our applications. We spent time looking at the Angular CLI and why it is a core part of our daily development process.
+
+We then moved on to looking at how to set up Routes within an Angular application so that the end user can navigate through the application. Following that, we spent time looking at dependency injection, which is the mechanism Angular uses to inject classes into other classes. We saw that we can use dependency injection along with Services to load data from external sources and make them available in the application.
+
+Then, we went through RxJs and Observables, seeing how, by using RxJs, we can make Angular application more reactive to both data changes and end user commands. After exploring the concept of Observables and really understanding what they are, we looked at the NgRx approach for managing state within an Angular application. To finish this off, we looked at how to write tests for Angular and how to optimise an Angular application for production.
+
+Throughout this book, we've been looking at the ways Angular can be used when creating an enterprise-level business application, but hopefully, you've seen that there is nothing that we've discussed that can't be used when developing smaller-scale applications in Angular.
+
+Angular is a perfect choice for creating modern web applications and with the topics we've discussed in this book, you are ready to start building your own Angular 8-based applications.
+
+Thank you for reading this book, and I wish you all the best on your Angular journey!
+
+
+
+
+
+
+
+
+
+
+
+
