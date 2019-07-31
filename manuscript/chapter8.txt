@@ -1,0 +1,852 @@
+# Chapter 8: Observables and RxJs
+
+Now that we know what services are and how to create them, we are going to move on to looking at Observables. We are going to learn what an Observable is, what role it provides, and what makes an Observable object. Once we have discussed the theory of Observables, we will move on to looking at the RxJs library that has been added to Angular. We will look at what RxJs is and what role it provides to Angular, as well as how we can add features of RxJs to our Services to make them more resilient and error-proof.
+
+We've spoken a few times already about Observables and RxJs, but never really looked into them in great depth, including how to use them and why we use them in Angular. In this chapter, we will explore both topics in more detail.
+
+In this chapter, we will cover the following topics:
+
+- Observable objects
+- How to use the Observable pattern in Angular
+- How to create Observables
+- How to use them
+- What RxJs is and an introduction to Reactive Programming How we can use the power of RxJs in our Angular applications
+
+There is a lot of theory to go through and a lot of concepts we need to learn and understand, but by the end of this chapter, you will see the benefits that this approach brings to our Angular applications.
+
+## Observables
+An Observable is an object that provides support for sending messages from publishers to subscribers within an application. That's the official explanation of what an Observable is. What this means is that when we create an object that uses the Observer pattern, this object has the ability to send out messages. These are messages that other objects that follow the Subscribe pattern can listen out for, and when they hear these messages, they can act on them.
+
+We have already seen examples of this in the previous chapter when we looked at Services. There were many times where we set up a function in a Service that returned an Observable object. This Observable object was then subscribed to at the Component level, where we could act on the message (or response) that was sent from the Observable object coming from the Service.
+
+### The terminology we need to know
+When discussing Observables, RxJs, and how they are used in Angular, we need to understand some terminology that will keep on coming up as we discuss these topics. These common terms are as follows:
+
+- Observable 
+- Observer 
+- Subscription 
+- Operators 
+- Subjects 
+- Schedulers
+
+We've looked an Observable, but to reiterate, this is the name we give an object that sends out the messages other objects listen for. The Observer is an object that Subscribes or is interested in hearing the messages that an Observable is sending out. A Subscription is a mechanism that the Observer uses to set out that it is interested in these messages from the Observable. Think of it this way – if you create an object that is a type of Observable, then you create an object that is an Observer. The Observer subscribes to anything that the Observable sends out.
+
+Operators are a concept from RxJs, and are methods that can be attached to an Observable. These methods perform operations on the Observable and what it returns in order to produce a new Observable object that is still subscribed to by Observers. We will look at Operators later when we discuss RxJs, but for now, just know that they are methods from the RxJs library we can use to perform operations on the Observables we create.
+
+Subjects are similar to Observables, but they can send out messages to multiple Observers. They have been described as being similar to an EventEmitter in Angular, where the Subject sends out a message or value to multiple listeners. Like Operators, they are a part of RxJs, but based on the Subject design pattern.
+
+Schedulers are also a part of RxJs, and we can use them so that we can schedule when work happens within our application. For example, we may want to take a response from an Observable and manipulate the data that's returned, and then we may want to get some more data from another Observable, but not before the first Observable has finished its work. With Schedulers, we can set up a pipeline of work, which is very powerful and shows how useful RxJS is to our Angular application.
+
+Now, let's take a look at what an Observable object is, the characteristics of an Observable object, and the design patterns that are used to define it.
+
+### The Observable object
+When an Observable object is created, we register an Observer object with the Observable. Then, as the Observable receives items, it calls all its subscribed Observer's methods. There are three handler methods that the Observable can call: `next()`, `error()`, and `complete()`. The `next()` method is called as each item is sent out in order for the Observer to handle the delivery of the next item it receives, the `complete()` handler is fired when the Observable has no more items to send to its subscribed Observers, and the `error()` handler is called by the Observable if there is a problem when it is emitting data to the subscribed Observers.
+
+These items that the Observables emit can be varied from a single click event to a block of JSON data to a series of messages from a backend push service. The Observable makes a non-blocking connection to its subscribed Observers, which allows items to be sent out over time to the Observer, each time calling the Observer's next handler until there is either an error or all the items the Observable has have been sent. It doesn't matter what the items being sent are – the approach is the same. We create an Observable, register the Observers, and it's not until the Observer's Subscribe method is called that the items the Observable is loading will be called. Then, the Observable calls the Observer's `next()` handler until all the items have been pushed out by the Observable.
+
+The following code should make the relationship between the Observable and the Observer clearer:
+
+```
+ // creating an Observable object passing a Observer object to its subscribe method
+ 
+   const observableObj = new Observable(subscribe(subscribedObserver) => {
+       try {
+           // calling the next handler on each item until there are no more
+           subscribedObserver.next(1);
+           subscribedObserver.next(2);
+           subscribedObserver.next(3);
+           subscribedObserver.complete();
+       } catch {
+           // calls the error handler if there is an issue
+           subscribedObserver.error(error);
+       }
+}) ;
+```
+
+The Observable is managing everything the Observer just reacts to when it receives data.
+
+This approach is different from earlier versions of Angular (AngularJS) where we would make a request for data, then wait for the data to be returned before moving on. Through the use of RxJS and Observables, our applications are more reactive to changes. Let's look at a simple example to show you this difference between taking a reactive approach compared to the previous approach.
+
+Say we have a page that has a button and we want to run an event when the button is clicked. Previously, we would add a click event like this:
+
+```
+const myButton = document.getElementById('myButton');
+   myButton.addEventListener('click', buttonClickHandler);
+   buttonClickHandler() => {
+       console.log('My button has been clicked');
+}
+```
+
+Now, by taking a more reactive approach, we can do the same:
+
+```
+import  { fromEvent } from 'rxjs';
+const buttonClick = document.getElementById('myButton');
+
+fromEvent(buttonClick, 'click').subscribe(buttonClickHandler);
+buttonClickHandler() => {
+   console.log('My button has been clicked');
+}
+```
+
+Both examples are very similar; they both find an element on the page and handle when the button is clicked. The first version adds an Event handler to the button for a Click event. When the button is clicked, the event listener calls `buttonClickedHandler()`; we have to find the element, then register a click Event listener to call a handler. In the second version, we are simply finding the element and subscribing to the click event of that element using the `fromEvent` operator of RxJs. The second approach produces cleaner code since only two things are happening: finding the element and subscribing to the click event. The first approach has three steps: find the element, add an event listener, and then register a handler.
+
+You can see that the second approach is just creating a connection and waiting for the element's click event to be fired. When that happens, the Subscribe method of the Observer from that `fromEvent` reacts and calls the `buttonClickHandler()` method. These examples show the very subtle differences from what we used to do compared to what we can do now through Observables, but it does show the shift in mindset we need to have when working with Observables, from the idea that we need to set up a load of Event Listeners to handle how our application works, to just Subscribing to events and then letting the application react to changes as the end user performs tasks in the application.
+
+### The Structure of an Observable object
+Before diving into a large technical explanation of how an Observable is structured, let's try and explain in layman terms what an Observable does. Basically, an Observable is a way of creating a stream of data. This data is passed along this stream from the Observable to the Observer. If you think of a conveyor belt that passes along boxes, this conveyor belt is only started when someone at the end of the belt switches it on. Then, the belt starts sending down boxes to the person who switched the belt on.
+
+In this metaphor, an Observable is the conveyor belt, that is, a mechanism for passing along data/boxes, and the Observer is what starts the stream or the person who starts the belt. They switch on this belt by subscribing to the data stream.
+With this metaphor in mind, let's start looking into the structure of an Observer.
+
+To create an Observer object, we need to have an object that implements the Observer interface, meaning that the object needs to implement methods for the three notifications that the Observables send out. These methods are, as we have already stated, are as follows:
+
+- next
+- complete
+- error
+
+For an object to be an Observer, it must at least have an implementation for the `next()` method. The `complete()` and `error()` methods are optional, though making use of an `error()` handler is good practice.
+
+If an Observable just sends out one item, say, as part of a click event, then the `next()` handler may not be called, because there is nothing `next()` for the handler to work with – there is just the one item, which in this instance is a click event. If, as we saw in the previous example, the Observable is sending out a series of three items (1,2,3), the `next()` handler will be called after each item to handle getting the next item. It all depends on how many items the Observable it emitting how many times the `next()` handler is invoked.
+
+The `error()` handler method is called if the stream of items from the Observable is interrupted by an issue, for example, if a series of messages being sent from an API is stopped due to an error being returned by the API. The `error()` handler is invoked when this happens. If there is no error handler, the errors are not captured and the Observable silently fails, without a way of seeing what the issue is.
+
+The complete handler is called when the Observable notifies the subscribed Observers that it has completed sending out items. Then, the Observer can use this handler to inform the user that the data has completed loading or that there are no more messages being sent at this time.
+
+It's important to remember that an Observer object can define any of these notification handlers, but if the Observer doesn't have a handler for these notification types, the notification is just ignored, which could lead to errors not being discovered if you don't have a handler for the error notifications.
+
+### Subscribing to Observables
+As we saw in *Chapter 7, Dependency Injection, Services*, and HttpClient, when we implemented one of the HttpClient methods, it returned an Observable, but it wasn't until we called the Subscribe method of the Observable that it actually ran.
+
+When we made a request to get some data using the HttpClient's `get()` method, the data wasn't loaded until we called the Subscribe method at the Component level. We set up the HttpClient `get()` method call in our Service and returned the Observable that the `get()` method returns. Then, in the Component, we called the Subscribe of that returned Observable.
+
+In this Subscribe method, we pass in the Observer. In this example, we are returning the Observable that the `get()` method creates for us:
+
+```
+const externalAPI = 'example.com/data';
+loadSomeData() {
+   return this.httpClient.get(externalAPI)
+}
+```
+
+Then in the Component, we call the Subscribe method of this Observable:
+
+```
+this.service.loadSomeData().subscribe((data) => {
+       console.log(data);
+})
+```
+
+This is a common pattern to use when working with Observables, but in the preceding code, we're not defining this *"subscribe"* method, we're just calling it – how is that possible? Well, we know that the `get()` method of the HttpClient returns an Object which is an Observable (if we look at the official API documentation, we can see that it returns an Observable: [https:/​/​angular.​io/​api/​common/​http/​HttpClient#get](https:/​/​angular.​io/​api/​common/​http/​HttpClient#get)) and so by being an Observable, it must have a Subscribe method that we can call.
+
+### Unsubscribing from Observables
+As well as subscribing to Observables, we can also unsubscribe from them, but why do we need to do that? The reason is so that we can improve the performance of our application. If you think about it, each Observable we subscribe to is like creating an open connection that is never closed. As items are passed from the Observable to the Observer, the `next()` and, if defined, `complete()` methods are called, but they don't close the connection.
+
+If the Observable sends through four different items (messages from a backend server, for example), after each of these four messages, the `next()` handler is invoked. When the last the of the four messages has been sent, the Observable calls the Observer's `complete()` handler. However, the connection is still open, so if the Observable has another five messages to send, they can be sent to the Observer.
+
+In an application uses Observables throughout the application without unsubscribing from them, there would be loads of open connections. This could lead to a memory leak in our application. Therefore, we need to unsubscribe from them in order to stop a memory leak getting into our application.
+
+There are a couple of ways we can unsubscribe from the connection the Observables make, as follows:
+
+- Calling the `unsubscribe()` method
+- Using the `takeUntil()` operator from RxJs 
+- Using `AsyncPipe`
+
+Let's look at an example of using the `unsubscribe()` method:
+
+```
+export class DemoComponent implement OnInit, OnDestroy {
+       service: DemoService;
+       subscription: Subscription;
+       
+       ngOnInt() {
+           this.subscription = this.service.getSomeData().subscribe((data) => {
+            console.log(data);
+           })
+        }
+        
+       ngOnDestroy() {
+           this.subscription.unsubscribe();
+        }
+}
+```
+
+Here, we're using two life cycle hooks (we discussed life cycle hooks in *Chapter 4, Components, Templates, and Forms*): OnInit and OnDestroy. In the `onInit` handler, we make a call to the service and get some data. This returns an Observable because, as we will remember from looking at the HttpClient service, the `get()` method returns an Observable. We then set this Observable to a Subscription object, which is from RxJs. The reason we use this Subscription object is that this objection has an `unsubscribe()` method.
+
+In the onDestroy life cycle hook handler (which is run when a component is destroyed), we call the `unsubscribe()` method of the Subscription object, which unhooks the connection that's made to the Observable we set to the Subscription object, which in this case is the Observable that's returned from the `get()` method.
+
+This is one approach; however, we can also use some of the functions that RxJs provides:
+
+```
+export class DemoComponent implements OnInit, OnDestroy { 
+    service: DemoService
+    unsubscribe$: Subject;
+    ngOnInit() {
+        this.service.getSomeData().takeUntil(this.unsubscribe$).subscribe((data) => {
+               console.log(data);
+           })
+   }
+       
+   ngOnDestroy() {
+           this.unsubscribe$.next();
+           this.unsubscribe$.complete();
+    } 
+}
+```
+
+Here, we are still using the life cycle hooks, but we are also using the `takeUntil()` operator of RxJs (I don't want to go into RxJs too deep just yet – I'm only using it now to show you the various ways you can unsubscribe from an Observable). This `takeUntil()` operator keeps using a source Observable until the notifier Observable that we pass into the `takeUntil()` operator tells it to stop.
+
+At the top of this demo component class, we create a new Observable called `unsubscribe$` (*the dollar sign is part of a naming convention that's used when working with Observables, which we will cover later*). This Subject Observable is passed into the `takeUntil()` operator. Then, when it's in the `ngOnDestroy` handler, the `next()` and `complete()` handlers of the `unsubscribe$` Observable are called, which stops/unsubscribes the Observable being returned from the `getSomeData()` method. Basically, we are creating a new Observable that manages the first one.
+
+The third method we're going to look at is using the AsyncPipe. This approach uses RxJs, but with Angular templates. Let's have a look at an example:
+
+```
+ export class DemoComponent implements OnInit {
+       dataSubscription: Observable<SomeData>;
+       ngOnInit(){
+           this.dataSubscription = this.service.getSomeData();
+        } 
+    }
+   
+   // in our HTML template file 
+   <span>{{ dataSubscription | async }}</span>
+```
+
+Here, we have our demo component, which has a local property called `dataSubscription`. This is an Observable that we expose to the template of this component. When we use this property in the template, we are using the async pipe, along with the property.
+
+> Pipes in Angular allow us to transform data into the desired output. There are many different pipes in Angular – ones that change the text to uppercase, ones that transform dates, and so on. They are very useful and worth exploring in the official documentation. - ([https:/​/​angular.​io/docs](https:/​/​angular.​io/docs))
+
+The async pipe handles subscribing and unsubscribing for us. When this DemoComponent is destroyed and the `onDestroy()` life cycle hook that is part of all component is called (even if we don't override it with our own version of the `onDestroy` hook), the async pipe will unsubscribe from the Observable.
+
+As we can see, there are a variety of ways to unsubscribe from an Observable. What these three examples show is that libraries like RxJs and using RxJs in Angular help us manage Observables in our Angular applications. As we know, using Observables provides many advantages, but they do need to be managed. Using the methods we've just looked at, we can make use of Observables and still keep our applications performing well.
+
+### Hot and Cold Observables
+Hot and Cold Observables? How can an Observable be hot? How can it be cold? Well, there is a distinction between when an Observable is considered hot and when it is considered cold.
+A hot Observable is when the data that the Observable exposes is created outside the Observable, whereas a cold Observable is when the data it returns has been created inside of the Observable, and the Observable is being used to emit the data to its Observers.
+
+So, if I have an Observable that is returning data from a backend service, if this Observable accesses the backend service (maybe using an API), then it emits this data. If this call to load the data from the API is made outside of the Observable, then when the Observable is created, the data it is going to emit is already there, ready for the Observable to send, then the Observable is considered hot.
+
+On the other hand, if an Observable that uses data from an API loads this data within the Observable when it is created, then this Observable is considered cold. In a cold Observable, if it has multiple subscribers, then on every emission, each subscriber gets its own copy of the data being emitted, and the data is not produced until the Observable is subscribed to.
+Unlike the hot Observable where the data is created outside of the Observable, the data is present even if the Observable is not subscribed to. If a hot Observable is receiving data and there are no subscribers, then the data is simply "lost".
+An example of a hot Observable is an Observable that's created from a click event. This is considered hot because the click event data exists outside of the Observable, and then click Event is created by the clicking of an element on the page. If there isn't a subscriber for this click event, the event is still fired but nothing happens – the event is just lost.
+
+An example of a cold Observable is an Observable that is created using the "from" operator of RxJS. This operator can create an Observable from a sequence or array of items. The cold Observable is created and the data (the array passed into the from an operator) is then emitted from the Observable when the Observable is subscribed to. Unlike the hot Observable, which uses a click event, the cold Observable does not "lose" data because the data is not"generated" until the Observable is subscribed to.
+
+So, there is a subtle difference between hot and cold Observables. It is worth knowing the difference between them, especially when we start looking at Operators in RxJS, so that we know what type of Observable they create. This lets us know when the data they emit has been generated. If we know where the data an Observable emits has come from, it helps us understand our code better, and reduce the risk of bugs being caused where we expect some data to be available and it's not.
+
+### Error handling in Observables
+Displaying errors when working with Observables is handled by the `error()` handler of the Observer object. As we know, an Observer has three types of handler: `next()`, `complete()`, and `error()`. In the `error()` handler, we can see if any problems have occurred.
+
+Let's look at an example:
+
+```
+aObservable.subscribe({
+   next(data) {
+       console.log('Here is some data' + data);
+   },
+   error(err) {
+       console.error('There is an error' + err);
+    } 
+});
+```
+
+In this example, we have an Observable, which is being subscribed to. In the Subscribe method, we are passing in an Object, which is our Observer. This has two handler functions: one for `next()` and one for `error()`. If this Observable was returning data from an API and there was an issue getting this data, the `error()` function of the Observer would be invoked, displaying the error message in the `console.error()` method.
+
+It is important to know that if the `error()` handler is called, then the Observable will stop producing data. The only time the Observable keeps producing a stream of data is when the `next()` handler is invoked. If either the `complete()` or the `error()` handlers are invoked, then the Observable will stop retrieving data. This is important to know because if we don't have an error handler and there is an error that we may not be aware of, our Observable will just stop retrieving data.
+
+### Multicasting in Observables
+Multicasting is the term given to the situation when an Observable is emitting data to multiple Observers. Each time an Observer subscribes, the Observable starts emitting data to that Observer, and with each new Subscriber, the Observable starts an event handler and starts emitting to this new Subscriber. This means that each Subscriber gets its own version of the data being sent by the Observable. But you may not want this. Instead, you may want all the Subscribers to get the same data from the Observable and not its own version of the data. The way we can decide this is through using the hot and cold Observable approach.
+
+If the Observable is a cold, then each Subscriber gets its own version of the data. Cold Observables get their data when they are created and subscribed to, so on each subscription, the data the Observable emits is created. A classic example of this is if we have an Observable that creates a timer. With every Subscriber, they get their own version of the timer, starting at different times.
+
+If the Observable is a hot Observable and the data is created outside of the Observable, when it is Subscribed to, the data each Subscriber gets is the same because it has come from the same source. If we think of our fromEvent operator, which creates an Observable from a DOM event (a button click event or a mouse event) when the Observable emits that DOM event, all the Subscribers get the same DOM event.
+
+Hot and cold Observables, as well as multicasting, are quite advanced concepts to understand when you first start looking at Observables, but it is good to try and understand them early on before getting into RxJs and working with Observables in Angular because once you understand these concepts, you'll know what Operators from RxJs to use in your application. Some Operators create hot Observables, while some create cold ones, and if you want to emit the one source of data to multiple Subscribers, you know that you need to create a hot Observable.
+
+Now that we have a good understanding of the structure of Observables, we can start looking at RxJs in more depth, what the library provides, and how to use it before we start taking advantage of RxJs in Angular.
+
+## What is RxJs?
+In this section, we will take a closer look at the RxJs library, which we have only taken a glimpse at so far. Now, we will look at the methodology behind RxJs and how it tackles this approach.
+
+RxJs is a JavaScript-based library, which has been added to Angular as a way of adding support for making working with Observables easier. The RxJs library provides functions and helpful JavaScript classes which we can use in our Angular code to create, manipulate and manage Observables in our applications.
+
+While RxJs comes included in Angular it is not part of the framework, instead, it is a separate library which can be used on its own in a none Angular based JavaScript application or with other frameworks. If you want to use Observables within your JavaScript application then RxJs is a great library to use in order to make working with Observables easy.
+
+Before we dive into what RxJs is, we need to understand more about Reactive Programming. By understanding this style of programming. We will have a clearer understanding of RxJs and the approach it takes. This will then translate to our Angular applications when we take full advantage of RxJs in Angular.
+
+### Understanding Reactive Programming
+When looking for a clear definition of what Reactive Programming is, there are many different explanations, from the very theoretical description in Wikipedia ([https:/​/​en. wikipedia.​org/​wiki/​Reactive_​programming](https:/​/​en.wikipedia.​org/​wiki/​Reactive_​programming)) to the corporate sounding manifesto of the Reactive Manifesto ([https:/​/​www.​reactivemanifesto.org/​](https:/​/​www.​reactivemanifesto.​org/)​) (*yes, there is a manifesto for Reactive Programming*).
+
+This Reactive Manifesto states that a 'reactive' system needs to be '**responsive**' to a user's demands when a user clicks on a button, for example, the application needs to respond almost immediately to the users' click. It also needs to be '**resilient**', this means if the application has an error, it has been designed so that it can handle the error and still continue working. It should be resilient to errors.
+
+They also state that a reactive application needs to be able to cope with high demand from users. If the application suddenly gets a larger number of users, all making demands from the application. It should be able to cope with this jump in user requests, it needs to be '**elastic**' in how it handles users numbers.
+
+Finally, the Reactive Manifesto states that a 'reactive' application needs to be '**messaged based**'. This means that the components of our application are loosely coupled and communication between components of the application is handled through the use of sending messages. In an Angular application, this means data is passed between components using Events or Services as a message mechanism.
+
+These "streams" are central to the reactive style of programming, so it's worth understanding what we mean by a stream. A stream is a sequence of ongoing events ordered by time. The stream can emit three things:
+
+- A value 
+- An error
+- A complete event
+
+From what we've already discussed so far, this isn't new to us. We have seen how Observer objects handle these three events through the `next()`, `error()`, and `complete() events.
+
+The stream will keep sending out these values until there are no more to send, or there has been an error. These values are sent asynchronously, one after the other, until they have all been sent. Listening to this stream is what we call subscribing, that is, subscribing to an Observable.
+
+#### Making use of the Observer Design pattern
+This approach uses the Observer Design pattern, which is an official design pattern from the Gang of Four.
+
+> The Gang of Four is in reference to a group of four developers, Erich Gamma, Richard Helms, Ralph Johnson and John Vlissides, who in 1994 worked together on a book called Design Patterns: Elements of Reusable Object-Orientated Programming. Here, they set out 23 design patterns or approaches to writing good object-orientated software, which in their opinion had some major problems at that time.
+> This book has become a classic computer programming book, and now over 25 years later the approaches they described in this book are still being used, including the Observer Design pattern.
+
+The Observer Design pattern solves the following problems:
+
+- A one-to-many dependency between objects should be defined without making the objects tightly coupled.
+- It should be ensured that when one object changes state, an open-ended number of dependent objects are updated automatically.
+- It should be possible that one object can notify an open-ended number of other objects.
+
+So, the Observer pattern aims to solve the problem where we have one object that needs to inform many other objects of any changes, whether they are data changes or errors.
+
+Reactive programming uses this Observer design pattern by allowing us as developers to create streams of data and then set any number of Observer objects to listen to this data over time. If this stream of data changes, then the Observer objects react to this.
+
+Before this approach, the objects in our applications were more closely coupled objects that were more aware of each other. This could lead to problems with the scalability, speed, and maintenance of our applications. Now, through using the Observer pattern, our objects are loosely coupled, allowing us to write faster and more maintainable code because it is easier to refactor code that is loosely coupled.
+
+#### Characteristics of a Reactive Programming
+According to the Reactive Manifesto, a reactive program needs to be all of the following:
+
+- Responsive: The program responds to action as quickly as possible
+- Resilient: The program responds even if there has been an error
+- Elastic: The program is still responsive, even with a heavy workload
+- Message-Driven: The program relies on asynchronous messages to establish boundaries between components, ensuring loose coupling
+
+
+Going back to Angular, we've seen that through our use of Observables, we can create many Observer objects listening to the one Observable, and we've seen that when data is loaded from an API call via an Observable, the data is available straight away, making our programs responsive. We've seen that with the `error()` handler of an Observer, if there are any problems, our applications can respond to an error and the stream of data will continue to be sent from an Observable. As our applications are not making requests every time we want data to be sent from the stream that an Observable makes, the application can handle making more requests, making them able to handle larger workloads. Finally, by adhering to a more Reactive approach, our Angular applications make use of messages to keep the application more loosely coupled, helping with the long-term maintenance and speed of the application.
+
+From what we've learned about what Reactive Programming is, it is clear to see that using this approach in Angular does bring many benefits. We can see why the Angular team decided to use RxJs as a way to add this Reactive Programming approach to Angular. Now that we have a clear picture of what Reactive Programming is, we can take what we have learned and use this to get a good understanding of how to use RxJs.
+
+### The RxJs library
+RxJs is the JavaScript implementation of ReactiveX ([http:/​/​reactivex.​io/​](http:/​/​reactivex.​io/​)), which is a library for developing asynchronous and event-driven programs using Observables. If we look at the ReactiveX website, it shows how to use Rx to make use of Observables in the applications we build. As part of the RX library, there are various implementations of this in different languages-everything from Java to Dart. One of these implementations is RxJs, which is the JavaScript implementation of ReactiveX.
+
+> The ReactiveX website is a great resource and is where you can find solutions to problems you may face using RxJs. Even though it may not be showing JavaScript examples, the concepts are still relevant for RxJs.
+
+#### The version of RxJs in Angular
+Currently, RxJs is on version 6, which was a major change from the previous version, but thankfully, through the use of Angular, we don't have to worry about keeping RxJs updated. This is all handled by the Angular CLI. Every time there is a new release from Angular, if there is a new version of RxJs, then this is part of the Angular release. At the time of writing, the version of RxJs that's used in Angular is 6.4.0.
+
+#### Using RxJs in non-Angular applications
+While we are focused on Angular in this book, it is worth knowing that RxJs is not just for Angular – it can also be used in a pure JavaScript application, such as a Node application.
+
+If you have a Node app that creates your API for your Angular application, and you still want to make use of Observables and the asynchronous events in your JavaScript, you can: all you need to do is install RxJs via npm into your Node application.
+
+Thankfully, the Angular team have decided that RxJs and Reactive Programming bring so many advantages to modern web applications they have made RxJs a core part of Angular, so we don't need to install it separately.
+
+Let's move on and look at the Operators RxJs provides and some more scenarios of how we can make use of them.
+
+## Operators
+If we go to the RxJs website ([https:/​/​rxjs.​dev/](https:/​/​rxjs.​dev/)​), we can see that the site provides us with an overview of what RxJs is and a reference section. This reference section shows us all the Operators, classes, and functions RxJs supplies. Take a moment to open this site and familiarise yourself with it; we will be using this over the next few sections.
+
+> There is a fantastic site called Learn RxJs that shows a large number of examples regarding how to use Operators in RxJs: [https:/​/​www.learnrxjs.​io/](https:/​/​www.learnrxjs.​io/)​.
+
+Operators are functions that allow us to write more elegant and easier to read asynchronous code. These operator functions are designed to be declarative so that when we're using them, it is clear to see from the code we write what we're doing. This helps when working on a large codebase or when we are part of a team on a large project, where the code is shared by various developers.
+
+### Categories of Operators
+In RxJs, there are many Operator functions, all of which have been grouped by category. This helps when we're looking for an Operator to help with a piece of code we are trying to write. These categories are as follows:
+
+- **Combination**: These type of Operators help join data from multiple Observables 
+- **Conditional**: If we want to perform conditional tasks with Observables 
+- **Creation**: These Operators help create Observables
+- **Error Handling**: These Operators provide ways of dealing with errors
+- **Multicasting**: These Operators make Observables hot since they are cold in RxJs by default
+- **Filtering**: These Operators take the response from an Observable and filter it 
+- **Transformation**: These Operators help transform or change the source of an Observable
+- **Utility**: A helpful set of Operators
+
+Having these categories not only helps when looking for an Operator for our code, but helps when learning them too. Let's have a look at some examples of Operators from these categories.
+
+## Examples of Operators
+Since there are a lot of Operators available in RxJs, we're not going to go through all of them, but we will take a few from each category to see how we can use them and what they return so that we have an idea of what each category of Operator offers us. 
+
+### Combination Operators
+The first Operator we're going to look at is the `merge()` Operator. The merge Operator takes in a series of Operators to create one that can be subscribed to. This can be useful if we have two Observables that return different data that we want to combine into one Observable. For example, if we have two Observables being returned from two different API calls, we could use the merge Operator to combine that returned data into one data source.
+
+Here's a simple example of the `merge` Operator:
+
+```
+import { mapTo } from 'rxjs/operators';
+import { interval, merge } from 'rxjs';
+
+   // create three Observables using a timer
+   const firstTimer = interval(1000);
+   const secondTimer = interval(2000);
+   const thirdTimer = interval(3000);
+
+    // merge all three timer Observables into one data source const example = merge(
+       firstTimer.pipe(mapTo('FIRST!')),
+       secondTimer.pipe(mapTo('SECOND!')),
+       thirdTimer.pipe(mapTo('THIRD'))
+    );
+   
+   // Subscribe to the merged Observable
+   const subscribe = example.subscribe(val => console.log(val));
+```
+
+Here, we are creating three Observables using the `interval()` Operator, which returns an Observable using a time property. Then, we're taking these three Observables and using the `merge()` Operator to combine them into one, then subscribing to the result. As each internal Observable fires, the returned string (either FIRST!, SECOND!, or THIRD) is returned.
+
+Another Combination Operator is called: concat. This Operator will take a number of Observables and return a single Observable. Here's a great example of how this works from the LearnRxJS website:
+
+```
+import { of, concat } from 'rxjs';
+
+//emits 1,2,3
+const sourceOne = of(1, 2, 3);
+//emits 4,5,6
+const sourceTwo = of(4, 5, 6);
+// emits 7,8,9
+const sourceThree = of(7,8,9);
+
+//used as static
+const example = concat(sourceOne, sourceTwo, sourceThree);
+
+//output: 1,2,3,4,5,6,7,8,9
+const subscribe = example.subscribe(val => console.log(val));
+```
+
+This example creates three source Observables from a list of numbers, and uses the `of()` Operator to create the Observable from the list. Then, it takes these three Observables and concats them into one Observable, which is subscribed to.
+
+Another example of a Combination Operator is the `concatAll()` Operator. This Operator takes a number of Observables and as each one completes, sending out its stream of data, the `concatAll()` Operator takes the result and adds it to the next Observable in its list. This leads to a new Observable that's created as all its source Observables complete, sending their stream of data one after the other.
+
+Again, from the LearnRxJs website, here is an example of the `concatAll()` Operator:
+
+```
+// RxJS v6+
+import { map, concatAll } from 'rxjs/operators';
+import { of, interval } from 'rxjs';
+//emit a value every 2 seconds
+const source = interval(2000);
+const example = source.pipe(
+    //for demonstration, add 10 to and return as observable
+    map(val => of(val + 10)),
+    //merge values from inner observable
+    concatAll()
+    );
+    
+   //output: 'Example with Basic Observable 10', 'Example with Basic
+   Observable 11'...
+   const subscribe = example.subscribe(val =>
+   console.log('Example with Basic Observable:', val)
+);
+```
+
+### Conditional Operators
+Conditional Operators help if we need to make a decision if a specific condition needs to be met. The first one we're going to look at is the `defaultIfEmpty()` Operator. This Operator will emit a value if nothing is returned by a source Observable. If something is returned by the source Observable, then that value is emitted. A classic example of this is demonstrated by the following code example from the official RxJs website:
+
+```
+import { fromEvent } from 'rxjs';
+import { defaultIfEmpty, takeUntil } from 'rxjs/operators';
+const clicks = fromEvent(document, 'click');
+const clicksBeforeFive = clicks.pipe(takeUntil(interval(5000)));
+const result = clicksBeforeFive.pipe(defaultIfEmpty('no clicks'));
+result.subscribe(x => console.log(x));
+```
+
+This example shows the `defaultIfEmpty` Operator being used if the Observable from the `fromEvent()` Operator is not emitted in time (which it isn't as there is an `interval()` Operator emitting the clicks Observable after a short time). So, in this scenario, the "no clicks" value is emitted.
+
+The `defaultIfEmpty()` Operator is helpful for those times when we want to make sure that a value is emitted and then you can handle what the value is. An example of where this may be really useful is if we are using an Observable to return some data from a backend, but if there is an issue or no matching results, we could just return a default Observable, which our application uses to inform the end user what has happened in their request.
+
+Another conditional Operator is the `iif()` Operator. This Operator will decide when we are subscribing which Observable to use. An example of using this is when we have two Observables and both are using a flag so that the systems knows which one to use. If the flag is set to true, the first Observable is used when we subscribe; if it's set to false, the second Observable is used when we subscribe. The `iif()` Operator takes in the conditional statement (the statement that checks the flag) and the source Observables. The result of this conditional statement determines what Observable to use as the source when subscribing. Again, an example from the official RxJs documentation shows how this will work:
+
+```
+import { iif, of } from 'rxjs';
+let subscribeToFirst;
+const firstOrSecond = iif(() => subscribeToFirst, of('first'), of('second'),);
+   
+subscribeToFirst = true;
+firstOrSecond.subscribe(value => console.log(value));
+
+// Logs: "first"
+subscribeToFirst = false;
+firstOrSecond.subscribe(value => console.log(value));
+```
+
+In this example, we set up the conditional statement with the two Observables (again, using the `of()` Operator to create an Observable). Then, the flag is set each time before we subscribe. This shows how Observables can be set up, but it is not until they are subscribed to that they run.
+
+### Creational Operators
+Creational Operators are probably the ones we will use the most. They allow us to create Observables from a number of sources. The following Operators are under the Creational category:
+
+- `create`
+- `defer`
+- `empty`
+- `from`
+- `fromEvent`
+- `interval`
+- `of`
+- `range`
+- `throw`
+- `timer`
+
+That's 10 different ways of creating an Observable – there are so many options that it's hard not to use an Observable in our Angular applications.
+
+We've already seen some of these Operators in action. We've seen how to use the `interval()` Operator by supplying it at a time interval, from which it will generate a new Observable on each of the duration periods we supply. For example, if we pass in 1 second, then a new Observable will be created every second. This example from Learnrxjs.io ([https:/​/​www.​learnrxjs.​io/​operators/​creation/​interval.​html](https:/​/​www.​learnrxjs.​io/​operators/​creation/​interval.​html)) shows how this will work:
+
+```
+import { interval } from 'rxjs';
+//emit value in sequence every 1 second
+const source = interval(1000);
+//output: 0,1,2,3,4,5....
+const subscribe = source.subscribe(val => console.log(val));
+```   
+
+We have also seen how we can use the `fromEvent()` Operator to generate a new Observable from an event. For example, a click event (again, an example from Learnrxjs.io) shows how we can use this Operator:
+
+```
+import { fromEvent } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+//create observable that emits click events
+const source = fromEvent(document, 'click');
+
+//map to string with given event timestamp
+const example = source.pipe(map(event => `Event time:${event.timeStamp}`));
+
+//output (example): 'Event time: 7276.390000000001'
+const subscribe = example.subscribe(val => console.log(val));
+```   
+
+We've seen the two previous examples being used before, but the original `create()` Operator is still a very good Operator and very easy to use. All we need to do is use the Observable class of RxJS and call the `create()` Operator on this class, like this:
+
+```
+import { Observable } from 'rxjs';
+/*
+Create an observable that emits 'Hello' and 'World' on
+subscription.
+*/
+const hello = Observable.create(function(observer) {
+   observer.next('Hello');
+   observer.next('World');
+   observer.complete();
+});
+
+//output: 'Hello'...'World'
+const subscribe = hello.subscribe(val => console.log(val));
+```
+
+This is a very straightforward way of creating an Observable, and this example shows really clearly how the `next()` and `complete()` event handlers are defined.
+
+It is well worth looking through all the available creation Operators and seeing how many different sources there are to create Observables from.
+
+These Operators are great at making Observables from various sources, but two Operators that you'll find really helpful are `mergeMap()` and `switchMap()`. These operators allow us to take two source Observables and convert them into one source Observable. Why would this be useful? Well, if we have an application that retrieves data from two separate APIs, we can take the two API Observables and merge them into one single data source. Let's have a look at a simple example:   
+
+```
+import { of } from 'rxjs';
+import { mergeMap }  from 'rxjs/operators';
+
+// first source Observable
+const bookTitle = of('Getting Started With Angular');
+const completeTitleObservable = bookTitle.pipe(mergeMap(value => (`${value} 8!`)));
+
+// this should create Getting Started With Angular 8!
+const subscribe = completeTitleObservable.subscribe(value =>
+console.log(value));
+```
+
+Here, we're creating an Observable that returns the *Getting Started With Angular* title, and then we're using the `pipe()` operator to add this bookTitle Observable to a new one that's been created from the `mergeMap()` Operator. The `mergeMap()` operator returns an Observable which is combined/merged with the first one. Then, when we Subscribe to this newly merged Observable, we can see the complete title.
+
+The switchMap Operator is very similar to the `mergeMap()` Operator, but the difference is that in the mergeMap, the first Observable continues to keep getting data as part of this stream of data that we've spoken about. With the `switchMap()` Operator, the first Observable gets data, and then switches to the next Observable. When it switches to the second Observable, the first one is unsubscribed, and we are no longer concerned with the stream of data from the first Observable – we have what we want from it, so now we *switch* to the new observable.
+
+In the following example, we have an Observable that has returned from a click event on a button. Once that has run, it switches over to the `interval()`-based Observable, which is writing to the console every second. In this example, we are switching between the two Observables instead of merging Observables like we did in the `mergeMap()` example:
+
+```
+import { interval, fromEvent } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
+fromEvent(button, 'click').pipe( 
+       //now we switch to an Observable from an  interval
+        switchMap(() => interval(1000))).subscribe(console.log);
+```
+
+The `switchMap()` Operator is useful when we want to get data from one Observable. Then, once we have the first data item that's been returned from the Observable, we can switch to another Observable to get the data from the second Observable.
+
+We can use these types of Operators to create complex pipelines of data from various Observables (if you think about it, these Observables can return data from APIs) so that we can combine data or switch to different sources of data in one single pipeline. This is a powerful feature of Operators.
+
+Let's move on and look at the Error Handling category of Operators.
+
+### Error Handling Operators
+All applications need error handling, and thankfully RxJS supplies a way of handling errors when working with Observables. Under the error handling category, we have three Operators:
+
+- `catch/catchError` 
+- `retry`
+- `retryWhen`
+
+The `catchError()` Operator allows us to either throw an error if we encounter an error when using a source Observable, or switch to a new Observable if there is an error. Looking at this example from the official RxJs documentation, we can see how the `catchError()` Operator creates a new Observable (using an Operator from the create category) that's returned instead of the original Observable, which is erroring:
+
+```
+import { of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+
+of(1, 2, 3, 4, 5).pipe(
+   map(n => {
+       // when n is 4 the error is thrown
+       if (n == 4) {
+           throw 'four!';
+       } return n; }),
+   catchError(err => of('I', 'II', 'III', 'IV', 'V')),
+)
+.subscribe(x => console.log(x));
+// 1, 2, 3, I, II, III, IV, V
+```   
+
+This is great, but sometimes you may want to try to get data from an Observable that may be returning an error. As we know, Observables return a stream of items, and while it may throw an error on delivering the first item, the next item in the stream may be fine and we still want to access the second item. Well, we can try getting the item from the Observable again using the `retry()` Operator.
+
+The `retry()` Operator takes in a number, which is the number of times it should retry an action. This is extremely useful when working with API requests – we can use the `retry()` operator to try making the API request again if there is an error.
+
+This example shows how the `retry()` Operator is used:
+
+```
+import { interval, of, throwError } from 'rxjs';
+import { mergeMap, retry } from 'rxjs/operators';
+   
+   //emit value every 1s
+   const source = interval(1000);
+   const example = source.pipe(mergeMap(val => {
+        //throw error for demonstration
+        if (val > 5) {
+            return throwError('Error!');
+        }
+        return of(val);
+    }),
+    //retry 2 times on error
+    retry(2)
+    ); 
+
+    /*
+    output:
+    0..1..2..3..4..5..
+    0..1..2..3..4..5..
+    0..1..2..3..4..5..
+    "Error!: Retried 2 times then quit!"
+   */
+   const subscribe = example.subscribe({
+       next: val => console.log(val),
+       error: val => console.log(`${val}: Retried 2 times then quit!`)
+   });
+``` 
+
+Here, we're using the `retry(2)` Observable, which creates a new item every second if there is an error after the second time of calling the `error()` handler. This is a nice example as it shows how we can retry running an Observable and still catch an error if the problem still exists after the retry.
+
+The final error handling Operator is the `retryWhen()` operator. We use this Operator when we want it to retry – not based on a number of times as the `retry()` operator does, but when the state of the Observable matches the criteria that's passed into the `retryWhen()` Operator. The following example from the Learnrx.io site shows how this works:  
+
+```
+import { timer, interval } from 'rxjs';
+import { map, tap, retryWhen, delayWhen } from 'rxjs/operators';
+
+//emit value every 1s
+   const source = interval(1000);
+   const example = source.pipe(
+       map(val => {
+           if (val > 5) {
+               //error will be picked up by retryWhen
+               throw val;
+            }
+       return val;
+   }),
+   retryWhen(errors => errors.pipe(
+       //log error message
+       tap(val => console.log(`Value ${val} was too high!`)),
+       
+       //restart in 6 seconds
+       delayWhen(val => timer(val * 1000)))) 
+   );
+   
+   /*
+    output:
+    0
+    1
+    2
+    3
+    4
+    5
+    "Value 6 was too high!"
+    --Wait 6 seconds then repeat
+   */
+   const subscribe = example.subscribe(val => console.log(val));
+```
+
+This example shows that when there is an error – which throws an error when the value equals 6 – then the error triggers the `retryWhen()` operator, which shows what the error is and adds a six-second delay. Once this delay has run, the `retryWhen()` operator tries again. The difference between this Operator and the `retry()` Operator is that it will only retry if the criteria that's been passed into it has run, while `retry()` just runs for a number of times. You have more control using `retryWhen()` if you have different reasons why the Operator should retry calling an Observable.
+
+- map 
+- mapReduce
+- take 
+- takeUntil 
+- reduce 
+- repeat 
+- delay
+
+The problem with so many Operators is knowing which one to use when writing our code. Thankfully, there is a way to find the perfect Operator.
+
+
+## The Operator Decision Tree
+In the RxJs website, there is a section that helps you find the Operator that you may want to use: the Operator Decision Tree ([https:/​/​rxjs-​dev.​firebaseapp.​com/​operator-decision-​tree](https:/​/​rxjs-​dev.​firebaseapp.​com/​operator-decision-​tree)). It looks like this:
+
+![The Operator Tree](/images/chapter8/1.png "The Operator Tree")
+
+As you can see, it asks you a set of questions and, based on the answers you select, it drills down until it can suggest an Operator you could use. This tool is extremely helpful and well worth bookmarking.
+
+## Subjects
+Before we move on and discuss using RxJs in Angular, we need to look at another type of Observable, called Subjects. A Subject Observable is a special type of Observable which is multicast, instead of unicast like the Observables we have been looking at.
+
+When an Observable creates a connection to an Observer, it wires up the event handlers (next, complete, and error), and then sends data to that Observer. Each Observer that is connected to the Observable is getting its own set of data. Multicasting is where one Observable sends the same data to multiple Observers – it is casting out its stream of data to all the Observers that are subscribed, and they all get the same data.
+
+A good way to think of a Subject Observable is as an EventEmitter (which we discussed in *Chapter 4, Components, Templates, and Forms*). This is the way of sending out data or an event to anyone listening. These events can be listened for by multiple EventListeners, and this is exactly what a Subject does.
+
+There are three types of Subject Observables, as follows:
+- BehaviorSubject 
+- ReplySubject 
+- AsyncSubject
+
+Let's look at each one.
+
+### The BehaviorSubject Observable
+A BehaviourSubject Observable needs an initial value to send out. First, it's sent to all the Subscribed Observers, then as the data stream. The Observable emits until all the Observers get the next item in the data stream, but with a BehaviorSubject, there is an initial value that all Observers get.
+
+This example from the Learn RxJs website shows how this type of Observable works:
+
+```
+import { BehaviorSubject } from 'rxjs';
+const subject = new BehaviorSubject(123);
+
+//two new subscribers will get initial value => output: 123, 123
+subject.subscribe(console.log);
+subject.subscribe(console.log);
+
+//two subscribers will get new value => output: 456, 456
+subject.next(456);
+
+//new subscriber will get latest value (456) => output: 456
+subject.subscribe(console.log);
+
+//all three subscribers will get new value => output: 789, 789, 789
+subject.next(789);
+
+// output: 123, 123, 456, 456, 456, 789, 789, 789
+```
+
+The first Subscribers get this initial data, which is set when the BehaviorSubject is created, then on each `next()`, any new Subscribers get the new value. This type of Observable is very useful if you want to guarantee that when an Observer first subscribes, some data is passed. For example, if you want to pass data to a form, and you want the form to have some data to initially populate the form.
+
+### The ReplaySubject Observable
+While the BehaviorSubject Observable sends initial data to the first set of Subscribers, ReplySubject Observables will send the initial data to any new Subscribers that may have missed a `next()` call.
+
+The ReplaySubject Observable emits old values to the new Subscribers. If, for example, we have an application that shows financial data, we might use a ReplaySubject Observable to send data to a panel in a web application that shows financial changes over time. By using the ReplaySubject Observable, any old values will be sent to this panel, as well as any new values that need to be displayed.
+
+This example shows how a ReplaySubject Observable can be used:
+
+```
+import { ReplaySubject } from 'rxjs';
+
+const sub = new ReplaySubject(3);
+sub.next(1);
+sub.next(2);
+sub.subscribe(console.log); // OUTPUT => 1,2
+
+sub.next(3); // OUTPUT => 3
+sub.next(4); // OUTPUT => 4
+sub.subscribe(console.log); 
+
+// OUTPUT => 2,3,4 (log of last 3 values from new subscriber)
+sub.next(5); // OUTPUT => 5,5 (log from both subscribers)
+```
+
+The value that's passed into the ReplaySubject Observable is a buffer for how much historical data it should keep.
+
+### The AsyncSubject Observable
+The last of these Subject Observables is the AsyncSubject Observable, which only sends out the last items of data that it has when the `complete()` handler is called. So, if we have an Observable that is returning a list of names, and the last name on this list before the `complete()` handler is Rogers, then the value that all Subscribed Observers gets would be Rogers, even if they called the `subscribed()` event before the `complete()` handler of the AsyncSubject Observable was called.
+
+This example shows how this works:
+
+```
+import { AsyncSubject } from 'rxjs';
+
+const sub = new AsyncSubject();
+sub.subscribe(console.log);
+sub.next(123); //nothing logged
+sub.subscribe(console.log);
+
+sub.next(456); //nothing logged
+sub.complete(); //456, 456 logged by both subscribers
+```
+
+Since the value 456 was the last value set in the `next()` handler before the `complete()` handler was called, both the `subscribe()` event handlers get this last value. This is helpful if you want to guarantee that all of the Subscribed Observers get the last value when a connection to an AsyncSubject Observable is complete. If we have an application that shows a number in the header of the application and in a panel of the application, then we want both places to show the same value when an Observable is loading a count into this number. In order to make sure both places show the same number, we may use an AsyncSubject Observable so that when the `complete()` handler is called, both places show the latest count.
+
+These three types of Subject Observables all have slight differences when it comes to what value they may return to all their Subscribed Observables, but it is important to remember that Subject Observables differ from standard Observables in that they send out the same data to multiple Observers. This can be really useful for web applications that need to show the same data in multiple places.
+
+Now that we have a good overview of Observables, Operators, Subjects, and RxJs in general, let's look at how all of these are used in our Angular applications.
+
+## How Angular uses RxJs
+So, how does RxJs relate to Angular? Well, the Angular team have made RxJs a core part of the framework, so much so that it is part of the framework. In everything, we've seen so far, we haven't had to install RxJs separately as a dependency in our projects. Having RxJs as part of Angular means that we can use Observables, Observers, and Operators throughout our applications, wherever we choose to use them.
+
+### Where to consider using RxJs
+When writing our Angular applications, there are certain times when an RxJs-based approach may be a better solution than a non-RxJs-based approach.
+
+#### In Services
+In regards to Services and HTTP requests, as we saw in *Chapter 7, Dependency Injection, Services, and HttpClient*, RxJs is used for managing them. All the REST requests that the HttpClient service makes return Observables, which we need to subscribe to in at the Component level.
+
+You can use Operators like `retry()` or `catchError()` when working with HTTP requests, to manage when there is an issue with the request. You can use the `pipe()` and `map()` operators to take the results of several HTTP requests and format the data into a structure you need for your component, for example, if you have a data grid that you need to populate. With the `pipe()` and `map()` Operators, you can build out a pipeline where the data from an HTTP request goes through until it is in a structure that works with your data grid. There are over 25 different Transformation category Operators we can make use of when working with the data we get through our Services.
+We can also cancel HTTP requests simply by calling the `unsubscribe()` handler of an Observable. This control over HTTP requests is not possible without Observables – requests can't be cancelled in Promises, so knowing how to use RxJS within our Services has many benefits.
+
+#### In Reactive forms
+Another area where we can make use of RxJS is in Reactive forms, which we discussed in *Chapter 4, Components, Templates and Forms*. By doing this, we can observe the values that are being entered into our forms, checking for errors or the wrong type of information (for example, email address format) as the user completes a form.
+
+We can store the state of the form as the user fills in the form by observing the form fields and storing the value. This could be helpful if the user leaves the page a form is in and comes back since we can keep what they entered in the form so that they don't have to start again, and they can carry on from where they left off. This helps make the experience of using your application better for the end user.
+
+#### In components
+RxJs is not just for Services and Forms. We can also make use of RxJs at the component level, too. In the TypeScript classes of our components, RxJs can be used for handling click events, such as using the `fromEvent()` Operator to create an Observable, which watches when a button is clicked. We can create time-based Observables using the `interval()` and `timer()` Operators if we need our components and templates to change state after a time period. For example, we may have a testing application where a user takes a time-based exam. If they haven't completed a question in time, then the component/template warns the user. This can be done with a time-based Observable.
+
+We can also use the `filter()` Operator to filter down a list of records that are displayed in a component as the user types in a search box. Without having to make an API call to get filtered data, we can filter the data we have as soon as the user starts searching.
+
+### AsyncPipe
+One important pipe that we can use in our templates is the AsyncPipe ([https:/​/​angular.io/​api/​common/​AsyncPipe](https:/​/​angular.io/​api/​common/​AsyncPipe)). This works with Observables and helps manage the Subscribing and Unsubscribing of Observables that are used in our components.
+
+The AsyncPipe will return the last value emitted from an Observable and tells the Observable that the value can be checked for the next value in the stream. It will also automatically unsubscribe to the Observable when the component is destroyed, or no longer in the UI. This automatic unsubscribing helps reduce the risk of memory leaks in our applications. They can still happen if we don't unsubscribe in our Services when using Observables, but when used in components, the AsyncPipe is extremely useful. Here is an example, from the Angular official docs, showing how it can be used:
+
+```
+@Component({
+selector: 'async-observable-pipe',
+template: `<div>
+                <code>observable|async</code>: 
+                Time: {{ time | async }}
+            </div>`
+   })
+   export class AsyncObservablePipeComponent {
+        time = new Observable(observer =>
+        setInterval(() => observer.next(new Date().toString()), 1000)
+    );
+}
+```
+
+In the preceding code, there is no Subscribe or Unsubscribe event calls. This is handled by the AsyncPipe, which is always set just after the place in the template where the value of the Observable is displayed.
+
+#### When to use AsyncPipe and when to Subscribe
+It's easy to think that, with AsyncPipe, we can have all our Observables managed. We would use AsyncPipe to subscribe and unsubscribe within the template of our component.
+
+This is true – we could – but there are scenarios where we wouldn't want to do this. For example, if we have multiple source Observables that we need to map together using Operators. We may need to have these Observables return data within the `ngOnInit()` life cycle hook of a component in order to have data returned before the component has completed loading. In this scenario, we have to subscribe within `ngOnInit()` – we can't use AsyncPipe because it's too late in the component life cycle.
+
+If we have a collection of data that we want to loop over with `ngFor`, the AsyncPipe is ideal for managing the subscribing and unsubscribing to it:
+
+```
+<ul>
+    <li *ngFor="let person of people$ | async">
+        {{person.firstname}}
+    </li> 
+</ul>
+```
+
+Here, we are looping over a collection of people, This collection is returned from an Observable. AsyncPipe is used to subscribe to this `people$` collection and once the list of names has been written to the template, the AsyncPipe unsubscribes.
+
+So, if we need the data from an Observable in more places than just the template of a Component, then the Subscribe method is a better choice. The problem with using Subscribe is that we need to handle unsubscribing to the Observable within our code – it's our responsibility.
+
+The benefit of the Async pipe is that we can go through the results of Observables directly within templates. The problem is if we then want to use the same Observable data is a non-template part of a component – we would need to set up a new Observable that we can subscribe to in our code.
+
+## Summary
+We have covered a lot in this chapter. It has been one of the largest in this book, but it is worth really understanding all that we have covered in this chapter in order to be able to write fast, powerful Angular applications.
+
+The use of Observables and RxJs is an extremely important part of how we build applications with Angular. With the need for modern web applications to be extremely fast and responsive to end user demands, being able to design and build applications that make use of Observables means that we can create Angular applications that react to the user's needs.
+
+With all that we have learned in this chapter, we can now take our knowledge and start looking at how we can handle state management within our Angular applications and how the new library, NgRx, makes use of Observables and Observers to manage state within applications.
