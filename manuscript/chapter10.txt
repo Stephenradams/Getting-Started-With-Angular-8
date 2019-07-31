@@ -1,0 +1,772 @@
+# Chapter 10: Testing
+
+In this chapter, we are going to look at testing, which is an essential part of developing an enterprise-level application. We will briefly discuss the importance of writing tests and the benefits of following a Test Driven Development (TDD) approach. We will then look at how Angular supports testing by reviewing the test spec files that Angular generates automatically through the CLI. Then, we will see how to run our tests to see if they have all passed or failed.
+
+After reading this chapter, you will have learned the following:
+
+- What tests are and what TDD is
+- Why tests are important
+- What Jasmine and Karma are
+- How to write tests using Jasmine
+- How to run tests and see the output of tests using Karma How to check if your tests either pass or fail
+- How Angular creates and runs test
+- What features Angular provides to make testing easier
+
+There is a lot to know about testing in both Angular and in general web development, so we best get going!
+
+## Testing and Test Driven Development
+In the world of Angular, testing is extremely important. As we know from when we explored Dependency Injection in *Chapter 7, Dependency Injection, Services, and HttpClient*, data is passed into out Components using DI. This leads to our components being isolated and separated, which is good practice. It does mean that we need to be sure that our inputs to our Components work as expected. Being able to test parts of our application in isolation is important because then we know that when all the various parts are passed into the components, they work. This is why TDD within Angular is important.
+
+One of the reasons Angular is so popular in the enterprise software space is because Angular insists on Unit Tests being written, and well-tested software is important in the enterprise space. But before we look into how Angular makes testing so easy, we need to understand what is meant by testing and writing tests for our code. Once we understand what testing is, then we can see the ways Angular makes testing a core part of the code we write.
+
+The first thing we need to look at is how tests are written and for that, we need to start with Jasmine.
+
+### Jasmine, Behavior-Driven JavaScript
+Jasmine is a Behavior-Driven framework for writing code that tests JavaScript. While we are writing TypeScript in Angular, we still make use of Jasmine to write the tests for our Angular code.
+
+> Behavior-Driven Development combines the techniques of TDD with the domain-specific design so that both developers and the business can share how the code being written should behave. Unlike pure TDD, where tests are written just to test the code, with BDD tests can be written not only to check that the code works as expected, but that it fulfills the businesses' needs.
+
+This is the official Jasmine website, where you'll find a lot of information about Jasmine and writing tests. It is well worth going through this site:
+
+![Jasmine Website](/images/chapter10/1.png "Jasmine Website")
+
+The Jasmine framework ([https:/​/​jasmine.​github.​io/](https:/​/​jasmine.​github.​io/)​) was originally created by a company called Pivotal Labs ([https:/​/​pivotal.​io/​labs](https:/​/​pivotal.​io/​labs)) to write BDD tests for their applications. They thankfully saw the great benefits that Jasmine can provide and released it to everyone to use in their own projects and it soon became the default choice for writing tests.
+
+In AngularJS, Jasmine was soon used to write Unit Tests. This has been carried on and improved in Angular with the Jasmine framework being installed when we create a new Angular application through the Angular CLI.
+
+> While Jasmine is a very popular choice for writing unit tests and is installed by default when a new application is generated, there are other frameworks available for writing tests in Angular – frameworks such as Mocha, Chai, and Jest – and we can replace Jasmine with these other frameworks if we find that a team wants to use a different framework. These other approaches can be installed and set up using NPM as part of generating a new Angular application. We can also tell the Angular CLI to generate a new application and not install Jasmine as part of the setup.
+
+With Jasmine being so popular, and Angular's long history with Jasmine from back in the AngularJS days, we are going to continue using Jasmine when writing testing for this book.
+
+So, how do we use Jasmine to write tests? Well, let's have a look at an example.
+
+## Jasmine in action
+The first thing we need to do is have an example piece of code to test. Say we have a function that returns the name of this book in the browser. This function would look like this:
+
+```
+function writeTitle() {
+   return 'Getting Started With Angular 8';
+}
+```
+
+A very simple function, but it will allow us to write a simple test. The test will look like this:
+
+```
+describe('writeTitle function', () => {
+       it('returns Getting Started With Angular 8', () => {
+           expect(writeTitle()).toEqual(
+               'Getting Started With Angular 8'
+           );
+       });
+});
+```
+
+So, this is our first test. It is a very simple example, but it does have a lot going on here. There are a number of features of the Jasmine framework being used in this example: let's take a minute to explore what these features are.
+
+### The test suite
+The first line of this test, which starts with the `describe()` statement, is called a test suite. A test suite is a function that sets out a series of test specs related to either a piece of code or a section of functionality. For example, you could create a test suite, which contains a series of test specs all about the one function. These test specs could be set up to test various scenarios of functionality that this code should be able to do. Or, we could set up a test suite that contains a series of test specs designed to test a piece of functionality with our application.
+
+The test suite takes in two arguments: a string and a function. The string can be a title that describes what the test suite is testing. In our example, we have a title called `writeTitle` function. This title is useful for two reasons: firstly, it allows us to see what this test suite is designed to be testing, which is very helpful if we are working on a test suite written by another developer. And the second reason this is very useful is that when the tests are run in a test runner (which we will be looking at later in this chapter), the output of the test runner uses the title to show both what tests have passed and more importantly what tests have failed. When a test fails we can see the title/name of the test suite the failed test belongs to.
+
+The second argument of the test suite function is another function, which is run when the test suite is run by the Test Runner. This function contains all the test specs for this suite.
+
+### The test spec
+The second part of this example is the test spec, which starts with the `it()` statement. The test spec contains one or more expectations, where we set out what we expect the code being tested to be able to do.
+
+In the previous example, we have one single expect statement that calls/runs the `writeTest()` function we are testing and sets out what we expect to get returned from the function being tested. We can have a number of these expect statements within a test spec so we set out various expectations of our code. All these expectations are contained within the one test spec.
+
+Again, like the test suite, a test spec takes in two arguments: a title and a function. The title allows us to describe what we expect the function under test to do. In this example, we are saying that it should return the Learning Angular 8 string. This title is helpful, as it tells us what the test is expecting of the code under test and in the test runner output we can see what tests have failed, because the test runner uses the title of the test spec to show what tests have failed.
+
+The second argument of the test spec is the function. This is again run like the test suite, but unlike the test suite, there is only one function for a test spec: it does not contain multiple functions, only expectations.
+
+### The Expectation expression
+Within our test spec, we have an Expectation expression, which is the line that starts with the `expect()` keyword. This simply describes what we expect the function under test to do. In our example, we expect that the `writeTitle()` function will return 'Getting Started With Angular 8'. If the `writeTitle()` function was to return 'Getting Started With Angular', then the test has failed, because it does not meet our expectation.
+
+> The term function under test which we have been using throughout this chapter is how we describe the function being tested. In this current example, the function under test refers to the writeTitle() function.
+
+There are two parts to the Expectation expression. The first is the **expect** statement and the second is the matcher, which in our example is the `toEqual()` statement. The Expectation expression and a matcher are combined to make a complete expression of what we want the function under test to do.
+
+Within the Test Spec, we can have multiple Expectation expressions. For example, we could add more expect statements to check other scenarios that we may or may not want our function to do:
+
+```
+describe('writeTitle function', () => {
+   it('should return the title', () => {
+       expect(writeTitle()).toEqual(
+           'Getting Started With Angular 8'
+       );
+       expect(writeTitle()).not.toEqual(
+           'Getting Started With Angular 9'
+       );
+    }); 
+});
+```
+
+Here, we have expanded on the test spec to have another Expectation expression that says that the returned string from our `writeTitle()` function is not equal 'Getting Started With Angular 9'. Now we are checking for two scenarios: what our function under test should do and what it shouldn't do.
+
+### The Matcher expression
+So far, we've seen just the one Matcher expression: the `toEqual()` statement. There are actually a load more matcher statements we can access from Jasmine. Here's a list of the ones available:
+
+- toContain()
+-         toThrow()
+-         toThrowError()
+-         not
+-         nothing()
+-         toBe()
+-         toBeCloseTo()
+-         toBeDefined()
+-         toBeFalsy()
+-         toBeGreaterThan()
+-         toBeGreaterThanOrEqual()
+-         toBeLessThan()
+-         toBeLessThanOrEqual()
+- toBeNaN()
+- toBeNegativeInfinity()
+-         toBeNull()
+-         toBeUndefined()
+-         toBeTruthy()
+-         toContain()
+-         toEqual()
+-         toHaveBeenCalled()
+-         toHaveBeenCalledBefore()
+-         toHaveBeenCalledTimes()
+-         toHaveBennCalledWith()
+-         toHaveClass()
+-         toMatch()
+-         toThrowMatching()
+-         withContext()
+
+That's a lot of possible matchers we can use with our Expectation expressions. To see how these matchers work and the arguments they take, check out the official Jasmine API docs ([https:/​/​jasmine.​github.​io/​api/​edge/​matchers.​html](https:/​/​jasmine.​github.​io/​api/​edge/​matchers.​html)), which go through this list and shows examples of how they can be used.
+
+### The Not matcher
+You may have noticed that the **not** matcher in the list doesn't look the same as the others: it doesn't have the brackets indicating that it can take in a set of arguments. This is because this matcher is used to switch the expectation expression around.
+
+In our example, we have one expect expression that says what our function should do, then we use the not match to create another one that says what the function should not do. We can use the not matcher with all the other matchers from the previous list to switch the expression around so we can set expectations of what a function under test should not do as well as what it should do. In order to build up a test spec that sets out clearly what a piece of code can and cannot do in order to pass the test we are writing.
+
+## Setup and tear down of tests
+When writing tests, sometimes we need to set up some things before running a test spec.
+
+The type of things we may need to initialise before running a test can include creating mock data, settings some global variables, and creating mock services needed to run the function under test.
+
+All this can be handled as part of the setup of a test, but we can also clear these mock services and data as part of the tear down of a test suite. To do this, Jasmine provides us with four functions we can use in a test suite, which are set out in the following list:
+
+- `beforeAll()`: This function is run once, before all the test specs within a suite 
+- `beforeEach()`: This function is run before each test spec is run
+- `afterAll()`: This function is run once after all the test specs have been run 
+- `afterEach()`: This function is run after each test spec has run
+
+As you can see, there are two types of this setup and tear down functions: there are ones that are run just once when a test suite is run and those that are run once for each test spec. Let's have a look at how the `beforeAll()` and `afterAll()` functions could be used:
+
+```
+describe('writeTitle function' () => {
+   const bookTitle = '';
+   
+   beforeAll(() => {
+           bookTitle = 'Getting Started With Angular 8';
+    });
+       
+    it('should return the title', () => {
+        expect(writeTitle()).toEqual(bookTitle);
+    });
+       
+    afterAll(() => {
+        bookTitle = '';
+    }); 
+});
+```
+
+In this example, we're creating a local `bookTitle` variable, which is used as the argument passed into the `toEqual()` matcher expression. In the `beforeAll()` function, we are setting this property to `Getting Started With Angular 8` so that the `bookTitle` property is set before all of our tests (which we only have one of in this example test spec) are run. 
+Then, after all the tests have run, we reset the local `bookTitle` property back to an empty property.
+
+So, you can see that in beforeAll()` we are setting up the state for the tests in the test suite, then after they have all run we reset this state data back to its original state.
+
+Why would we want to do this? Well, say for example we want to make sure that our test data is reset in case one of our tests updates or amends this state data and we want to have this data reset for when the tests run again. The setup and tear down functions can be used to create and clear up mock data needed for the tests.
+
+These functions really come into their own when we need mock data and services needed for our tests to run, which we will see later when we explore writing more complex tests.
+
+Now we know what test specs and test suites are, we need to look into how to run them. This is where a test runner is needed.
+
+## The Karma test runner
+In Angular along with having Jasmine, there is the Karma test runner, which is part of the testing process of Angular. Again, like Jasmine, Karma is installed as part of a new Angular application (we can also create a new Angular application without installing Karma).
+
+> When we say running our tests, this means we get the test running to go through all the test suite files written and trigger the `describe()` functions within each test suite, which in turn runs all the test specs to test the code we've created to meet our expectations.
+
+Karma aims to give developers immediate feedback on the tests we've written so we know exactly where and when the code we're writing has not passed a test. While by default we use Jasmine and Karma together, Karma will run other testing frameworks such as Jest, Mocha, and QUnit, meaning that while we are using Jasmine in this book, if you work with a team that uses Jest, for example, instead of Jasmine, the use of Karma is still the same.
+
+### How Karma is used
+Karma is a command-line tool that starts up a local web server (similar to the Angular CLI when we run `ng serve`). This local web server is used to execute the application code against our tests, and then Karma will give immediate feedback on any passing or failing tests in either the command line or a local browser as an HTML-based report, which you can see an example of here:
+
+![Karma Runner in Action showing all Tests passing](/images/chapter10/2.png)
+
+This example shows the Tests from the Tour of Heroes example application that the Angular team provides. As you can see from this report, there are 8 test specs and 0 failures. If there was a failing test, the report would show it like this:
+
+![Karma Runner in Action showing some Tests failing](/images/chapter10/3.png)
+
+Now the generated report is showing the test that has failed and what it has failed on, which in this case is the expectation that the code that generates the phrase 'Top Heroes' should actually generate 'Top Hero', which it doesn't, so the test has failed.
+
+Karma is running the local web server, running the Tests against the application, and generating the test report in the browser, but as we said earlier, Karma is a command-line tool, so we can also see the report in the Terminal. The same report of the failing test in the Terminal looks like this:
+
+![Terminal showing some Tests failing](/images/chapter10/4.png)
+
+This screenshot also shows that a test has failed, what the test is that has failed (we're using the title of test spec in the output of the report) and even what line of code the failed test can be found at.
+
+Karma can also continuously watch all our application files and if there is a change, it can re-run all the tests to see if the change we've made has fixed the code being tested so it passes the test. If the change has fixed the failing code, the generated report will show a green line indicating that all the tests have passed.
+
+As we continue developing our application, we can keep the Karma web server running and monitoring our application to keep informing us if the code we're writing is passing the tests we've written. This part of the continuous development is a key part of Test Driven Development, where we write the tests defining what our code should do then we write the code to 'pass' the tests.
+
+## Taking a Test Driven Development approach
+Before moving onto seeing how tests are set up within an Angular application, we need to understand what is meant by taking a Test Driven Development or TDD approach to writing code.
+
+TDD has been around since the 1970s. The exact date when it started being used is hard to say, as the practice of TDD has evolved over time as testing has grown in various languages and frameworks, and as testing became more and more important a set of rules were agreed on for an approach on how we should write code, these rules became the base for the TDD approach.
+
+### The rules of Test Driven Development
+According to the Agile Alliance ([https:/​/​www.​agilealliance.​org](https:/​/​www.​agilealliance.​org)), which is designed to promote Agile Development practices, which TDD is part of (along with Sprints, Stand-ups, and pair programming) the definition of TDD is:
+
+*Test-driven development refers to a style of programming in which three activities are tightly interwoven: coding, testing (in the form of writing unit-tests) and design (in the form of refactoring).*
+
+As part of this definition, the Agile Alliance has a set of rules that describes TDD:
+
+- Write a single unit test describing an aspect of the program (our test specs) 
+- Run the test, which should fail because the program lacks the feature 
+- Write 'just enough' code, the simplest possible to make the test pass 
+- Refactor the code until it conforms to the simplicity criteria
+- Repeat, accumulating unit tests over time
+
+So, according to these rules, when taking a TDD approach to our development we should start writing a test spec that sets out what we expect a piece of functionality to do, then run this test, which will fail because we haven't written the implementation code yet. Then we write the simplest code we can to make the test pass. Once this code is in place, we refactor this code, making sure it still passes the test. Continuing this process throughout the development of our application code and by taking this approach, we have a growing set of tests that confirm all the code of our application passes the tests.
+
+The simplicity criteria have been set out by Kent Beck, the originator of extreme programming, to judge whether some code is simple enough:
+
+- The code is verified by automated unit tests, and all tests must pass
+- The code contains no duplication
+- The code expresses separately each distinct idea or responsibility
+- The code is composed of the minimum number of components (classes, methods, and lines) compatible with the first three criteria
+
+By taking a TDD approach in Angular, we would be writing our tests before writing the code of our Component classes and services. This approach does bring a lot of benefits, including knowing that all your code is covered by tests, so if we refactor our code or add a new feature we will be aware of any new bugs that may surface in our code over time.
+
+TDD, while a great approach to development, is not a requirement of writing tests in Angular, but it is worth knowing the strategies of TDD, as it keeps our tests as small as possible and tests the public interfaces into our functions, even if we don't follow the approach of writing tests before we write our code.
+
+Now we know about Jasmine and Karma, we can move onto how we use these tools to write tests in our Angular applications.
+
+## Karma settings in Angular
+From what we've learned about Jasmine and Karma, we could set up testing within our Angular applications ourselves; all we need to do is install Karma, set the configuration file telling Karma to run and continuously watch for changes to our files in order to trigger the re-running of tests. We also need to install the Jasmine framework into our application via NPM.
+
+> The Karma website has a great tutorial on how to set up Karma for a project ([https:/​/​karma-​runner.​github.​io/​3.​0/​intro/​installation.html](https:/​/​karma-​runner.​github.​io/​3.​0/​intro/​installation.html)) and you can find details on adding Jasmine from the Jasmine website ([https:/​/​jasmine.​github.​io/​pages/​getting_​started.​html](https:/​/​jasmine.​github.​io/​pages/​getting_​started.​html)).
+
+Thankfully for us, all this has been handled for us through the Angular CLI. When we create a new project, the Angular CLI downloads and installs all we need for testing our applications.
+
+> If you want to create a new Angular application without the tests and test files, you can by adding the `--skipTests=true` argument to the `ng new MyTestFreeApp --skipTests=true` ng new command.
+
+In an Angular project, there are two separate files, which manage tests. They are the `angular.json` file and the `karma.config.js` file.
+
+### Test Settings in angular.json
+In the angular.json config file, which is the main config file of an Angular application, there is a section where the test command of the Angular CLI settings can be found:
+
+```
+"test": {
+       "builder": "@angular-devkit/build-angular:karma",
+       "options": {
+           "main": "src/test.ts",
+           "polyfills": "src/polyfills.ts",
+           "tsConfig": "src/tsconfig.spec.json",
+           "karmaConfig": "src/karma.conf.js",
+            "styles": [     
+                "src/styles.scss"
+            ],
+            "scripts": [],
+            "assets": [
+             "src/favicon.ico",
+             "src/assets"
+            ]
+    ...
+```
+
+This section from the `angular.json` file provides all the details needed when our tests are run. There are two sections that we are looking at here: the first is the builder property and the `karmaConfig` property. The builder property tells the Angular CLI what building tool it should use when running the test command, which in this example is using the default builder of Karma (this could be different if we're using another test runner).
+
+The `karmaConfig` property tells the CLI where the `karma.config.js` file can be found. This JavaScript file is the configuration file for the Karma test runner.
+
+### The Karma config JavaScript file
+
+If we look at this file, we can see a number of settings that tell Karma how to run:
+
+```
+module.exports = function (config) {
+       config.set({
+           basePath: '',
+           frameworks: ['jasmine', '@angular-devkit/build-angular'],
+           plugins: [
+               require('karma-jasmine'),
+               require('karma-chrome-launcher'),
+               require('karma-jasmine-html-reporter'),
+               require('karma-coverage-istanbul-reporter'),
+               require('@angular-devkit/build-angular/plugins/karma')
+            ], 
+            client: {
+                in browser 
+            },
+            clearContext: false,
+            coverageIstanbulReporter: {
+               dir: require('path').join(__dirname, '../coverage'),
+               reports: ['html', 'lcovonly'],
+               fixWebpackSourcePaths: true
+           },
+           reporters: ['progress', 'kjhtml'],
+           port: 9876,
+           colors: true,
+           logLevel: config.LOG_INFO,
+           autoWatch: true,
+           browsers: ['Chrome'],
+           singleRun: false
+        }); 
+    };
+```
+
+This Karma config file, which is from a standard Angular application generated from the Angular CLI, has a number of properties. Let's take a quick look at what these properties are:
+
+- `basePath`: Used to resolve the path to any files.
+- `frameworks`: An array of the testing framework being used, in this case, Jasmine.
+- `plugins`: An array of plugins needed: in this example, we have plugins that Karma needs to run the app in the browser, link with Jasmine, and generate the report in the browser, which we saw an example of in a screenshot earlier.
+- `client`: An object with arguments that are passed to the browser. Here, we are passing the clearContext, which clears the context of the client forcing a clean run every time the tests are run.
+- `coverageInstanbulReporter`: This is an object with settings for the HTML reported that Karma uses to show the outcome of the test.
+- `reporters`: A list of the reporters that should be used. Here, we are saying show us the report on the progress of the tests being run. As tests are being run, we can see how they are progressing as the tests run.
+- `logLevel`: This is the level of the information returned to log as tests are being run. By default, we get the general information level, but we could change this to show just errors, or full debug information.
+- `autoWatch`: This is the setting that tells Karma to watch for changes to our files and if there have been any changes, run the tests.
+- `browsers`: This is the browser we are using to run the app. We can run tests in more than one browser.
+- `singleRun`: This is used if Karma should run all the tests in all the list of browsers continuously as we work.
+
+There is a huge set of configuration settings for Karma. As well as these, it's worth familiarising yourself with them by going to the Configuration settings page of the Karma website: [https:/​/​karma-​runner.​github.​io/​3.​0/​config/​configuration-​file.​html](https:/​/​karma-​runner.​github.​io/​3.​0/​config/​configuration-​file.​html).
+
+Now we know what these settings are, we can amend them to our needs if we want. For example, we could change logLevel to `config.LOG_ERROR` to just return information on when a test fails/errors to the console or report. Or we can set singleRun to false so the tests are continuously running in the console. Karma is very flexible and even though Karma has been installed and set up as part of the build of a new Angular application by the CLI, we can still tweak the settings for our own needs.
+
+## Running tests using the Angular CLI
+To run the tests within an Angular application, we can simply use a single command to the Angular CLI:
+
+`ng test`
+
+This will begin the process of starting Karma, launching the browser, and finding and running all the test specs we have in our code base. Then, within the same Terminal window, we will see the outcome of the tests, and if they have passed or failed.
+
+This screenshot shows the Terminal window before we start running our tests. We're running the `ng test` command:
+
+![Running the ng test command in Terminal](/images/chapter10/5.png)
+
+Now after the tests have run, we can see the output of the tests in the terminal window. As you can see from this screenshot, 17 of our tests have not passed:
+
+![Terminal showing failing tests](/images/chapter10/6.png)
+
+Here, we can see two screenshots of the same Terminal window, the first showing the `ng test` command being entered for the project, and the second showing the outcome of the tests, where we see 17 have failed and 3 were successful.
+
+### Test command arguments
+The ng test command, like so many of the other Angular CLI commands, has a set of arguments that can be passed along with this command. A couple that are extremely useful are as follows:
+
+- `--codeCoverage`: This can be true or false. If true, it will generate a report telling you how much of your code is covered by tests. So you can see if there are any areas that need more tests.
+- `--watch`: This also can be true or false. If true, it runs the `ng test` whenever a file is changed, so you have this set to false in the Karma config file, but if you want to keep the tests running when you are working on a complex section of the application, you can start the `ng test` command with this argument to keep tests running.
+
+To see what other arguments are available for the ng test command, check out the official documentation: [https:/​/​angular.​io/​cli/​test.](https:/​/​angular.​io/​cli/​test)
+
+## Writing tests in Angular
+Not only does the Angular CLI install and set up Karma, as well as have a command to run all our tests, it also automatically generates a test spec file for us every time we use the CLI to generate a Component or service.
+
+You may have seen this when we've used the `ng generate` command in earlier chapters: where we've created either a new Component or a service, the list of files being generated has always included a `spec.ts` file.
+
+So, if we were to use the Angular CLI to generate a new component for use we would use this command:
+
+`ng generate component my-comp`
+
+This would create four separate files:
+
+- `my-comp.component.html`: The Template file of our component
+- `my-comp.component.scss`: The Sass CSS file for the component
+- `my-comp.component.ts`: The TypeScript class of the component
+- `my-comp.component.spec.ts`: The Test file for the component
+
+The file we're interested in here is the `my-comp.component.spec.ts` file, which is our automatically generated Test file. Every time one of these `spec.ts` files is generated, Karma is automatically aware of the file, so we do not need to update a config file with the names of any new Spec files. Angular makes Karma aware of these files through a separate TypeScript file called `test.ts`.
+
+### The Test.ts file
+In this `test.ts` file, which can be found in the src folder, Angular's testing environment is set up using the `BrowserTestingDynamicModule` of Angular. If we look at the `test.ts`, we can see how this is initialised:
+
+```
+// This file is required by karma.conf.js and loads recursively all the .spec and framework files
+import 'zone.js/dist/zone-testing';
+import { getTestBed } from '@angular/core/testing';
+import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+
+declare const require: any;
+
+// First, initialize the Angular testing environment.
+getTestBed().initTestEnvironment(
+   BrowserDynamicTestingModule,
+   platformBrowserDynamicTesting()
+);
+   
+// Then we find all the tests.
+const context = require.context('./', true, /\.spec\.ts$/);
+
+// And load the modules.
+context.keys().map(context);
+```
+
+This file is performing two main actions: first, it is initialising Angular's testing environment, which is the environment Angular runs in when running our tests. This is different from when Angular is running the application in the browser.
+
+Next, a context property is initialised, which uses a regular expression to find all the `spec.ts` files in our codebase. It creates a map of all these spec files which is available to Karma. So, when the Karma test runner starts and runs, it uses this mapping to go through all the available spec files.
+
+### The auto-generated test spec file
+If we open one of these spec files for a component and see what that CLI has created for us, it'll look like this:
+
+```
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CompanyPageComponent } from './company-page.component';
+   
+describe('CompanyPageComponent', () => {
+       let component: CompanyPageComponent;
+       let fixture: ComponentFixture<CompanyPageComponent>;
+       beforeEach(async(() => {
+           TestBed.configureTestingModule({
+               declarations: [ CompanyPageComponent ]
+           })
+           .compileComponents();
+       }));
+       beforeEach(() => {
+           fixture = TestBed.createComponent(CompanyPageComponent);
+           component = fixture.componentInstance;
+           fixture.detectChanges();
+    });
+
+    it('should create', () => {
+       expect(component).toBeTruthy();
+    }); 
+});
+```
+
+This is a test spec file of the Company Page component from our demo application. Even though this is a generated file, there is still a bit going on here.
+
+The first thing to know is that while this is a TypeScript file, it's still using the Jasmine test framework. From what we've already learned about Jasmine, we can see that there are an expectation expression and a matcher from Jasmine used in the single test we have in this file:
+
+```
+it('should create', () => {
+   expect(component).toBeTruthy();
+});
+```
+
+The file starts with a `describe()` function, as all test files do. In this, we have the title, and the CLI uses the name of the component to generate this title. Then we have two local properties: component and fixture. The component property is a reference to component TypeScript file, so we have access to the components properties through this local property. The fixture property creates a ComponentFixture object, which we will explore in a bit.
+
+Then we have two `beforeEach()` functions. We can have more than one if we choose. In the first of these functions, the TestBed class is being provided with a declarations array, consisting of the one component file. In the second beforeEach() function, we are setting the TestBed class to create the component being tested and set this as the fixture property, then getting an instance of the fixture and setting that to our local component property. Finally, we are calling the **fixture** property's `detectChanges()` function. All this is to set up how Angular knows about the component being tested and making it available to Angular's testing classes.
+
+To understand what is happening here, we need to look at the TestBed class and the ComponentFixture class Angular provides.
+
+## The TestBed class
+The Angular TestBed class helps us by providing an environment for testing our application. It also provides an API for making our components and services available to the Unit Tests.
+
+In AngularJS we didn't have the TestBed class, which made it far more complex to access the Controllers and services in the Unit Tests. Thankfully, now with the TestBed class, this has made it far easier to access our components and services in order to test them.
+
+Going back to our example spec file, let's see how the TestBed class is being used.
+
+```
+let component: CompanyPageComponent;
+let fixture: ComponentFixture<CompanyPageComponent>;
+       
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [ CompanyPageComponent ]
+        }).compileComponents();
+    }));
+    
+    beforeEach(() => {
+        fixture = TestBed.createComponent(CompanyPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+```
+
+In the two `beforeEach()` functions, which, as we know, are run before each test spec within the file, we are using the TestBed to make the component we're testing accessible.
+
+In the first `beforeEach()`, the TestBed is being configured through calling its `configureTestingModule()` method. This tells the test environment's module of all the declarations it needs to know. This is very similar to how the main `app.module.ts` is set up: if we go back to what we learned about the main NgModule class in *Chapter 5, NgModule*, the same set of arrays (declarations, imports, providers, and so on) that we pass into the `app.module.ts` file can be passed into the Testing environment module via the TestBed class. When we look at some examples of tests, you'll see this list grow, depending on what is being tested.
+
+In the second `beforeEach()` method, we create this fixture property, which is a wrapper for the component being tested and the template of the component. This is helpful for accessing the template's HTML if we want to test if a value in the template has been updated.
+
+Then we create an instance of this component based on the fixture wrapper property. The reason we do this is so that when a test is run, it has a new instance of the component from the fixture. If we have one test that needs to set a property in the component, in order to test if the property has been changed successfully, while in another test we don't want to change the same property.
+
+Finally, we call the `detectChanges()` method of the fixture. This triggers all the lifecycle hooks a component has, which we learned about in *Chapter 4, Components, Templates, and Forms*.
+
+### Injecting a service using the TestBed
+If our component under test requires a service as part of the functionality of the component we're testing, we can use the TestBed class to inject this service into our spec file.
+
+For example, if we have a component that needs a `LoginService`, we can make this service available by adding it in our `beforeEach()` methods:
+
+```
+let loginService: LoginService;
+
+beforeEach(async(() => {
+    TestBed.configureTestingModule({
+        declarations: [ CompanyPageComponent ],
+        providers: [ LoginService ]
+        }).compileComponents();
+   }));
+       
+beforeEach(() => {
+   fixture = TestBed.createComponent(CompanyPageComponent);
+   component = fixture.componentInstance;
+   fixture.detectChanges();
+
+   loginService = TestBed.get(LoginService);
+});
+```
+
+In this example, we're creating a new local property called `loginService`, then adding the `LoginService` to the list of providers (an example of the providers' array we pass to the TestingModule) so the `TestingModule` is aware of the service. Then we use the TestBed `get()` method to return an instance of the LoginService to our new local property.
+
+In a test spec, we can create a spy to check that a function from this LoginService has been called when we are testing our component:
+
+```
+it('checks that isLoggedIn is called during login', () => {
+   // creates a Spy to see if the loginService isLoggedIn() method has been called
+   spyOn(loginService, 'isloggedIn').and.returnValue(false);
+   
+   // runs the logUsIn() method of the component
+   expect(component.logUsIn()).toBeTruthy();
+   
+   // tests to see that the Service method has been called
+   expect(loginService.isloggedIn).toHaveBeenCalled();
+});
+```
+
+#### A brief word about spies
+When we looked at Jasmine earlier in the chapter, we didn't look at what spies are, but now we have an example we can learn a bit more about them and why we would use them.
+A spy is part of the Jasmine testing framework, and a spy can stub out a function and keep track of any calls to this function. This is useful for when, as the previous example shows, we have a function that is called as part of the code being tested and we want to make sure that this function has been called. As the spy function keeps track of calls to the method being tracked, we can use matchers such as `hasBeenCalled()` and `hasBeenCalledWith()` to see if these methods are being invoked correctly.
+
+In our example, we are creating a spy object, by calling the `spyOn()` method and passing in the name of the spy object, `loginService`, and the name of the method we want to track calls to, which is the 'isLoggedIn' method.
+
+Spies are very useful, especially where we are testing interaction with services in our components. It is worth exploring how to use them by checking out the official Jasmine documentation: [https:/​/​jasmine.​github.​io/​tutorials/​your_​first_​suite](https:/​/​jasmine.​github.​io/​tutorials/​your_​first_​suite).
+
+### Mocks in Jasmine
+Another useful feature of Jasmine are mocks. This is where we create mock versions of full classes within our test. These mock classes have the same signature as the real class they are replacing within our tests.
+
+Why would we do this? Well, we may be testing a complex function that has a few classes it's dependent on. To isolate the piece of code under test, we would use mocks to create mock versions of the classes that our code is using. These mocks can be far simpler than the real classes they represent, which means we can be sure that the code being tested is not affected by any bugs that may be in the other classes. By isolating our code through mocking dependencies, we can be sure that our test is only testing the code we're interested in.
+
+An example could be where we're testing a piece of code that accesses some data from a database. Instead of having to create a database to test with, we could mock a data source for our code under test so we can test that it works with data retrieved from this mock data source. We could write a test that only asserts that our code accesses data successfully and not need to be concerned with the database code, which we're not testing at that time.
+
+### Stubs in tests
+Stubs in tests are similar to mocks: they provide us with the ability to create stubs of an interface we may need in our test. For example, we might be testing a piece of code that loads in a dataset or a list of usernames. In order to prove this data to our code under test, we could create a 'stub' of this data to use when we make assertions in our tests.
+
+Being able to write stubs means we can use different combinations of data stubbed out to see how the code being tested performs if it still works as we expect with different data sets. For example, a list of four users may be fine for a piece of code, but if we mock 50 users, will the tests still pass?
+
+Spies, stubs, and mocks allow us to write small isolated tests where we can write a variety of tests for our code base.
+
+### Benefits of the TestBed class
+There are a number of benefits we get from using the TestBed class in our tests:
+
+- We can access our components far more easily than before
+- We can test the interaction between the component and the template, as the fixture gives us access to the template
+- We can make use of Dependency Injection in our test
+- We can duplicate the setup of our main NgModule in our Test Module, so we know the tests are using the same providers and declarations as the application
+
+The TestBed class has made writing tests in Angular far easier than in the previous version of Angular, where accessing components, templates, and services was far more complex and error-prone.
+
+## Examples of tests
+Let's move on to looking at some examples of the types of tests we may have in our Angular applications. While the functionality of each Angular application is different, there are some common types of tests we may write in our application.
+
+The scenarios we're going to look at are as follows:
+
+- A test that accesses the template of a component
+- A test that checks the @Input() and @Output() attributes of the component
+- A test for a service
+
+### Tests for a template of a component
+In this example, we're going to look at how to access elements within a template to see if there are changes to them based on functionality in the component class. Here is an example test spec file that checks for changes in the template:
+
+```
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { ExampleComponent } from './example.component';
+   
+describe('DomTestingComponent', () => {
+    let component: ExampleComponent;
+    let fixture: ComponentFixture<ExampleComponent>;
+
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [ExampleComponent]
+        }); 
+    }));
+       
+    beforeEach(() => {
+        fixture = TestBed.createComponent(ExampleComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+       
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+    
+    it('should not have the display the users name', () => {
+        const usernameEl = fixture.debugElement.query(By.css('.username'));
+           expect(usernameEl).toBeNull();
+    });
+       
+    it('should display the users name when set', () => {
+        component.username = 'Test User';
+        fixture.detectChanges();
+        fixture.whenStable().then(() => {
+
+        const usernameEl = 
+        fixture.debugElement.query(By.css('.username'));
+        
+        expect(usernameEl).not.toBeNull();
+       });
+    });
+});
+```
+
+We can access the template through the fixture, which as we know is set via the TestBed class generating a wrapper for the component and the template. Then, to access the value of the HTML element, we're using CSS to find the class of the HTML element that contains the username:
+
+`const usernameEl = fixture.debugElement.query(By.css('.username'));`
+
+This line accesses the HTML element, using the By.css() function to find the matching element with the CSS class. When we have access to this HTML element, we can check to see if it's null or not using the not.toBeNull() matcher from Jasmine (hopefully now you can see how we are using the Jasmine framework to write these tests all within the Angular environment).
+
+This is a fairly simple test, but it does show how HTML from the template can be accessed via the fixture returned from the TestBed. There are other methods as well as By `.css()` to search through the template. To find others, check through the official Angular API docs and the Protractor API docs.
+
+> Protractor is an Angular framework for writing end to end tests, where we write tests that interact with the UI of an application, testing how a user would work with the application. While we are not going to be looking at Protractor in this book, once you feel confident with testing it is work looking at Protractor: [https:/​/​www.​protractortest.​org/​.](https:/​/​www.​protractortest.​org/​)
+
+Protractor does have a rich API, which we can use in our tests to inspect a component's template.
+
+### Tests for @Input() and @Output() attributes
+Another common scenario is to test the `@Input(`) and `@Output()` attributes of a component. Let's start by looking at how we check that an `@Input()` of a component is being set correctly.
+
+Continuing from our first example, if the component has an `@Input()` called age, in order to check that age is being set correctly, we could write a simple test like this:
+
+```
+it('should correctly display the @Input value for age', () => {
+   // there shouldn't be any value initially
+   expect(fixture.debugElement.nativeElement.innerHTML).toBe('');
+   
+   // let's set the @Input() value of our age property
+   component.age = '45';
+   // call detectChanges() so the change to the input is picked up
+   fixture.detectChanges();
+   
+   // test to confirm that the element has the same value
+   expect(fixture.debugElement.nativeElement.innerHTML).toBe('45');
+});
+```
+
+This example first checks that there isn't a value for the element that displays the passed-in age property. Then we set the `@Input()` value of age to be **45**; this is how we can set the properties of this `@Input()`.
+
+Next, we call `detectChanges()` in order for Angular to re-run the lifecycle hooks of the component, so that the change to the age property is made, and, finally, we have the expectation expression that checks the value displayed in the HTML element matches the value of the `@Input()` property.
+
+Testing an `@Output()` is slightly more complex than testing an `@Input()`. The reason for this is that an `@Output()` could emit an event that we need to check has been fired. Again, using our previous example, let's have a test that checks that when a button in the template is clicked an event is emitted:
+
+```
+it('should test the @Output using a spy', () => {
+   // using a Spy to track the 'emit' event of the login EventEmitter
+   spyOn(component.login, 'emit');
+   
+   // find the loginButton from the template
+   const loginButton = fixture.nativeElement.querySelector('button');
+   
+   // trigger the click of the button
+   loginButton.click();
+   
+   // test that the emit of the login EventEmitter has been called
+   expect(component.login.emit).toHaveBeenCalled();
+});
+```
+
+In this example, we're using a spy from Jasmine to create a way to track `@Output()` of our component, which is a login event. As the `@Output` is using the EventEmitter class (we looked at the EventEmitter as part of *Chapter 4, Components, Templates, and Forms*) it will have an 'emit' event, which we can track.
+
+We find the `loginButton` again using the fixture wrapper to access the Template. Once we've found the button element, we trigger its `click()` event, which will fire off the login EventEmitter. Finally, in the expectation expression, we can check with the spy to see if the emit has been called; this means that our `@Output()` has successfully been fired.
+
+With Angular using a component-based architecture, the `@Input()` and `@Output()` attributes can be used to pass data in and out of components. Being able to write tests that cover these interactions helps as our application grows in complexity to make sure our changes do not break this connection between the components. Understanding how to write tests that cover how data is passed between components is an extremely important part of writing Angular applications.
+
+### Tests for a service
+As well as being able to pass data via `@Input()` and `@Output()` attributes, another way data is passed throughout our applications is through the use of a service. So, we need to be able to write tests that will cover the functionality of a service.
+
+A test spec for a service is slightly different from a component test spec. If we look at the spec for our Client Service, we can see that it has less setup than a component spec:
+
+```
+import { TestBed } from '@angular/core/testing';
+import { ClientService } from './client.service';
+
+describe('ClientService', () => {
+    beforeEach(() => TestBed.configureTestingModule({}));
+   
+    it('should be created', () => {
+       const service: ClientService = TestBed.get(ClientService);
+       expect(service).toBeTruthy();
+    }); 
+});
+```
+
+As you can see, there is only one `beforeEach()` function, which is creating a TestingModule without any settings. Then the test is simply creating a local instance of the service we're testing using the TestBed class and then testing that the service exists.
+
+This is a fairly straightforward example; it shows how we again use the TestBed class for accessing classes we're testing, but let's have a look at another example of a more complex service:
+
+```
+import { HttpClientTestingModule, HttpTestingController } from
+   '@angular/common/http/testing';
+import { of } from 'rxjs/observable/of';
+import { TestBed } from '@angular/core/testing';
+import { BookService } from './book.service';
+   
+describe('BookService', () => {
+    let serviceToTest: BookService;
+
+    beforeEach(() => {
+       TestBed.configureTestingModule({
+           imports: [HttpClientTestingModule],
+           providers: [BookService]
+       });
+       // inject the service using the TestBed
+       serviceToTest = TestBed.get(BookService);
+    });
+
+    it('should have a service instance', () => {
+       expect(serviceToTest).toBeDefined();
+    });
+       
+    it('should return the mocked data in the subscribe', () => {
+        const spy = spyOn(serviceToTest,'getBookTitle').and.returnValue(
+            of({ title: 'Getting Started With Angular 8 })
+        );
+           
+        // subscribing to the method of the service
+        serviceToTest.getBookTitle().subscribe(result => {
+        // in the subcribe handler checking for the expected result
+        expect(result.title).toBe('Getting Started With Angular 8');
+       });
+        expect(spy).toHaveBeenCalled();
+   });
+       
+    it('should not invoke the error throwing function since we mocked it', () => {
+        const mockFunction = () => {};
+        const spy = spyOn(serviceToTest, 'errorHandler').and.callFake(mockFunction);
+        serviceToTest.errorHandler();
+        expect(spy).toHaveBeenCalled();
+    });
+});
+```
+
+In this example, our BookService class has two functions, one that gets a book title and another that checks an error handler is working as expected. Again, you'll see the use of the TestBed class to load in our service under test (BookService), which we set to a local property called 'serviceToTest'.
+
+Then in our first test, we create a spy for the `getBookTitle()` method of our BookService. Not only are we creating a spy, we're also returning a value when the spy is created. In this instance, it's an Observable created using the `of()` Operator that contains an object with a book title property.
+
+> See how we are able to use RxJs within our Jasmine based code. This is because Jasmine and RxJs are both using JavaScript, so there is no issue mixing the two different frameworks together. You can use other RxJs Operators within your tests. We learned about Operators in *Chapter*
+> *8, Observables and RxJs*.
+
+Once our spy has been established, we call the `getBookTitle()` method of the service. This runs the spy object, and as it returns an Observable we need to subscribe to it. In the **subscribe** method, we're using an assertion to test that the return result object has the value we've set. This confirms that the `getBookTitle()` method is working. After that, we have another assertion that confirms that our spy has been called. So, not only do we know that our service under test returns a value from the `getBookTitle()` method, but also that the `getBookTitle()` runs as expected.
+
+The second test is checking that an `errorHandler()` method of our service is working. In this example, we're first creating a mock function, which returns an empty object. The `callFake()` method of Jasmine means that all calls to this spy will return this fake function. In this example, it will return `mockFunction()`. Using `callFake()` is extremely useful because we can create different spies, all returning different fake functions so that we can test different scenarios in our tests. For example, in the `mockFunction()` we're returning an empty object; we could have a second spy that returns an error message like this:
+
+```
+const mockFunctionWithMessage = () => { 
+    return 'An error has occurred' 
+}
+
+const spyWithMessage = spyOn(serviceToTest, 'errorHandlerWithMessage').and.callFake(mockFunctionWithMessage);
+```
+
+A new spy object returning something different. Spies are very useful for testing service functions and different responses from these service functions.
+
+The official Angular documentation has some great example of other scenarios of the types of tests you may write, not only for services but components as well. You can find these examples here: [https:/​/​angular.​io/​guide/​testing#testing](https:/​/​angular.​io/​guide/​testing#testing).
+
+## Summary
+Writing tests is a difficult and ongoing process, and as our code becomes more and more complex, the more complex tests we'll need to write. So, while we've seen some examples, it's impossible to cover all the possible test scenarios you'll need to write for your applications. The best way to write good tests is to keep writing tests, and as you make tests a core part of Angular development you'll start to see patterns for how to set up tests, mock different responses, and create well-written tests.
+
+In the next chapter, we're going to be looking at how we can take a completed application and make it ready for production, as well as what settings we can amend in the Angular CLI in order to deliver a version of the application that loads as quickly as possible for our end users.
+
