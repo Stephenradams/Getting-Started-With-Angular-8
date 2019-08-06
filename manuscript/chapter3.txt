@@ -83,7 +83,7 @@ This will create a new folder within the `Getting-Started-Angular-8` folder call
 1. Would you like to add Angular routing?
 2. Which stylesheet format would you like to use?
 
-![Project Setup Commands](/images/chapter3/Project-Setup-Terminal.png "Project Setup Commands")
+![Project Setup Commands](/resources/images/chapter3/Project-Setup-Terminal.png "Project Setup Commands")
 
 Basically, the CLI is asking: *Do we want to add routing to the application?* Routing is how you set up navigation throughout an application, and by saying yes, we are asking the CLI to create a Routing module, where all our links can be added to a separate module. We will be going over Routing in *Chapter 6, Routing and Navigation*; but for now, say `Yes`.
 
@@ -99,7 +99,7 @@ Then, type the following:
 
 This will open Visual Studio Code, with our newly created Angular application loaded. You should see the following screenshot:
 
-![VSCode showing our new project](/images/chapter3/VSCode.png "VSCode")
+![VSCode showing our new project](/resources/images/chapter3/VSCode.png "VSCode")
 
 This screenshot shows Visual Studio Code with the `Client-Contacts-Manager` folder loaded in the left-hand side project view.
 
@@ -125,13 +125,13 @@ Or alternatively you can run this command:
 
 You should see that the application has compiled successfully as shown in the following screenshot:
 
-![Terminal Running Our App](/images/chapter3/Terminal-Running-App.png "Terminal Running Our App")
+![Terminal Running Our App](/resources/images/chapter3/Terminal-Running-App.png "Terminal Running Our App")
 
 The Angular CLI has compiled all the source code of the application and started running a new Node server making the application accessible at this web address: `http://localhost:4200`.
 
 If you open this URL in your favourite browser, you should see the newly generated Angular app as follows:
 
-![Our app running in the browser](/images/chapter3/Localhost.png "Our app running in the browser")
+![Our app running in the browser](/resources/images/chapter3/Localhost.png "Our app running in the browser")
 
 What we have here is our application running in the browser. As part of building a new application, the CLI generates an initial page with some helpful links. These links are as follows:
 
@@ -158,7 +158,7 @@ So we know the Angular CLI can be used to start a new application and also run t
 
 Let's now go to the official Angular website to find the official documentation for the CLI as shown in the following screenshot:
 
-![The Angular CLI Documentation](/images/chapter3/Angular-CLI-Site.png "The Angular CLI Documentation")
+![The Angular CLI Documentation](/resources/images/chapter3/Angular-CLI-Site.png "The Angular CLI Documentation")
 
 Once the site has loaded, we will see a list on the left-hand side of all the available commands. There are the following:
 
@@ -196,7 +196,7 @@ After running this command, the CLI will be asking you a series of questions as 
 - Do you want to use HammerJS for handling gestures? This gives you support for gestures on mobile.
 - Do you want to use animations? This will give your app the smooth effects that you'd expect with that Material design style
 
-![Adding Angular Material](/images/chapter3/Adding-Angular-Material.png "Adding Angular Material")
+![Adding Angular Material](/resources/images/chapter3/Adding-Angular-Material.png "Adding Angular Material")
 
 This shows the Angular CLI after it has asked its setup questions and updated the modules automatically. As you can see, `main.ts` has been updated, so has `app.modules.ts`. This is where the CLI has added the links and modules of Angular Material to our project automatically.
 
@@ -206,7 +206,7 @@ So now that this is complete, let us run our application to see how it looks in 
 
 This will open the browser with the updated application, looking like the following screenshot:
 
-![Client Contacts Manager using Material](/images/chapter3/Contacts-Manager-Using-Material.png "Client Contacts Manager using Material")
+![Client Contacts Manager using Material](/resources/images/chapter3/Contacts-Manager-Using-Material.png "Client Contacts Manager using Material")
 
 Now, the site doesn't look completely different, but that's because we haven't started adding Material specific components, but you can see that the fonts are different and the padding around the side of the application has been reduced. This is all because of the newly installed CSS file of the Angular Material library the CLI has installed.
 
@@ -221,7 +221,7 @@ Again, open Terminal and navigate to our `Client-Contacts-Manager` folder, once 
 
 Two things should happen; first, the Terminal window should show that it is compiling the application, the same way the CLI compiles the application when running it in the browser.
 
-![Terminal Running ng test](/images/chapter3/Command-ng-test.png "Terminal Running ng test")
+![Terminal Running ng test](/resources/images/chapter3/Command-ng-test.png "Terminal Running ng test")
 
 In here you'll see that it says **TOTAL: 3 SUCCESS** in green and **Executed 3 of 3 SUCCESS**, this three of three is in reference to the three unit tests that have been created by the Angular CLI and that these three tests have passed.
 
@@ -229,7 +229,7 @@ In here you'll see that it says **TOTAL: 3 SUCCESS** in green and **Executed 3 o
 
 The second thing you should see is the browser opens; this is caused by the Angular CLI opening the browser to show the output of the Karma test runner the library Angular uses to run the tests. The Angular CLI uses Karma, a popular testing framework, to go through and perform all the available tests on the main code base. You should see the browser looking like this screenshot:
 
-![Browser Showing Test Results](/images/chapter3/Browser-Showing-Tests.png "Browser Showing Test Results")
+![Browser Showing Test Results](/resources/images/chapter3/Browser-Showing-Tests.png "Browser Showing Test Results")
 
 This is the browser window that the Angular CLI has opened for us, showing the report Karma generates; as you can see at the top, we have a nice green bar and this shows all our tests have passed; if they hadn't, it would be red. In the world of Unit tests, green is good, red is bad.
 
@@ -244,7 +244,7 @@ To run this command, all you need to do is again navigate to your `Client-Contac
 
 Now the CLI won't show much in Terminal once this has finished running, but if we look in the project directory of Visual Studio Code, we can see a new `dist` folder as shown in the following screenshot:
 
-![The generate Dist folder](/images/chapter3/dist-folder.png "The generate Dist folder")
+![The generate Dist folder](/resources/images/chapter3/dist-folder.png "The generate Dist folder")
 
 This `dist` folder, which stands for distribution, has all the compiled JavaScript files of the application and one `index.html` file. You'll see there are no TypeScript files, no other HTML files because everything has been compiled. Now if we want to make our release of the application even smaller and faster to download, there are other arguments we can pass into with the `ng build` command.
 

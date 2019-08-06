@@ -197,7 +197,7 @@ Now that we've created a new module, we can start adding Components to this newl
 
 If we create this new admin module in the `angular-architecture` project we created earlier, in Chapter 2, Angular Architecture. Our new folder structure will look like this:
 
-![Admin Module](/images/chapter5/AdminModule.png "Admin Module")
+![Admin Module](/resources/images/chapter5/AdminModule.png "Admin Module")
 
 See now we have this new `admin/admin-module` and inside that folder, we have `admin-module.module.ts`, which is a very basic NgModule file, but it is enough for us to start using the following:
 
@@ -432,7 +432,7 @@ Next, all we need to do is update the `client-page.template.html` to use the `Se
 
 If we rerun the app using `ng serve -o`, we should see the `SearchForm` component in the Client page as shown in the following screenshot:
 
-![Client Contacts Manager App showing the Search Form ](/images/chapter5/ContactManagerApp.png "Client Contacts Manager App showing the Search Form")
+![Client Contacts Manager App showing the Search Form ](/resources/images/chapter5/ContactManagerApp.png "Client Contacts Manager App showing the Search Form")
 
 We've have made a lot of changes to our application, so before we move, on let us recap what we've done:
 
@@ -496,7 +496,7 @@ This is what we are going to do—we're going to add a toolbar across the top of
 
 This is what we will finally end up with:
 
-![Client Contacts Manager App with MaterialUI ](/images/chapter5/MaterialUI.png "Client Contacts Manager App with MaterialUI")
+![Client Contacts Manager App with MaterialUI ](/resources/images/chapter5/MaterialUI.png "Client Contacts Manager App with MaterialUI")
 
 This looks far cleaner than the previous version. Let's go through the code changes we've made in order to achieve this look.
 

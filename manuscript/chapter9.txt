@@ -77,7 +77,7 @@ Redux is a state container for JavaScript apps. It is closely linked to the Reac
 
 If we go to the ReduxJS website ([https:/​/​redux.​js.​org](https:/​/​redux.​js.​org)), we'll see that there are a set of principles that Redux has (below is a screenshot of the official ReduxJS website).
 
-![Redux Website](/images/chapter9/1.png "Redux Website")
+![Redux Website](/resources/images/chapter9/1.png "Redux Website")
 
 These principles have also been implemented in NgRx. We will look at how NgRx has implemented these principles later. First, let's go to the Redux website and see what these principles are.
 
@@ -114,7 +114,7 @@ Now that we know what Redux is and what the principles of Redux are, we can star
 
 The best place to start when looking into NgRx is on the official website, which can be found at [https:/​/​ngrx.​io](https:/​/​ngrx.​io):
 
-![NgRx Website](/images/chapter9/2.png "NgRx Website")
+![NgRx Website](/resources/images/chapter9/2.png "NgRx Website")
 
 As you can see, it looks different from the official Angular website. This is because while NgRx is used with Angular, it isn't officially part of Angular – it's a library that we can use with Angular.
 

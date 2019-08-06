@@ -152,7 +152,7 @@ For example, in a `Component` class, we could do the following:
 
 Here, we have hooked into the `ngOnInit()` life cycle hook of this component and added a simple console log statement, which we will see when the component is displayed in the view, as shown in the following screenshot:
 
-![Showing OnInit Lifecycle Hook](/images/chapter4/Oninit-example.png)
+![Showing OnInit Lifecycle Hook](/resources/images/chapter4/Oninit-example.png)
 
 We're not replacing the component's life cycle hook; instead, we are extending what is already there. In the preceding example, the Angular `ngOnInit()` function is run with our code as part of the life cycle event.
 
@@ -663,7 +663,7 @@ export class AppRoutingModule {}
 The main change we've made is that we've created two new routes. The first is the clients route, which will load `ClientPageComponent` (a smart component) into the view when called. If we run our application using `ng serve -o`, the application will run in the browser. If we then add `/clients` to the end of the URL of our application, it will
 load `ClientPageComponent` in the browser:
 
-![Client Contacts Manager, showing the Client Page Component](/images/chapter4/App-In-Browser.png "Client Contacts Manager, showing the Client Page Component")
+![Client Contacts Manager, showing the Client Page Component](/resources/images/chapter4/App-In-Browser.png "Client Contacts Manager, showing the Client Page Component")
 
 Here, we can see that the path of our application is
 `http://localhost:4200/clients` and that the Client page is being displayed within the view of the application, but what about this second route we've added? If we change the URL of the application to just `http://localhost:4200`, we will see that the Client page has been reloaded again. But why? This is where our second route comes into play.
@@ -696,7 +696,7 @@ We're not going to have all our components in the same folder. Instead, we're go
 
 In our current folder structure, we have a Clients section, and within that, we have a `client-page` component. What we are going to do is create a new folder for our search form above the Clients section. To do this, we need to navigate to the app folder in VSCode and create a new folder called `search`:
 
-![Client Contacts Manager, showing the search folder](/images/chapter4/Search-Folder.png "Client Contacts Manager, showing the search folder")
+![Client Contacts Manager, showing the search folder](/resources/images/chapter4/Search-Folder.png "Client Contacts Manager, showing the search folder")
 
 Now that we've created this folder, we need to navigate to it in the terminal. You can do this in the built-in terminal of VSCode. Once you have navigated to this folder, run the following command to generate a component called `search-form`:
 

@@ -265,7 +265,7 @@ Now that we know more about `Routes`, the `RouterModule`, and how to structure a
 ### Angular Materials Menu
 If we go to the Angular Material website again ([http:/​/​material.​angular.​io](http:/​/​material.​angular.​io)), under the **Components** section, you'll see they are grouped by category. The category we are interested in is the **Navigation** category:
 
-![Angular Material site showing the Components section](/images/chapter6/1.png "Angular Material site showing the Components section")
+![Angular Material site showing the Components section](/resources/images/chapter6/1.png "Angular Material site showing the Components section")
 
 Under the **Navigation** category, Angular Material provides three components we could use for our menu, as follows:
 
@@ -281,7 +281,7 @@ The final type is the **Toolbar**, where a bar is drawn across the top of an app
 
 It is possible to combine these three components. For example, your application could have a toolbar across the top, then have an icon which opens a **Sidenav**, and you could also have a Menu item in the toolbar that opens a login/logout icon. To see an example of this type of approach, look at the Angular docs website ([https:/​/​angular.​io/​docs](https:/​/​angular.​io/​docs)):
 
-![Angular Docs site showing sidebar and toolbar components](/images/chapter6/2.png "Angular Docs site showing sidebar and toolbar components")
+![Angular Docs site showing sidebar and toolbar components](/resources/images/chapter6/2.png "Angular Docs site showing sidebar and toolbar components")
 
 In the preceding screenshot, you can see how the layout of the site is using a Sidenav for all the links to the main sections of the documentation, while the Toolbar is used to hold the Angular logo and the Menu links to all the other parts of the Angular Docs website.
 
@@ -401,7 +401,7 @@ Now, we are ready to add the Menu components inside the Toolbar to create our me
 
 We should see the following in our menu:
 
-![Client Contacts Manager with Toolbar](/images/chapter6/3.png "Client Contacts Manager with Toolbar")
+![Client Contacts Manager with Toolbar](/resources/images/chapter6/3.png "Client Contacts Manager with Toolbar")
 
 Here, we've added a series of Menu components. `<mat-menu> `creates the dropdown menus. In each of these, we've added two button components. By using the `mat-menu-item` directive, we are telling Angular that these buttons are part of a menu and should look and behave as drop-down menu items.
 
@@ -455,7 +455,7 @@ import { CompanyPageComponent } from './company/company-page/company-page.compon
 
 Now, if we change the URL of our site to `http://localhost:4200/company`, we will see our new component displayed on the page:
 
-![Client Contacts Manager with new Company Page](/images/chapter6/4.png "Client Contacts Manager with new Company Page")
+![Client Contacts Manager with new Company Page](/resources/images/chapter6/4.png "Client Contacts Manager with new Company Page")
 
 As you can see, we can still see the header and the navigation. That's because these are part of the `app.component.html` template, but the new `CompanyPageComponent` is being displayed within the `<router-outlet></router-outlet>` component, which is also part of the `app.component.html` template.
 
