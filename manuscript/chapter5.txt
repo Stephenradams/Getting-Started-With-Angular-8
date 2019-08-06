@@ -63,9 +63,7 @@ This is an import statement where we are adding the `NgModule `class from the an
 
 As you learn more about Angular, you'll see other modules, such as the root module. This module handles all the bootstrapping of the application. Its role is to manage the startup of the application. If you look at the `main.ts` file of an Angular application, you'll see the following code:
 
-```
-platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));
-```
+`platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));`
 
 This is where the framework is taking the `AppModule` and setting it as the module that will be run first as part of this startup process.
 
@@ -177,7 +175,7 @@ To create a new module using the CLI, we simply use the generate command we've a
 
 So if we wanted to create a new module called **AdminModule**, we would simply use this command:
 
-```ng generate module AdminModule```
+`ng generate module AdminModule`
 
 Or use the shortcut format as follows:
 
@@ -197,7 +195,7 @@ Now that we've created a new module, we can start adding Components to this newl
 
 If we create this new admin module in the `angular-architecture` project we created earlier, in Chapter 2, Angular Architecture. Our new folder structure will look like this:
 
-![Admin Module](/resources/images/chapter5/AdminModule.png "Admin Module")
+![Admin Module](manuscript/resources/images/chapter5/AdminModule.png "Admin Module")
 
 See now we have this new `admin/admin-module` and inside that folder, we have `admin-module.module.ts`, which is a very basic NgModule file, but it is enough for us to start using the following:
 
@@ -432,7 +430,7 @@ Next, all we need to do is update the `client-page.template.html` to use the `Se
 
 If we rerun the app using `ng serve -o`, we should see the `SearchForm` component in the Client page as shown in the following screenshot:
 
-![Client Contacts Manager App showing the Search Form ](/resources/images/chapter5/ContactManagerApp.png "Client Contacts Manager App showing the Search Form")
+![Client Contacts Manager App showing the Search Form ](manuscript/resources/images/chapter5/ContactManagerApp.png "Client Contacts Manager App showing the Search Form")
 
 We've have made a lot of changes to our application, so before we move, on let us recap what we've done:
 
@@ -496,7 +494,7 @@ This is what we are going to do—we're going to add a toolbar across the top of
 
 This is what we will finally end up with:
 
-![Client Contacts Manager App with MaterialUI ](/resources/images/chapter5/MaterialUI.png "Client Contacts Manager App with MaterialUI")
+![Client Contacts Manager App with MaterialUI ](manuscript/resources/images/chapter5/MaterialUI.png "Client Contacts Manager App with MaterialUI")
 
 This looks far cleaner than the previous version. Let's go through the code changes we've made in order to achieve this look.
 
