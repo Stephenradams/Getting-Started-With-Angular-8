@@ -79,13 +79,13 @@ If you don't already have Visual Studio Code (more commonly called VSCode), go t
 
 You should see the following screenshot:
 
-![VSCode showing our Angular application](/resources/images/chapter2/vscode.png "VSCode showing our Angular application")
+![VSCode showing our Angular application](/images/chapter2/vscode.png "VSCode showing our Angular application")
 
 This is VSCode with our new app loaded. We can now use the features of VSCode to go through the app and see how it's structured.
 
 First, let's expand the source tree folder; you should see the full `src` folder, as follows:
 
-![VSCode showing the src folder](/resources/images/chapter2/source-folder.png "VSCode showing the src folder")
+![VSCode showing the src folder](/images/chapter2/source-folder.png "VSCode showing the src folder")
 
 There are a few main parts to the app; the first thing you'll notice is that there are two main folders, the `src` folder and the `e2e` folder. The `src` folder contains all the source code for your app. It will contain all the HTML, CSS, and TypeScript code of your app. The `e2e` folder contains all your end-to-end tests, and these tests can be run to test how your app runs in the browser. However, we are looking at the architecture of an Angular app, so let's carry on with that.
 
@@ -241,7 +241,7 @@ When the `@Injectable` decorator is added to a class, this tells Angular that th
 
 To get a better understanding of how a service is linked to a module, let's create a simple Service for our `angular-architecture` app. Within VSCode, we need to open the Terminal panel (if you open the **Terminal** drop-down menu in the main navigation, you should see the **New Terminal** link). This is shown in the following screenshot:
 
-![VSCode Showing Terminal Menu ](/resources/images/chapter2/VSCode-Terminal-Menu.png "VSCode Terminal Menu")
+![VSCode Showing Terminal Menu ](/images/chapter2/VSCode-Terminal-Menu.png "VSCode Terminal Menu")
 
 This will open a new Terminal window at the bottom of VSCode, with the folder of our project already loaded. In this new window, type the following:
 
