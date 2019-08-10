@@ -79,13 +79,13 @@ If you don't already have Visual Studio Code (more commonly called VSCode), go t
 
 You should see the following screenshot:
 
-![VSCode showing our Angular application](/images/chapter2/vscode.png "VSCode showing our Angular application")
+![VSCode showing our Angular application](/resources/images/chapter2/vscode.png "VSCode showing our Angular application")
 
 This is VSCode with our new app loaded. We can now use the features of VSCode to go through the app and see how it's structured.
 
 First, let's expand the source tree folder; you should see the full `src` folder, as follows:
 
-![VSCode showing the src folder](/images/chapter2/source-folder.png "VSCode showing the src folder")
+![VSCode showing the src folder](/resources/images/chapter2/source-folder.png "VSCode showing the src folder")
 
 There are a few main parts to the app; the first thing you'll notice is that there are two main folders, the `src` folder and the `e2e` folder. The `src` folder contains all the source code for your app. It will contain all the HTML, CSS, and TypeScript code of your app. The `e2e` folder contains all your end-to-end tests, and these tests can be run to test how your app runs in the browser. However, we are looking at the architecture of an Angular app, so let's carry on with that.
 
@@ -213,11 +213,12 @@ While the `angular-architecture` application doesn't have a service, we can stil
 In the Angular official documentation, there is an example application called *Tour of Heroes*, and it is possible to download and view the source code of this example application. (It's well worth doing this, as the Tour of Heroes application has great examples of the various parts of an Angular application. It was written by some of the leading experts within the Angular community, so it's a great example of some best practices for building Angular apps.)
 
 In this *Tour of Heroes* application, there are many Services that we can take a look at to see how a Service is structured. This is one of the main services, which loads a list of Heros from an external API:
+
 ```
  export class HeroService {
        private heroes: Hero[] = [];
-       constructor(private backend: BackendService, private logger: Logger) {
-   }
+       constructor(private backend: BackendService, private logger: Logger) {}
+       
        getHeroes() {
            this.backend.getAll(Hero).then( (heroes: Hero[]) => {
              this.logger.log(`Fetched ${heroes.length} heroes.`);
@@ -232,16 +233,19 @@ As you can see, it is a simple TypeScript class with a Constructor and a single 
 
 What's missing from this Service is the Decorator that tells Angular that this class can be consumed/injected into Components. The Decorator that provides Angular with this information is called the `Injectable` decorator, and it looks like this:
 
-`@Injectable({`
-       `providedIn: 'root',`
-   `})`
-   `export class HeroService {}`
+```
+@Injectable({
+       providedIn: 'root',
+   })
+   export class HeroService {}
+```
+
    
 When the `@Injectable` decorator is added to a class, this tells Angular that this class and its functionality can be passed into components and other services, using Dependency Injection.
 
 To get a better understanding of how a service is linked to a module, let's create a simple Service for our `angular-architecture` app. Within VSCode, we need to open the Terminal panel (if you open the **Terminal** drop-down menu in the main navigation, you should see the **New Terminal** link). This is shown in the following screenshot:
 
-![VSCode Showing Terminal Menu ](/images/chapter2/VSCode-Terminal-Menu.png "VSCode Terminal Menu")
+![VSCode Showing Terminal Menu ](/resources/images/chapter2/VSCode-Terminal-Menu.png "VSCode Terminal Menu")
 
 This will open a new Terminal window at the bottom of VSCode, with the folder of our project already loaded. In this new window, type the following:
 
