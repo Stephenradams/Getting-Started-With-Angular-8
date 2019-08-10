@@ -275,7 +275,7 @@ While RxJs comes included in Angular it is not part of the framework, instead, i
 Before we dive into what RxJs is, we need to understand more about Reactive Programming. By understanding this style of programming. We will have a clearer understanding of RxJs and the approach it takes. This will then translate to our Angular applications when we take full advantage of RxJs in Angular.
 
 ### Understanding Reactive Programming
-When looking for a clear definition of what Reactive Programming is, there are many different explanations, from the very theoretical description in Wikipedia ([https:/​/​en. wikipedia.​org/​wiki/​Reactive_​programming](https:/​/​en.wikipedia.​org/​wiki/​Reactive_​programming)) to the corporate sounding manifesto of the Reactive Manifesto ([https:/​/​www.​reactivemanifesto.org/​](https:/​/​www.​reactivemanifesto.​org/)​) (*yes, there is a manifesto for Reactive Programming*).
+When looking for a clear definition of what Reactive Programming is, there are many different explanations, from the very theoretical description in Wikipedia ([https:/​/​en. wikipedia.​org/​wiki/​Reactive_​programming](https:/​/en.wikipedia.​org/​wiki/​Reactive_​programming)) to the corporate sounding manifesto of the Reactive Manifesto ([https:/​/​www.​reactivemanifesto.org/​](https:/​/​www.​reactivemanifesto.​org/)​) (*yes, there is a manifesto for Reactive Programming*).
 
 This Reactive Manifesto states that a 'reactive' system needs to be '**responsive**' to a user's demands when a user clicks on a button, for example, the application needs to respond almost immediately to the users' click. It also needs to be '**resilient**', this means if the application has an error, it has been designed so that it can handle the error and still continue working. It should be resilient to errors.
 
@@ -686,7 +686,7 @@ The problem with so many Operators is knowing which one to use when writing our 
 ## The Operator Decision Tree
 In the RxJs website, there is a section that helps you find the Operator that you may want to use: the Operator Decision Tree ([https:/​/​rxjs-​dev.​firebaseapp.​com/​operator-decision-​tree](https:/​/​rxjs-​dev.​firebaseapp.​com/​operator-decision-​tree)). It looks like this:
 
-![The Operator Tree](/resources/images/chapter8/1.png "The Operator Tree")
+![The Operator Tree](images/chapter8/1.png "The Operator Tree")
 
 As you can see, it asks you a set of questions and, based on the answers you select, it drills down until it can suggest an Operator you could use. This tool is extremely helpful and well worth bookmarking.
 
