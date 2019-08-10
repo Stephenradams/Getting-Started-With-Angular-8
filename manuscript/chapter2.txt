@@ -68,7 +68,7 @@ Congratulations! You've created your first Angular app.
 So, let's recap on what we've done. We've installed Node, because we need `npm` to install the Angular CLI. We installed the CLI, and then we created a new Angular application. We are going to leave the Angular CLI for now; there will be more on what the CLI is and how you will use the CLI as an Angular developer later, in *Chapter 3, Getting Started with the Angular CLI*. Now, we need to start looking at the code the CLI has generated; to do that, we need to open the `angular-architecture` folder in our favourite editor.
 
 ## Installing Visual Studio Code
-Ask a room full of developers what their favorite editor is, and you'll get a thousand different answers. One thing is for sure: there is no correct answer. For this book, we're going to be using Visual Studio Code, for the following two reasons:
+Ask a room full of developers what their favourite editor is, and you'll get a thousand different answers. One thing is for sure: there is no correct answer. For this book, we're going to be using Visual Studio Code, for the following two reasons:
 
 - It's free, so you can download it with no cost to yourself 
 - It works well with Angular
@@ -79,7 +79,7 @@ If you don't already have Visual Studio Code (more commonly called VSCode), go t
 
 You should see the following screenshot:
 
-![VSCode showing our Angular application](images/chapter2/vscode.png "VSCode showing our Angular application")
+![VSCode showing our Angular application](images/chapter2/vscode.png "VSCode showing our Angular application") 
 
 This is VSCode with our new app loaded. We can now use the features of VSCode to go through the app and see how it's structured.
 
