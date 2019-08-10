@@ -20,7 +20,7 @@ So far, we've seen commands such as `ng serve` and `ng test` that we can use to 
 
 This will take our application code and make a release build in a new folder, which can be found in the `dist` folder in the project tree:
 
-![VSCode Showing our new Dist folder](/resources/images/chapter11/1.png)
+![VSCode Showing our new Dist folder](images/chapter11/1.png)
 
 In the preceding screenshot from VSCode, you can see the new `dist` folder, which has a sub-folder that uses the name of our project as its name. In this sub-folder is all the minified code the build process has made. Notice that there are no TypeScript files here – all our sub-folders have gone and all of our component and service folders are no longer there. This is because the build process has compiled all our code into one single JavaScript file, the `main.js` file.
 
@@ -410,7 +410,7 @@ Being able to keep an eye on the final size of the download the browser needs to
 ## Measuring performance
 After all these optimisation settings, we need a way to actually measure the performance of our Angular application. One way we can check the performance of the application is through the Chrome Dev Tools and, in particular, the Network Analysis section:
 
-![Chrome Dev Tools Network Panel](/resources/images/chapter11/2.png)
+![Chrome Dev Tools Network Panel](images/chapter11/2.png)
 
 Within this section, we can see what the browser is downloading, as well as how long each file is taking to download (this is very helpful so that we can see if any individual files are slowing down the application). There is so much that can be inspected within this tool, so it is worth reading through the official documentation of the Dev Tools for your browser of choice. Here is a link to the Chrome Dev Tools: [https:/​/​developers.​google.​com/web/​tools/​chrome-​devtools/​network/​reference#timing-​breakdown](https:/​/developers.google.com/web/tools/​chrome-​devtools/​network/​reference#timing-​breakdown).
 

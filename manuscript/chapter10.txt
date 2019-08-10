@@ -28,7 +28,7 @@ Jasmine is a Behavior-Driven framework for writing code that tests JavaScript. W
 
 This is the official Jasmine website, where you'll find a lot of information about Jasmine and writing tests. It is well worth going through this site:
 
-![Jasmine Website](/resources/images/chapter10/1.png "Jasmine Website")
+![Jasmine Website](images/chapter10/1.png "Jasmine Website")
 
 The Jasmine framework ([https:/​/​jasmine.​github.​io/](https:/​/​jasmine.​github.​io/)​) was originally created by a company called Pivotal Labs ([https:/​/​pivotal.​io/​labs](https:/​/​pivotal.​io/​labs)) to write BDD tests for their applications. They thankfully saw the great benefits that Jasmine can provide and released it to everyone to use in their own projects and it soon became the default choice for writing tests.
 
@@ -195,17 +195,17 @@ Karma aims to give developers immediate feedback on the tests we've written so w
 ### How Karma is used
 Karma is a command-line tool that starts up a local web server (similar to the Angular CLI when we run `ng serve`). This local web server is used to execute the application code against our tests, and then Karma will give immediate feedback on any passing or failing tests in either the command line or a local browser as an HTML-based report, which you can see an example of here:
 
-![Karma Runner in Action showing all Tests passing](/resources/images/chapter10/2.png)
+![Karma Runner in Action showing all Tests passing](images/chapter10/2.png)
 
 This example shows the Tests from the Tour of Heroes example application that the Angular team provides. As you can see from this report, there are 8 test specs and 0 failures. If there was a failing test, the report would show it like this:
 
-![Karma Runner in Action showing some Tests failing](/resources/images/chapter10/3.png)
+![Karma Runner in Action showing some Tests failing](images/chapter10/3.png)
 
 Now the generated report is showing the test that has failed and what it has failed on, which in this case is the expectation that the code that generates the phrase 'Top Heroes' should actually generate 'Top Hero', which it doesn't, so the test has failed.
 
 Karma is running the local web server, running the Tests against the application, and generating the test report in the browser, but as we said earlier, Karma is a command-line tool, so we can also see the report in the Terminal. The same report of the failing test in the Terminal looks like this:
 
-![Terminal showing some Tests failing](/resources/images/chapter10/4.png)
+![Terminal showing some Tests failing](images/chapter10/4.png)
 
 This screenshot also shows that a test has failed, what the test is that has failed (we're using the title of test spec in the output of the report) and even what line of code the failed test can be found at.
 
@@ -345,11 +345,11 @@ This will begin the process of starting Karma, launching the browser, and findin
 
 This screenshot shows the Terminal window before we start running our tests. We're running the `ng test` command:
 
-![Running the ng test command in Terminal](/resources/images/chapter10/5.png)
+![Running the ng test command in Terminal](images/chapter10/5.png)
 
 Now after the tests have run, we can see the output of the tests in the terminal window. As you can see from this screenshot, 17 of our tests have not passed:
 
-![Terminal showing failing tests](/resources/images/chapter10/6.png)
+![Terminal showing failing tests](images/chapter10/6.png)
 
 Here, we can see two screenshots of the same Terminal window, the first showing the `ng test` command being entered for the project, and the second showing the outcome of the tests, where we see 17 have failed and 3 were successful.
 
