@@ -628,4 +628,4 @@ Next, we went on to add new modules to our Client Contacts Manager application s
 
 Finally, we used the power of modules to add new components from the Angular Material UI library in order to make the UI of our application look far better than it has previously.
 
-The next thing we are going to look at as part of our learning Angular 8 is how to add navigation and routes to our application so the user can go from the Client section to the Company section and back.
+The next thing we are going to look at as part of our learning Angular is how to add navigation and routes to our application so the user can go from the Client section to the Company section and back.

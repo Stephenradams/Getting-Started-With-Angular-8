@@ -543,7 +543,7 @@ import { mergeMap }  from 'rxjs/operators';
 const bookTitle = of('Getting Started With Angular');
 const completeTitleObservable = bookTitle.pipe(mergeMap(value => (`${value} 8!`)));
 
-// this should create Getting Started With Angular 8!
+// this should create Getting Started With Angular!
 const subscribe = completeTitleObservable.subscribe(value =>
 console.log(value));
 ```

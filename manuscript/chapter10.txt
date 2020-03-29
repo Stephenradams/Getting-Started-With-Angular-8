@@ -80,7 +80,7 @@ Again, like the test suite, a test spec takes in two arguments: a title and a fu
 The second argument of the test spec is the function. This is again run like the test suite, but unlike the test suite, there is only one function for a test spec: it does not contain multiple functions, only expectations.
 
 ### The Expectation expression
-Within our test spec, we have an Expectation expression, which is the line that starts with the `expect()` keyword. This simply describes what we expect the function under test to do. In our example, we expect that the `writeTitle()` function will return 'Getting Started With Angular 8'. If the `writeTitle()` function was to return 'Getting Started With Angular', then the test has failed, because it does not meet our expectation.
+Within our test spec, we have an Expectation expression, which is the line that starts with the `expect()` keyword. This simply describes what we expect the function under test to do. In our example, we expect that the `writeTitle()` function will return 'Getting Started With Angular'. If the `writeTitle()` function was to return 'Getting Started With Angular', then the test has failed, because it does not meet our expectation.
 
 > The term function under test which we have been using throughout this chapter is how we describe the function being tested. In this current example, the function under test refers to the writeTitle() function.
 
@@ -92,10 +92,10 @@ Within the Test Spec, we can have multiple Expectation expressions. For example,
 describe('writeTitle function', () => {
    it('should return the title', () => {
        expect(writeTitle()).toEqual(
-           'Getting Started With Angular 8'
+           'Getting Started With Angular'
        );
        expect(writeTitle()).not.toEqual(
-           'Getting Started With Angular 9'
+           'Getting Started With React'
        );
     }); 
 });
@@ -161,7 +161,7 @@ describe('writeTitle function' () => {
    const bookTitle = '';
    
    beforeAll(() => {
-           bookTitle = 'Getting Started With Angular 8';
+           bookTitle = 'Getting Started With Angular';
     });
        
     it('should return the title', () => {

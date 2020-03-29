@@ -121,17 +121,71 @@ As you can see, it looks different from the official Angular website. This is be
 ### The core concepts of NgRx
 There are four key concepts in NgRx, and they are as follows:
 
-- **Store** is the state container of our application, which is an Observable object. This object contains all the actual state information for our application, which Actions and Reducers interact with in order to add this state management to the application.
-- **Reducers** are the pure functions we mentioned earlier when looking at Redux. Reducers handle the functionality where we go from one state to the next. A Reducer function will take in the current state plus an Action, and then return a new state which has been reduced down to the new state. For example, if we have an Action that adds a new item to the State, a Reducer would return a new State that contains this new item as one single State object.
 - **Actions** are the events we dispatch from our components and services. These Action events or Actions are unique events that happen in our application. They cover everything from a user clicking a button to a Service making an API call. All these different things are triggered by Actions.
+- **Reducers** are the pure functions we mentioned earlier when looking at Redux. Reducers handle the functionality where we go from one state to the next. A Reducer function will take in the current state plus an Action, and then return a new state which has been reduced down to the new state. For example, if we have an Action that adds a new item to the State, a Reducer would return a new State that contains this new item as one single State object.
 - **Selectors** are also pure functions that return a selection of the State Store object. They allow us to get information for the State Store without having to return the entire Store. These are very helpful when getting state information for our views, where we don't want to have the entire State Store just to show a small amount of data in the view level.
+- **Store** is the state container of our application, which is an Observable object. This object contains all the actual state information for our application, which Actions and Reducers interact with in order to add this state management to the application.
 
 ### Using these concepts in Angular
-In a NgRx based Angular application, we write Actions, Reducers, and Selectors in order to access the Store object that contains all the state information of our application. If we want to write some data to the Store when the user clicks on a button, for example, a Save button. We write an Action that contains a payload of the form data. This gets passed to a Reducer, which looks at the Action and performs this action on the state, which in this case will be an `ADD` Action.
+In an Angular application, we write Actions, Reducers, and Selectors in order to access the Store object that contains all the state information of our application. If we want to write some data to the Store when the user clicks on a button, for example, a Save button, we write an Action that contains a payload of the form data. This gets passed to a Reducer, which looks at the Action and performs this action on the state, which in this case will be an `ADD` Action.
 
 > A payload is an object that is passed to the Reducers, along with the action from the Action event. It can contain any data that is needed as part of the Action.
 
 Let's have a look at some examples of each of these different concepts so that we know what they look like.
+
+## Example of an Action
+All Actions are based on the Action interface, which defines what an Action must have. The interface is like the signature of the class. It defines what the class should have, without setting the implementation. A class that implements an interface has to implement what the interface says it should have, but how the class implements that feature is up to the individual class.
+
+The `Action` interface of NgRx looks like this:
+
+```
+interface Action {
+    type: string;
+}
+```
+
+Any class that implements the Action interface **must** have a type – that's all it really needs to be an Action.
+
+This is an example of an `Action`:
+
+```
+{
+       type: 'Add Apples',
+       payload: {
+           numberOfApples: number
+       }
+}
+```
+
+This Action has a type called "Save Apples", which is the action it is performing. In the payload object, we're passing the number of apples, which is to be saved. This Action can be written in a separate TypeScript file called `save-apples.action.ts`. We can create separate TypeScript files for each Action if we want and have them kept in an actions folder. We could also have all our actions grouped by functionality in a single TypeScript file. So, if we had further actions which are related to managing emails, we could have a TypeScript file called `manage-apples.actions.ts`. Here, we could keep all the Apple basket-related actions:
+
+```
+import { Action } from '@ngrx/store';
+
+export enum ActionTypes {
+    SaveApples = 'Save Apples',
+    RemoveApples = 'Remove Apple',
+    RemoveAllApples = 'Remove All Apples',
+}
+
+export class SaveApples implements Action {
+   readonly type = ActionTypes.SaveApples;
+   constructor(public payload: number ) {}
+}
+
+export class RemoveApples implements Action {
+    readonly type = ActionTypes.RemoveApple;
+}
+
+export class RemoveAllApples implements Action {
+    readonly type = ActionTypes.RemoveAllApples;
+}
+
+// This is used in the Reducer as a list of the Actions it can support
+export type ActionUnion = SaveApples | RemoveApples | RemoveAllApples
+   ```
+   
+In this TypeScript class, we have all the Actions associated with managing the email address in an application. At the top, we're using an Enum to define the Action type. This helps reduce spelling errors when setting the type of Action and produces cleaner looking code.
 
 ## Example of a Reducer
 A Reducer doesn't implement an interface like the Action does, but it does return a State object. The Reducer function takes in two arguments, that is, the state and the action. For our manage email example, a Reducer could look as follows:
@@ -140,7 +194,7 @@ First, we define the interface of our State model:
 
 ```
 export interface ApplesState {
-     applesCount: number;
+     applesCount: number
 }
 ```
 
@@ -148,33 +202,47 @@ Then, we create an initial state object, along with some default values:
 
 ```
 export const initialState : ApplesState = {
-    applesCount: 0;
+    applesCount: 0
 }
 ```
 
-## Example of an Action
-An Action is dispatched when a message needs to be sent, for example, on a button click or a form submission. Any event within the application can dispatch an Action. 
+Then, we create a Reducer function that handles different Actions:
 
 ```
-import { createAction, props } from '@ngrx/store';
-
-    export const addFruit = createAction('[Fruit] Add Fruit', props<{fruit: string, amount: number}>()
-```
-
-In this Action file you can see that we're using the new NgRx 8 syntax to create an Action, which can be dispatched within the application. 
-
-To dispatch this Action we use the Store's dispatch method, like this:
-
-```
-onAddFruit(fruit: string, amount: number): void {
-    this.store.dispatch(addFruit({fruit, amount}));
+export function reducer(state = initialState, action:ManageApples.ActionUnion): ApplesState {
+    
+    switch (action.type) {
+        case ManageApples.ActionUnion.SaveApples: {
+            return {
+                ...state,
+                applesCount: numberOfApples,
+            };
+        }
+        case ManageApples.ActionUnion.RemoveApple: {
+            return {
+                ...state,
+                applesCount: numberOfApples - 1
+            };
+        }
+        case ManageApples.ActionUnion.RemoveAllApples: {
+            return {
+                ...state,
+                applesCount: 0
+            };
+        }
+        default: {
+            return state;
+        } 
+    }
 }
 ```
 
-When the `onAddFruit()` method is fired, say from a click event of a button, the Store sends the Action, ready for a Reducer to pick up that the Action has been dispatched.
+In this Reducer function, you can see that we're using a `Switch` statement, which uses the `ActionUnion` list from our `Actions` file to match against the `Action` being fired. Then, when the case statement matches the `Action` type, it returns the state with the email updated. If the `Action` does not have a matching case statement, the `State` is returned without any `Actions` performed on it.
 
 This is a very simple example of a Reducer, but the important thing to note is the use of the Enums when defining Action names. This really helps because our modern IDEs and editors can use this information to tell us what Actions are available as we type. Therefore, we don't have to keep jumping back and forth between Action files and Reducer files, trying to see what things are named.
 
+#### Reducing file size for Actions and Reducers
+Note the use of the Case/Switch statement to handle the different Actions within the Reducer and how we create a different Case for each Action. The more Actions we have, the more Case Statements we have. You would think this could lead to large TypeScript files with hundreds of Case statements, but by grouping the Actions into separate files – for example, `manage-apples.action.ts` or `manage-user.action.ts` – we only have the Actions for a specific part of our application within the one file. With the Reducer file having Case statements for all the Actions within the single Actions file, we have a lot of the application state management within just two separate files: one for Actions and one for Reducers.
 
 ## Example of the Store
 So far, we've mentioned State and Store, but sometimes it's difficult to know what the difference between the two is. Let's try to clear up the distinction between the two.
@@ -369,7 +437,7 @@ An Effect is a Service class that is injected using dependency injection (covere
 
 An `Effect` service is made up of the following parts:
 
-- The `createEffect()` function which is new from NgRx 8
+- The `@Effect()` decorator
 - An injectable Actions service
 - The list of Actions are filtered using the ofType() operator
 - Effects are subscribed to the Store Observable that NgRx provides Services that access external APIs are injected into the Effect service
@@ -379,16 +447,15 @@ Let's have a look at an example `Effect` service so that we can see these parts 
 ```
 import { Injectable } from '@angular/core';
 import { Actions, Effect, typeOf } from  '@ngrx/effects';
-import { * } as FruitActions from './fruit.actions.ts';
 
 @Injectable()
 export class ProductsEffects {
     constructor(private actions$: Actions, 
         private productService:ProductService) {}
 
-    
-    loadProducts$ = createEffect( this.actions$.pipe(
-       ofType(FruitAction.LoadFruit).map(() =>
+    @Effect()
+    loadProducts$ = this.actions$.pipe(
+       ofType('Load Products').mergeMap(() =>
            this.productService.getAllProducts().pipe( map ( 
            products => ({
                type: 'Products Loaded', payload: products
@@ -440,6 +507,7 @@ import {ProductsEffect } from './effects/products.effects.ts';
 })
 
 export class ProductsModule {}
+...
 ```
 
 ## Installing NgRx
@@ -457,13 +525,13 @@ While the NPM install command will install NgRx for us, using the Angular CLI an
 
 - Install all the required packages from NPM
 - Update the `package.json` file with the required packages Create a Reducers folder
-- Create an `index.ts` file within the Reducer folder with the boiler plate code needed to write a Reducer
+- Create an `index.ts` file within the Reducer folder with the shellcode needed to write a Reducer
 - Update the `app.modules.ts` file with the StoreModule and set the `forRoot()` method of the StoreModule in order to add the new Reducer file that was created
 
 The `ng add` command not only adds the dependencies we need for NgRx – it also creates the start of our first Reducer file in order to help us get started.
 
 ## Summary
-In this chapter, we have slightly stepped away from learning Angular, instead of looking at an approach regarding how we can structure our Angular applications in order to solve the problem of managing state.
+In this chapter, we have slightly stepped away from learning Angular 8, instead of looking at an approach regarding how we can structure our Angular applications in order to solve the problem of managing state.
 
 This chapter has aimed to give you an understanding of both the concept of state in modern web applications and a possible way of managing state by using NgRx. I've aimed to give you an idea of how NgRx works, what all the parts of NgRx are, and how they are implemented in an application. If you decide that NgRx is not something you want to use with Angular, there are other options available, but if you do want to learn more about NgRx, there are a number of resources available that you can look at which expand upon the overview I've given here.
 
@@ -471,8 +539,8 @@ This chapter has aimed to give you an understanding of both the concept of state
 NgRx is a complex approach to implement, so if you do want to take your knowledge further, you could check out these resources:
 
 - NgRx.io – the main website of NgRx ([https:/​/​ngrx.​io/​resources](https:/​/​ngrx.​io/​resources))
-- There is a great Gitter channel where you can ask questions to other NgRx developer, even some of the core team ([https://gitter.im/ngrx/platform](https://gitter.im/ngrx/platform))
 - The example applications that are available through the NgRx website, showing how others have implemented NgRx ([https:/​/​ngrx.​io/​resources](https:/​/​ngrx.​io/​resources))
+- A YouTube playlist of NgRx talks from NgConf 2018 ([https:/​/​www.​youtube.com/​playlist?​list=PL8OUS498tQP3FFsZzULTGnbyIcILFjHd3](youtube.com))
 - Architecting Angular Applications, by Christoffer Noring ([https:/​/​www.​packtpub.com/​web-​development/​architecting-​angular-​applications-​redux-​rxjs-​and-ngrx](packtpub.com)), an excellent book from Packt about designing your Angular application using RxJs and NgRx
 
-    Hopefully, you have an understanding of state management and NgRx. Next, we are going to move back into Angular and start looking at the extremely important topic of testing in Angular.
+Hopefully, you have an understanding of state management and NgRx. Next, we are going to move back into Angular and start looking at the extremely important topic of testing in Angular.

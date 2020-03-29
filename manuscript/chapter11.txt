@@ -260,7 +260,7 @@ However, that's not all – there are a number of other benefits AoT brings, as 
 - **Detect template errors earlier**: Errors in our HTML templates can be found during this build step. To ensure that the end user doesn't see an error in the template, we pick these errors up earlier.
 - **Better security**: With all the code compiled to JavaScript before getting to the browser, there are no HTML templates, which injection attacks can be made through.
 
-Ahead-of-Time compilation is a great feature of Angular 8 and brings so many benefits. This is why it is switched on by default in the production version of the application.
+Ahead-of-Time compilation is a great feature of Angular and brings so many benefits. This is why it is switched on by default in the production version of the application.
 
 ## Other various production optimisations
 As well as AoT and environmental settings, there are other options we can set in order to optimise our application for production. One of these areas is setting the browser support level you want for your application.
@@ -435,7 +435,7 @@ Then, we went through RxJs and Observables, seeing how, by using RxJs, we can ma
 
 Throughout this book, we've been looking at the ways Angular can be used when creating an enterprise-level business application, but hopefully, you've seen that there is nothing that we've discussed that can't be used when developing smaller-scale applications in Angular.
 
-Angular is a perfect choice for creating modern web applications and with the topics we've discussed in this book, you are ready to start building your own Angular 8-based applications.
+Angular is a perfect choice for creating modern web applications and with the topics we've discussed in this book, you are ready to start building your own Angular-based applications.
 
 Thank you for reading this book, and I wish you all the best on your Angular journey!
 
